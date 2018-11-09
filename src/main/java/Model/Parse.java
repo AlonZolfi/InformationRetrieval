@@ -1,11 +1,39 @@
 package Model;
 
+import java.io.*;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.Stack;
 
 public class Parse {
-    public void Parse(Stack<String> wordStack){
+
+    public void Parse(Stack<String> wordStack) {
+
+        Set<String> stopWords = new HashSet<String>();
+
+        String fileName = "stopWords.txt";
+        String line = null;
+
+        try {
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while((line = bufferedReader.readLine()) != null) {
+                stopWords.add(line);
+            }
+            bufferedReader.close();
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         while(!wordStack.empty()){
             String word = wordStack.pop();
+
+            if (stopWords.contains(word))
+                break;
+
             if (isNumber(word)){
                 int number = Integer.parseInt(word);
                 //switch(numberSize(number)):

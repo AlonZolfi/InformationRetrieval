@@ -22,7 +22,7 @@ public class MiniDictionary {
             dictionary.put(word, i+1);
         }
     }
-    
+
     public boolean containsKey( String word){
         return dictionary.containsKey(word);
     }

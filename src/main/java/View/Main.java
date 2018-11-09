@@ -17,6 +17,8 @@ public class Main extends Application {
         primaryStage.show();*/
         ReadFile rf = new ReadFile();
         rf.readFiles("corpus");
+
+
     }
 
 
