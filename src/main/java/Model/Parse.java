@@ -36,54 +36,60 @@ public class Parse {
                 break;
 
             if (isNumber(word)){
-                int number = Integer.parseInt(word);
+                double number = Double.parseDouble(word.replace(",",""));
                 String parsedNumber = parseNumbers(wordStack, number);
-                System.out.println(parsedNumber);
             }
         }
     }
 
-    private String parseNumbers(Queue<String> wordStack, int number) {
+    private String parseNumbers(Queue<String> wordStack, double number) {
         int mult = 1000;
         if(number < mult){
             if (!wordStack.isEmpty()){
-                if(wordStack.peek().equals("Thousand")){
+                String letter = "";
+                String nextWord = wordStack.peek();
+                if(nextWord.equals("Thousand")){
                     wordStack.remove();
-                    return (number/mult)+"K";
+                    letter = "K";
                 }
-                mult *= 1000;
-                if(wordStack.peek().equals("Million")){
+                else if(nextWord.equals("Million")){
                     wordStack.remove();
-                    return (number/mult)+"M";
+                    letter = "M";
                 }
-                mult *= 1000;
-                if(wordStack.peek().equals("Billion")){
+                else if(nextWord.equals("Billion")){
                     wordStack.remove();
-                    return (number/mult)+"B";
+                    letter = "B";
                 }
-                if(wordStack.peek().equals("Trillion")){
+                else if(nextWord.equals("Trillion")){
                     wordStack.remove();
-                    return (number*1000)+"T";
+                    number*=1000;
+                    letter = "B";
                 }
+                if(isInteger(number))
+                    return new Double(number).intValue()+letter;
+                return number+letter;
             }
         }
+        mult *= 1000;
         if( number < mult) {
-            return (number/mult)+"K";
+            return (number/(mult/1000))+"K";
         }
         mult *= 1000;
         if( number < mult)
-            return (number/mult)+"M";
+            return (number/(mult/1000))+"M";
         return (number/mult)+"B";
+    }
+
+    private boolean isInteger(double word) {
+        return String.valueOf(word).endsWith(".0");
     }
 
     private boolean isNumber(String word) {
         for(int i = 0; i < word.length(); i++)
             if(word.charAt(i) < '0' || word.charAt(i) > '9'){
-                if( !(word.charAt(i)==',') && !(word.charAt(i)=='.'))
+                if(!(word.charAt(i)=='.') && !(word.charAt(i)==','))
                     return false;
             }
         return true;
     }
-
-
 }

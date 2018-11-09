@@ -22,9 +22,9 @@ public class Main extends Application {
         primaryStage.show();
         ReadFile rf = new ReadFile();
         rf.readFiles("corpus");*/
-
         Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
+        s.add("999");
         s.add("10,123");
         s.add("123");
         s.add("Thousand");
