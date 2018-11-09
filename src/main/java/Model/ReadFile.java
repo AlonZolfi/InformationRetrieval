@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 public class ReadFile {
@@ -47,7 +49,7 @@ public class ReadFile {
             for(Element element: elements){
                 String s = element.getElementsByTag("TEXT").toString();
                 String[] splitted = s.split(" ");
-                Stack<String> stack = StringToStack(splitted);
+                Queue<String> stack = StringToStack(splitted);
                 Parse p = new Parse();
                 p.Parse(stack);
             }
@@ -59,11 +61,11 @@ public class ReadFile {
         }
     }
 
-    private Stack<String> StringToStack(String[] splitted) {
-        Stack stack = new Stack();
+    private Queue<String> StringToStack(String[] splitted) {
+        Queue<String> queue = new LinkedList<String>();
         for (String s : splitted){
-            stack.push(s);
+            queue.add(s);
         }
-        return stack;
+        return queue;
     }
 }

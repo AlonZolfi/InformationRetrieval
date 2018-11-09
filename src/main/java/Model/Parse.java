@@ -4,11 +4,12 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Queue;
 import java.util.Stack;
 
 public class Parse {
 
-    public void Parse(Stack<String> wordStack) {
+    public void Parse(Queue<String> wordStack) {
 
         Set<String> stopWords = new HashSet<String>();
 
@@ -28,24 +29,51 @@ public class Parse {
             e.printStackTrace();
         }
 
-        while(!wordStack.empty()){
-            String word = wordStack.pop();
+        while(!wordStack.isEmpty()){
+            String word = wordStack.remove();
 
             if (stopWords.contains(word))
                 break;
 
             if (isNumber(word)){
                 int number = Integer.parseInt(word);
-                //switch(numberSize(number)):
-
+                String parsedNumber = parseNumbers(wordStack, number);
+                System.out.println(parsedNumber);
             }
         }
     }
 
-    private char numberSize(int number) {
-        if(number < 1000)
-            return 's';
-        return 'g';
+    private String parseNumbers(Queue<String> wordStack, int number) {
+        int mult = 1000;
+        if(number < mult){
+            if (!wordStack.isEmpty()){
+                if(wordStack.peek().equals("Thousand")){
+                    wordStack.remove();
+                    return (number/mult)+"K";
+                }
+                mult *= 1000;
+                if(wordStack.peek().equals("Million")){
+                    wordStack.remove();
+                    return (number/mult)+"M";
+                }
+                mult *= 1000;
+                if(wordStack.peek().equals("Billion")){
+                    wordStack.remove();
+                    return (number/mult)+"B";
+                }
+                if(wordStack.peek().equals("Trillion")){
+                    wordStack.remove();
+                    return (number*1000)+"T";
+                }
+            }
+        }
+        if( number < mult) {
+            return (number/mult)+"K";
+        }
+        mult *= 1000;
+        if( number < mult)
+            return (number/mult)+"M";
+        return (number/mult)+"B";
     }
 
     private boolean isNumber(String word) {
