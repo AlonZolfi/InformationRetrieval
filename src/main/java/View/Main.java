@@ -37,6 +37,11 @@ public class Main extends Application {
         s.add("Billion");
         s.add("7");
         s.add("Trillion");
+        s.add("6%");
+        s.add("6");
+        s.add("percent");
+        s.add("6");
+        s.add("percentage");
         p.Parse(s);
 
     }
