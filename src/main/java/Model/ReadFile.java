@@ -17,7 +17,7 @@ import java.util.Queue;
 
 public class ReadFile {
 
-    public void readFiles(String path){
+    public static void readFiles(String path){
         File dir = new File(path);
         File[] directoryListing = dir.listFiles();
         if(directoryListing!= null && dir.isDirectory()){
@@ -30,7 +30,7 @@ public class ReadFile {
         }
     }
 
-    private void iterateOverFolders(File dir){
+    private static void iterateOverFolders(File dir){
         File[] directoryListing = dir.listFiles();
         if(directoryListing!= null && dir.isDirectory()){
             for(File file: directoryListing){
@@ -42,15 +42,15 @@ public class ReadFile {
         }
     }
 
-    private void separateFileToDocs(File fileToSeparate) {
+    private static void separateFileToDocs(File fileToSeparate) {
         try {
             FileInputStream fis = new FileInputStream(fileToSeparate);
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("DOC");
             for(Element element: elements){
                 String s = element.getElementsByTag("TEXT").toString();
-                Queue<String> queue = StringToQueue(StringUtils.split(s," .\n\r\t"));
-                Parse p = new Parse(queue);
+                Queue<String> tokensQueue = StringToQueue(StringUtils.split(s," .\n\r\t"));
+                Parse p = new Parse(tokensQueue);
                 new Thread(p).start();
             }
         } catch (FileNotFoundException e) {
@@ -61,7 +61,7 @@ public class ReadFile {
         }
     }
 
-    private Queue<String> StringToQueue(String[] splitted) {
+    private static Queue<String> StringToQueue(String[] splitted) {
         Queue<String> queue = new LinkedList<String>();
         Collections.addAll(queue,splitted);
         return queue;

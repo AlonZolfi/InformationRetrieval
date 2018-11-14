@@ -1,4 +1,7 @@
 package Model;
 
-public interface IModel {
+interface IModel {
+
+    void Parse(String path);
+
 }
