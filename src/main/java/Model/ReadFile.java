@@ -1,5 +1,6 @@
 package Model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,9 +11,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Stack;
 
 public class ReadFile {
 
@@ -48,10 +49,9 @@ public class ReadFile {
             Elements elements = doc.select("DOC");
             for(Element element: elements){
                 String s = element.getElementsByTag("TEXT").toString();
-                String[] splitted = s.split(" ");
-                Queue<String> stack = StringToStack(splitted);
-                Parse p = new Parse();
-                p.Parse(stack);
+                Queue<String> queue = StringToQueue(StringUtils.split(s," .\n\r\t"));
+                Parse p = new Parse(queue);
+                new Thread(p).start();
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
@@ -61,11 +61,9 @@ public class ReadFile {
         }
     }
 
-    private Queue<String> StringToStack(String[] splitted) {
+    private Queue<String> StringToQueue(String[] splitted) {
         Queue<String> queue = new LinkedList<String>();
-        for (String s : splitted){
-            queue.add(s);
-        }
+        Collections.addAll(queue,splitted);
         return queue;
     }
 }

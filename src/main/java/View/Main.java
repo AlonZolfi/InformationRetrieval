@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -16,13 +17,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        /*Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("View.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("View.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
         ReadFile rf = new ReadFile();
-        rf.readFiles("corpus");*/
-        Parse p = new Parse();
+        rf.readFiles("corpus");
+        /*Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
         s.add("999");
         s.add("10,123");
@@ -42,7 +43,7 @@ public class Main extends Application {
         s.add("percent");
         s.add("6");
         s.add("percentage");
-        p.Parse(s);
+        p.Parse(s);*/
 
     }
 

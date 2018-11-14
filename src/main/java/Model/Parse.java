@@ -5,9 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Queue;
 
-public class Parse {
+public class Parse implements Runnable{
 
-    public void Parse(Queue<String> wordStack) {
+    private Queue<String> queue;
+    Parse(Queue<String> queue){
+        this.queue = queue;
+    }
+
+    public void run() {
 
         Set<String> stopWords = new HashSet<String>();
 
@@ -26,16 +31,15 @@ public class Parse {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        while(!wordStack.isEmpty()){
-            String word = wordStack.remove();
+        while(!queue.isEmpty()){
+            String word = queue.remove();
 
             if (stopWords.contains(word))
-                break;
+                continue;
 
             if (isNumber(word)){
                 double number = Double.parseDouble(word.replace(",",""));
-                word = parseNumbers(wordStack, number);
+                word = parseNumbers(queue, number);
             }
             System.out.println(word);
         }
@@ -63,24 +67,24 @@ public class Parse {
         return (number/mult)+"B";
     }
 
-    private char nextWord(Queue<String> wordStack) {
+    private char nextWord(Queue<String> wordQueue) {
         char letter=' ';
-        if (!wordStack.isEmpty()) {
-            String nextWord = wordStack.peek();
+        if (!wordQueue.isEmpty()) {
+            String nextWord = wordQueue.peek();
             if (nextWord.equals("Thousand")) {
-                wordStack.remove();
+                wordQueue.remove();
                 letter = 'K';
             } else if (nextWord.equals("Million")) {
-                wordStack.remove();
+                wordQueue.remove();
                 letter = 'M';
             } else if (nextWord.equals("Billion")) {
-                wordStack.remove();
+                wordQueue.remove();
                 letter = 'B';
             } else if (nextWord.equals("Trillion")) {
-                wordStack.remove();
+                wordQueue.remove();
                 letter = 'T';
             } else if (nextWord.equals("percent") || nextWord.equals("percentage")) {
-                wordStack.remove();
+                wordQueue.remove();
                 letter = '%';
             }
         }
