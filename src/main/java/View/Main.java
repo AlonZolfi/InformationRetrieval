@@ -17,7 +17,7 @@ import java.util.Stack;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
@@ -43,6 +43,7 @@ public class Main extends Application {
         primaryStage.show();
         Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
+        Parse p = new Parse(s);
         s.add("999");
         s.add("10,123");
         s.add("123");
@@ -61,9 +62,21 @@ public class Main extends Application {
         s.add("percent");
         s.add("6000");
         s.add("percentage");
-        s.add("1.7320");
+        s.add("1102.7320");
         s.add("Dollars");
-        s.add("$450,000");*/
+        s.add("$450,000");
+        s.add("1,000,000");
+        s.add("Dollars");
+        s.add("$450,000,000");
+        s.add("$100");
+        s.add("million");
+        s.add("20.6m");
+        s.add("Dollars");
+        s.add("$100");
+        s.add("billion");
+        s.add("100bn");
+        s.add("Dollars");
+        p.run();
 
     }
 
