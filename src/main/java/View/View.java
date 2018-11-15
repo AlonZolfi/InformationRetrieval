@@ -1,13 +1,19 @@
 package View;
 
 import Model.ReadFile;
+import ViewModel.ViewModel;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 import java.awt.*;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 
-public class ViewController implements IView{
+
+public class View implements Observer, IView {
+
+    private ViewModel viewModel;
     public TextField source;
     public TextField destination;
     public Button btn_start;
@@ -15,15 +21,20 @@ public class ViewController implements IView{
     public Button btn_showDic;
     public Button btn_loadDic;
 
+    public void setViewModel(ViewModel viewModel) {
+        this.viewModel = viewModel;
+    }
+
     public void onStartClick(){
-        ReadFile rf = new ReadFile();
-        rf.readFiles(source.getText());
+        viewModel.onStartClick(source.getText());
     }
 
     public void onStartOverClick() {
 
+        viewModel.onStartOverClick(destination.getText());
     }
 
+    public void update(Observable o, Object arg) {
 
-
+    }
 }
