@@ -1,5 +1,10 @@
 package View;
 
-public class ViewController implements IView{
+import java.awt.*;
 
+public class ViewController implements IView{
+    public TextField source;
+
+
+    
 }
