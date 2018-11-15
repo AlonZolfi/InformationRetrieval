@@ -35,27 +35,82 @@ public class Parse implements Runnable{
             String term = queue.remove();
             if (stopWords.contains(term))
                 continue;
-
-            String letter = nextWord();
-            if(letter.equals("%"))
-                term = term + letter;
-            if(term.charAt(0)=='$')
-                term = term.substring(1) + " Dollars";
-            if(letter.equals("Dollars"))
-                term += " "+letter;
-            else if (isNumber(term)) {
-                term = parseNumber(Double.parseDouble(term.replace(",", "")));
-                if( !(term.charAt(term.length()-1)>'A' && term.charAt(term.length()-1)<'Z')) {
-                    if (letter.equals("T")) {
-                        term = intOrDouble(Double.parseDouble(term) * 1000);
-                        letter = "B";
-                    }
-                    term += letter;
+            String nextWord = "";
+            if (isNumber(term)) {
+                nextWord = nextWord();
+                if (nextWord.equals("Dollars")){
+                    term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
                 }
-
+                else if(nextWord.equals("%")) {
+                    term = term + nextWord;
+                }
+                else {
+                    term = parseNumber(Double.parseDouble(term.replace(",", "")));
+                    if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) {
+                        if (nextWord.equals("T")) {
+                            term = intOrDouble(Double.parseDouble(term) * 1000);
+                            nextWord = "B";
+                        }
+                        term += nextWord;
+                    }
+                }
             }
+            else if( isNumber(term.substring(1))){
+                if(term.charAt(0)=='$')
+                    term = parseDollars(Double.parseDouble(term.substring(1).replace(",", ""))) + "Dollars";
+            }
+            else if(isNumber(term.substring(0,term.length()-1))) {
+                if(!term.substring(0,term.length()-1).equals("%")){
+                    nextWord = nextWord();
+                    if (term.substring(term.length()-1).equals("m") && nextWord.equals("Dollars")){
+                        term = term.substring(0,term.length()-1)+ " M " + nextWord;
+                    }
+                }
+            }
+            else if(isNumber(term.substring(0,term.length()-2))){
+                nextWord = nextWord();
+                if (term.substring(term.length()-2).equals("bn") && nextWord.equals("Dollars")){
+                    String s = intOrDouble(Double.parseDouble(term.substring(0,term.length()-2))*1000);
+                    term = s+ " M " + nextWord;
+                }
+            }
+            nextWord = nextWord();
+
+
+
             System.out.println(term);
         }
+    }
+
+    private String parseDollars(double number) {
+        String ans = "";
+        int multi = 1000000;
+        if(number >= multi) {
+            ans = "M";
+            number /= multi;
+        }
+        String nextWord = nextWord();
+        if (nextWord.equals("M"))
+            ans = "M";
+        else if (nextWord.equals("B")){
+            number *= 1000;
+            ans = "M";
+        }
+        if (ans.equals(""))
+            return addCommas(intOrDouble(number))+ " " +ans;
+        return intOrDouble(number)+ " " +ans + " ";
+    }
+
+    private String addCommas(String number) {
+        String saveFraction="";
+        if(number.indexOf('.')!=-1) {
+            saveFraction = number.substring(number.indexOf('.'));
+            number = number.substring(0, number.indexOf('.'));
+        }
+        for (int i = number.length()-3; i > 0; i-=3) {
+            number = number.substring(0,i)+","+number.substring(i);
+        }
+        return number+saveFraction;
     }
 
     private String parseNumber(Double number){
@@ -109,8 +164,7 @@ public class Parse implements Runnable{
             } else if (nextWord.equalsIgnoreCase("percent") || nextWord.equalsIgnoreCase("percentage")) {
                 queue.remove();
                 suffix = "%";
-            }
-            else if (nextWord.equalsIgnoreCase("Dollars")) {
+            } else if (nextWord.equalsIgnoreCase("Dollars")) {
                 queue.remove();
                 suffix = "Dollars";
             }
