@@ -30,7 +30,6 @@ public class View implements Observer, IView {
     }
 
     public void onStartOverClick() {
-
         viewModel.onStartOverClick(destination.getText());
     }
 

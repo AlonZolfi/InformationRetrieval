@@ -10,7 +10,7 @@ public class Model extends Observable implements IModel {
 
 
     public void onStartClick(String path){
-
+        Parse(path);
     }
 
     public void onStartOverClick(String path) {

@@ -1,6 +1,7 @@
 package ViewModel;
 
 import Model.IModel;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.shape.Path;
 
 import java.util.Observable;
@@ -10,8 +11,9 @@ public class ViewModel extends Observable implements Observer {
 
     private IModel model;
 
-    public void setModel(IModel model) {
-        this.model = model;
+    public ViewModel(IModel model) {
+        if (model != null)
+            this.model = model;
     }
 
     public void update(Observable o, Object arg) {

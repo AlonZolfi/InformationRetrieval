@@ -1,7 +1,8 @@
 package View;
 
 import Model.*;
-import Model.ReadFile;
+import ViewModel.*;
+import View.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,11 +18,30 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("View.fxml"));
+
+        Model model = new Model();
+        ViewModel viewModel = new ViewModel(model);
+        model.addObserver(viewModel);
+        //--------------
         primaryStage.setTitle("Information Retrieval Project");
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        Parent root = fxmlLoader.load(getClass().getClassLoader().getResource("View.fxml").openStream());
+        //scene.getStylesheets().add(getClass().getResource("ViewStyle.css").toExternalForm());
+        primaryStage.setScene(new Scene(root));
+        //--------------
+        View view = fxmlLoader.getController();
+        view.setViewModel(viewModel);
+        viewModel.addObserver(view);
+        //--------------
+        primaryStage.show();
+
+
+/*
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("View.fxml"));
+        primaryStage.setTitle();
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        /*Parse p = new Parse();
+        Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
         s.add("999");
         s.add("10,123");
