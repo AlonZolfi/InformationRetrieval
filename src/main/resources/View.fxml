@@ -7,17 +7,17 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="btn_start" prefHeight="329.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.ViewController">
+<AnchorPane prefHeight="329.0" prefWidth="557.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.ViewController">
    <children>
-      <TextField fx:id="source" layoutX="84.0" layoutY="78.0" text="corpus" />
-      <TextField fx:id="destination" layoutX="309.0" layoutY="78.0" />
-      <Label layoutX="84.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Sourse path" />
-      <Label layoutX="312.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Dastination path" />
-      <CheckBox layoutX="84.0" layoutY="127.0" mnemonicParsing="false" text="Stemming" />
-      <ChoiceBox layoutX="233.0" layoutY="123.0" prefWidth="150.0" />
-      <Button layoutX="84.0" layoutY="256.0" mnemonicParsing="false" text="Start Over" />
-      <Button layoutX="233.0" layoutY="188.0" mnemonicParsing="false" text="Show Dictionary" />
-      <Button layoutX="84.0" layoutY="188.0" mnemonicParsing="false" text="Load Dictionary" />
-      <Button layoutX="498.0" layoutY="78.0" mnemonicParsing="false" onAction="#startClick" text="START" />
+      <TextField fx:id="source" layoutX="23.0" layoutY="78.0" text="corpus" />
+      <TextField fx:id="destination" layoutX="233.0" layoutY="78.0" />
+      <Label layoutX="25.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Sourse path" />
+      <Label layoutX="233.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Dastination path" />
+      <CheckBox layoutX="23.0" layoutY="115.0" mnemonicParsing="false" text="Stemming" />
+      <ChoiceBox layoutX="23.0" layoutY="152.0" prefWidth="150.0" />
+      <Button fx:id="btn_startOver" layoutX="421.0" layoutY="259.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="Start Over" />
+      <Button fx:id="btn_showDic" layoutX="421.0" layoutY="176.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="Show Dictionary" />
+      <Button fx:id="btn_loadDic" layoutX="421.0" layoutY="219.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="Load Dictionary" />
+      <Button fx:id="btn_start" layoutX="421.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" onAction="#onStartClick" prefWidth="102.0" text="START PARS"/>
    </children>
 </AnchorPane>

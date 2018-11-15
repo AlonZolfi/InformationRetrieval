@@ -23,8 +23,6 @@ public class Main extends Application {
         primaryStage.setTitle("Information Retrieval Project");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        ReadFile rf = new ReadFile();
-        rf.readFiles("corpus");
         /*Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
         s.add("999");
