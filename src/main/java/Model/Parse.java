@@ -74,10 +74,6 @@ public class Parse implements Runnable{
                     term = s+ " M " + nextWord;
                 }
             }
-            nextWord = nextWord();
-
-
-
             System.out.println(term);
         }
     }
