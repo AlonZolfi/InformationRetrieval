@@ -8,7 +8,7 @@ import java.util.Queue;
 public class Parse implements Runnable{
 
     private Queue<String> queue;
-    Parse(Queue<String> queue){
+    public Parse(Queue<String> queue){
         this.queue = queue;
     }
 
@@ -32,63 +32,90 @@ public class Parse implements Runnable{
             e.printStackTrace();
         }
         while(!queue.isEmpty()){
-            String word = queue.remove();
-
-            if (stopWords.contains(word))
+            String term = queue.remove();
+            if (stopWords.contains(term))
                 continue;
 
-            if (isNumber(word)){
-                double number = Double.parseDouble(word.replace(",",""));
-                word = parseNumbers(queue, number);
+            String letter = nextWord();
+            if(letter.equals("%"))
+                term = term + letter;
+            if(term.charAt(0)=='$')
+                term = term.substring(1) + " Dollars";
+            if(letter.equals("Dollars"))
+                term += " "+letter;
+            else if (isNumber(term)) {
+                term = parseNumber(Double.parseDouble(term.replace(",", "")));
+                if( !(term.charAt(term.length()-1)>'A' && term.charAt(term.length()-1)<'Z')) {
+                    if (letter.equals("T")) {
+                        term = intOrDouble(Double.parseDouble(term) * 1000);
+                        letter = "B";
+                    }
+                    term += letter;
+                }
+
             }
-            System.out.println(word);
+            System.out.println(term);
         }
     }
 
-    private String parseNumbers(Queue<String> wordStack, double number) {
-        int mult = 1000;
-        if(number < mult){
-            char letter = nextWord(wordStack);
-            if(letter=='T') {
-                number *= 1000;
-                letter = 'B';
+    private String parseNumber(Double number){
+        String ans = "";
+        int multi = 1000;
+        if(number > multi){
+            multi *= 1000;
+            if( number > multi){
+                multi *= 1000;
+                if( number > multi) {
+                    ans = "B";
+                    number = (number/multi);
+                }
+                else{
+                    ans = "M";
+                    number = number/(multi/1000);
+                }
             }
-            if(isInteger(number))
-                return ""+new Double(number).intValue()+letter;
-            return ""+number+letter;
+            else{
+                ans = "K";
+                number = number/(multi/1000);
+            }
         }
-        mult *= 1000;
-        if( number < mult) {
-            return (number/(mult/1000))+"K";
-        }
-        mult *= 1000;
-        if( number < mult)
-            return (number/(mult/1000))+"M";
-        return (number/mult)+"B";
+        return intOrDouble(number)+ans;
+
     }
 
-    private char nextWord(Queue<String> wordQueue) {
-        char letter=' ';
-        if (!wordQueue.isEmpty()) {
-            String nextWord = wordQueue.peek();
-            if (nextWord.equals("Thousand")) {
-                wordQueue.remove();
-                letter = 'K';
-            } else if (nextWord.equals("Million")) {
-                wordQueue.remove();
-                letter = 'M';
-            } else if (nextWord.equals("Billion")) {
-                wordQueue.remove();
-                letter = 'B';
-            } else if (nextWord.equals("Trillion")) {
-                wordQueue.remove();
-                letter = 'T';
-            } else if (nextWord.equals("percent") || nextWord.equals("percentage")) {
-                wordQueue.remove();
-                letter = '%';
+    private String intOrDouble(Double d){
+        if(isInteger(d))
+            return ""+d.intValue();
+        return ""+d;
+    }
+
+
+    private String nextWord() {
+        String suffix="";
+        if (!queue.isEmpty()) {
+            String nextWord = queue.peek();
+            if (nextWord.equalsIgnoreCase("Thousand")) {
+                queue.remove();
+                suffix = "K";
+            } else if (nextWord.equalsIgnoreCase("Million")) {
+                queue.remove();
+                suffix = "M";
+            } else if (nextWord.equalsIgnoreCase("Billion")) {
+                queue.remove();
+                suffix = "B";
+            } else if (nextWord.equalsIgnoreCase("Trillion")) {
+                queue.remove();
+                suffix = "T";
+            } else if (nextWord.equalsIgnoreCase("percent") || nextWord.equalsIgnoreCase("percentage")) {
+                queue.remove();
+                suffix = "%";
+            }
+            else if (nextWord.equalsIgnoreCase("Dollars")) {
+                queue.remove();
+                suffix = "Dollars";
             }
         }
-        return letter;
+        return suffix;
     }
 
     private boolean isInteger(double word) {
