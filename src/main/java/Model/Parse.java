@@ -52,6 +52,34 @@ public class Parse implements Runnable{
                             nextWord = "B";
                         }
                         term += nextWord;
+
+                        nextWord = queue.peek();
+                        if (nextWord != null && isFraction(queue.peek())) {
+                            queue.remove();
+                            term += " " + nextWord;
+                            nextWord = nextWord();
+                            if(nextWord.equals("Dollars"))
+                                term += " " + nextWord;
+
+                        }
+                        if(nextWord != null &&nextWord.equals("U.S.")){
+                            queue.remove();
+                            nextWord=queue.peek();
+                            if(nextWord != null && nextWord.equalsIgnoreCase("dollars")){
+                                queue.remove();
+                                if (term.charAt(term.length()-1)=='M')
+                                    term = term.substring(0,term.length()-1)+" M Dollars";
+                                if (term.charAt(term.length()-1)=='B') {
+                                    double d= Double.parseDouble(term.substring(0,term.length()-1));
+                                    if(d<1000)
+                                        term = intOrDouble(Double.parseDouble(term.substring(0,term.length()-1)) * 1000) + " M Dollars";
+                                    else
+                                        term = intOrDouble(Double.parseDouble(term.substring(0,term.length()-1)) * 1000000) + " M Dollars";
+                                }
+
+                            }
+                        }
+
                     }
                 }
             }
@@ -76,6 +104,14 @@ public class Parse implements Runnable{
             }
             System.out.println(term);
         }
+    }
+
+    private boolean isFraction(String nextWord) {
+        int idx =nextWord.indexOf('/');
+        if (idx!=-1){
+            return isNumber(nextWord.substring(0,idx)) && isNumber(nextWord.substring(idx+1));
+        }
+        return false;
     }
 
     private String parseDollars(double number) {
@@ -139,7 +175,6 @@ public class Parse implements Runnable{
             return ""+d.intValue();
         return ""+d;
     }
-
 
     private String nextWord() {
         String suffix="";

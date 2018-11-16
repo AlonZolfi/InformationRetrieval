@@ -19,7 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Model model = new Model();
+        /*Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
         //--------------
@@ -33,15 +33,8 @@ public class Main extends Application {
         view.setViewModel(viewModel);
         viewModel.addObserver(view);
         //--------------
-        primaryStage.show();
+        primaryStage.show();*/
 
-
-/*
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("View.fxml"));
-        primaryStage.setTitle();
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
-        Parse p = new Parse();
         Queue<String> s= new LinkedList<String>();
         Parse p = new Parse(s);
         s.add("999");
@@ -76,6 +69,23 @@ public class Main extends Application {
         s.add("billion");
         s.add("100bn");
         s.add("Dollars");
+        s.add("22");
+        s.add("3/7");
+        s.add("Dollars");
+        s.add("654");
+        s.add("1451919/116161");
+        s.add("100");
+        s.add("billion");
+        s.add("U.S.");
+        s.add("dollars");
+        s.add("320.5");
+        s.add("million");
+        s.add("U.S.");
+        s.add("dollars");
+        s.add("1.2");
+        s.add("trillion");
+        s.add("U.S.");
+        s.add("dollars");
         p.run();
 
     }

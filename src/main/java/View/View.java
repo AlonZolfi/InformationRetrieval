@@ -1,12 +1,9 @@
 package View;
 
-import Model.ReadFile;
 import ViewModel.ViewModel;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
-import java.awt.*;
-import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
