@@ -1,5 +1,7 @@
 package Model;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +28,6 @@ public class Parse implements Runnable{
                 stopWords.add(line);
             }
             bufferedReader.close();
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -38,7 +38,10 @@ public class Parse implements Runnable{
             String nextWord = "";
             if (isNumber(term)) {
                 nextWord = nextWord();
-                if (nextWord.equals("Dollars")){
+                if(isMonth(nextWord)!=-1) {
+                    term = "0" + isMonth(nextWord) + "-" + term;
+                }
+                else if (nextWord.equals("Dollars")){
                     term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
                 }
                 else if(nextWord.equals("%")) {
@@ -198,13 +201,26 @@ public class Parse implements Runnable{
             } else if (nextWord.equalsIgnoreCase("Dollars")) {
                 queue.remove();
                 suffix = "Dollars";
+            } else if( isMonth(nextWord)!=-1){
+                queue.remove();
+                suffix = nextWord;
             }
+
+
         }
         return suffix;
     }
 
     private boolean isInteger(double word) {
         return String.valueOf(word).endsWith(".0");
+    }
+
+    private int isMonth(String month){
+        String[] s = new String[]{"JAN", "Jan", "FEB", "Feb", "MAR", "Mar", "APR", "Apr","MAY","May","JUN","Jun","JUL","Jul","AUG","Aug","SEP","Sep","OCT","Oct","NOV","Nov","DEC","Dec"};
+        int monthNumber = ArrayUtils.indexOf(s,month);
+        if (monthNumber!=-1)
+            return (monthNumber/2)+1;
+        return -1;
     }
 
     private boolean isNumber(String word) {
