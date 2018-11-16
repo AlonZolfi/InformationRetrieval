@@ -108,7 +108,7 @@ public class Parse implements Runnable{
             System.out.println(term);
         }
     }
-
+    //stam
     private boolean isFraction(String nextWord) {
         int idx =nextWord.indexOf('/');
         if (idx!=-1){
