@@ -216,7 +216,19 @@ public class Parse implements Runnable{
     }
 
     private int isMonth(String month){
-        String[] s = new String[]{"JAN", "Jan", "FEB", "Feb", "MAR", "Mar", "APR", "Apr","MAY","May","JUN","Jun","JUL","Jul","AUG","Aug","SEP","Sep","OCT","Oct","NOV","Nov","DEC","Dec"};
+        String[] s = new String[]{
+                "JAN", "Jan",
+                "FEB", "Feb",
+                "MAR", "Mar",
+                "APR", "Apr",
+                "MAY","May",
+                "JUN","Jun",
+                "JUL","Jul",
+                "AUG","Aug",
+                "SEP","Sep",
+                "OCT","Oct",
+                "NOV","Nov",
+                "DEC","Dec"};
         int monthNumber = ArrayUtils.indexOf(s,month);
         if (monthNumber!=-1)
             return (monthNumber/2)+1;
