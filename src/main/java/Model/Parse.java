@@ -10,115 +10,88 @@ import java.util.Queue;
 public class Parse implements Runnable{
 
     private Queue<String> queue;
-    public Parse(Queue<String> queue){
+    private  boolean stm;
+
+    public Parse(Queue<String> queue, boolean stm){
         this.queue = queue;
+        this.stm = stm;
     }
 
     public void run() {
-
-        Set<String> stopWords = new HashSet<String>();
-
-        String fileName = "stopWords.txt";
-        String line = null;
-
-        try {
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while((line = bufferedReader.readLine()) != null) {
-                stopWords.add(line);
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         while(!queue.isEmpty()){
             String term = queue.remove();
-            if (stopWords.contains(term))
-                continue;
             String nextWord = "";
-            if (isNumber(term)) {
-                nextWord = nextWord();
-                if(isMonth(nextWord)!=-1) {
-                    int monthNum = isMonth(nextWord);
-                    if(monthNum<9)
-                        term = "0" + isMonth(nextWord) + "-" + term;
-                    else
-                        term = isMonth(nextWord) + "-" + term;
-                }
-                else if (nextWord.equals("Dollars")){
-                    term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
-                }
-                else if(nextWord.equals("%")) {
-                    term = term + nextWord;
-                }
-                else {
-                    term = parseNumber(Double.parseDouble(term.replace(",", "")));
-                    if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) {
-                        if (nextWord.equals("T")) {
-                            term = intOrDouble(Double.parseDouble(term) * 1000);
-                            nextWord = "B";
-                        }
-                        term += nextWord;
+            if (!term.equals(",")) {
+                if (isNumber(term)) {
+                    nextWord = nextWord();
+                    if (isMonth(nextWord) != -1) {
+                        int monthNum = isMonth(nextWord);
+                        if (monthNum < 9) term = "0" + isMonth(nextWord) + "-" + term;
+                        else term = isMonth(nextWord) + "-" + term;
+                    } else if (nextWord.equals("Dollars")) {
+                        term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
+                    } else if (nextWord.equals("%")) {
+                        term = term + nextWord;
+                    } else {
+                        term = parseNumber(Double.parseDouble(term.replace(",", "")));
+                        if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) {
+                            if (nextWord.equals("T")) {
+                                term = intOrDouble(Double.parseDouble(term) * 1000);
+                                nextWord = "B";
+                            }
+                            term += nextWord;
 
-                        nextWord = queue.peek();
-                        if (nextWord != null && isFraction(queue.peek())) {
-                            queue.remove();
-                            term += " " + nextWord;
-                            nextWord = nextWord();
-                            if(nextWord.equals("Dollars"))
-                                term += " " + nextWord;
-
-                        }
-                        if(nextWord != null &&nextWord.equals("U.S.")){
-                            queue.remove();
-                            nextWord=queue.peek();
-                            if(nextWord != null && nextWord.equalsIgnoreCase("dollars")){
+                            nextWord = queue.peek();
+                            if (nextWord != null && isFraction(queue.peek())) {
                                 queue.remove();
-                                if (term.charAt(term.length()-1)=='M')
-                                    term = term.substring(0,term.length()-1)+" M Dollars";
-                                if (term.charAt(term.length()-1)=='B') {
-                                    double d= Double.parseDouble(term.substring(0,term.length()-1));
-                                    if(d<1000)
-                                        term = intOrDouble(Double.parseDouble(term.substring(0,term.length()-1)) * 1000) + " M Dollars";
-                                    else
-                                        term = intOrDouble(Double.parseDouble(term.substring(0,term.length()-1)) * 1000000) + " M Dollars";
-                                }
+                                term += " " + nextWord;
+                                nextWord = nextWord();
+                                if (nextWord.equals("Dollars")) term += " " + nextWord;
 
                             }
-                        }
+                            if (nextWord != null && nextWord.equals("U.S.")) {
+                                queue.remove();
+                                nextWord = queue.peek();
+                                if (nextWord != null && nextWord.equalsIgnoreCase("dollars")) {
+                                    queue.remove();
+                                    if (term.charAt(term.length() - 1) == 'M')
+                                        term = term.substring(0, term.length() - 1) + " M Dollars";
+                                    if (term.charAt(term.length() - 1) == 'B') {
+                                        double d = Double.parseDouble(term.substring(0, term.length() - 1));
+                                        if (d < 1000)
+                                            term = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 1)) * 1000) + " M Dollars";
+                                        else term = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 1)) * 1000000) + " M Dollars";
+                                    }
 
+                                }
+                            }
+
+                        }
                     }
-                }
-            }
-            else if( isNumber(term.substring(1))){
-                if(term.charAt(0)=='$')
-                    term = parseDollars(Double.parseDouble(term.substring(1).replace(",", ""))) + "Dollars";
-            }
-            else if(isNumber(term.substring(0,term.length()-1))) {
-                if(!term.substring(0,term.length()-1).equals("%")){
+                } else if (isNumber(term.substring(1))) {
+                    if (term.charAt(0) == '$') term = parseDollars(Double.parseDouble(term.substring(1).replace(",", ""))) + "Dollars";
+                } else if (isNumber(term.substring(0, term.length() - 1))) {
+                    if (!term.substring(0, term.length() - 1).equals("%")) {
+                        nextWord = nextWord();
+                        if (term.substring(term.length() - 1).equals("m") && nextWord.equals("Dollars")) {
+                            term = term.substring(0, term.length() - 1) + " M " + nextWord;
+                        }
+                    }
+                } else if (isNumber(term.substring(0, term.length() - 2))) {
                     nextWord = nextWord();
-                    if (term.substring(term.length()-1).equals("m") && nextWord.equals("Dollars")){
-                        term = term.substring(0,term.length()-1)+ " M " + nextWord;
+                    if (term.substring(term.length() - 2).equals("bn") && nextWord.equals("Dollars")) {
+                        String s = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 2)) * 1000);
+                        term = s + " M " + nextWord;
                     }
-                }
-            }
-            else if(isNumber(term.substring(0,term.length()-2))){
-                nextWord = nextWord();
-                if (term.substring(term.length()-2).equals("bn") && nextWord.equals("Dollars")){
-                    String s = intOrDouble(Double.parseDouble(term.substring(0,term.length()-2))*1000);
-                    term = s+ " M " + nextWord;
-                }
-            }
-            else if(isMonth(term)!=-1){
-                if(!queue.isEmpty()) {
-                    nextWord = queue.peek();
-                    if (isNumber(nextWord)) {
-                        queue.remove();
-                        int monthNum = isMonth((term));
-                        if(monthNum<9)
-                            term = nextWord + "-0" + isMonth(term);
-                        else
-                            term = nextWord + "-" + isMonth(term);
+                } else if (isMonth(term) != -1) {
+                    if (!queue.isEmpty()) {
+                        nextWord = queue.peek();
+                        if (isNumber(nextWord)) {
+                            queue.remove();
+                            int monthNum = isMonth((term));
+                            if (monthNum < 9) term = nextWord + "-0" + isMonth(term);
+                            else term = nextWord + "-" + isMonth(term);
+                        }
                     }
                 }
             }

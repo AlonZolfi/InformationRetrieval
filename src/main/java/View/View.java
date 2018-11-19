@@ -1,6 +1,7 @@
 package View;
 
 import ViewModel.ViewModel;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -30,8 +31,21 @@ public class View implements Observer, IView {
         this.viewModel = viewModel;
     }
 
-    public void onStartClick(){
-        viewModel.onStartClick("","", doStemming());
+    public void onStartClick() {
+        if (source.getText().equals("") || destination.getText().equals("")) {
+            //cheks cheks cheks cheks cheks cheks
+        } else {
+            String pathOfDocs = "" + source.getText(), pathOfStopWords = "" + source.getText();
+            File dir = new File(source.getText());
+            File[] directoryListing = dir.listFiles();
+            if (directoryListing != null && dir.isDirectory()) {
+                for (File file : directoryListing) {
+                    if (file.isDirectory()) pathOfDocs += "/" + file.getName();
+                    else pathOfStopWords += "/" + file.getName();
+                }
+            }
+            viewModel.onStartClick(pathOfDocs, pathOfStopWords, doStemming());
+        }
     }
 
     public void onStartOverClick() {
@@ -49,7 +63,7 @@ public class View implements Observer, IView {
     public void browseSource(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Path");
-        File defaultDirectory = new File("src/main/resources");
+        File defaultDirectory = new File("src");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
@@ -60,7 +74,7 @@ public class View implements Observer, IView {
     public void browseDest(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Path");
-        File defaultDirectory = new File("src/main/resources");
+        File defaultDirectory = new File("src");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)

@@ -7,22 +7,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.io.*;
+import java.util.*;
 
 public class ReadFile {
 
-    public static void readFiles(String path){
-        File dir = new File(path);
+    public static Set<String> stopWords;
+
+
+    public static void readFiles(String pathOfDocs,String pathOfStopWords, boolean stm){
+        initStopWords(pathOfStopWords);
+        File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         if(directoryListing!= null && dir.isDirectory()){
             for(File file: directoryListing){
-                iterateOverFolders(file);
+                iterateOverFolders(file,stm);
             }
         }
         else{
@@ -30,11 +29,30 @@ public class ReadFile {
         }
     }
 
-    private static void iterateOverFolders(File dir){
+
+    public static void initStopWords(String pathOfStopWords){
+        stopWords = new HashSet<String>();
+        String fileName = pathOfStopWords;
+        String line = null;
+
+        try {
+            FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while((line = bufferedReader.readLine()) != null) {
+                stopWords.add(line);
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void iterateOverFolders(File dir,boolean stm){
         File[] directoryListing = dir.listFiles();
         if(directoryListing!= null && dir.isDirectory()){
             for(File file: directoryListing){
-                separateFileToDocs(file);
+                separateFileToDocs(file,stm);
             }
         }
         else{
@@ -42,7 +60,7 @@ public class ReadFile {
         }
     }
 
-    private static void separateFileToDocs(File fileToSeparate) {
+    private static void separateFileToDocs(File fileToSeparate,boolean stm) {
         try {
             FileInputStream fis = new FileInputStream(fileToSeparate);
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
@@ -50,7 +68,7 @@ public class ReadFile {
             for(Element element: elements){
                 String s = element.getElementsByTag("TEXT").toString();
                 Queue<String> tokensQueue = StringToQueue(StringUtils.split(s," .\n\r\t"));
-                Parse p = new Parse(tokensQueue);
+                Parse p = new Parse(tokensQueue,stm);
                 new Thread(p).start();
             }
         } catch (FileNotFoundException e) {
