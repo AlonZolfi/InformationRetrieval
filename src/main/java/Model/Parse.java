@@ -1,16 +1,13 @@
 package Model;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Queue;
 
 public class Parse implements Runnable{
 
     private Queue<String> queue;
-    private  boolean stm;
+    private boolean stm;
+    private static String[] shortMonth = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+    private static String[] longMonth = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
 
     public Parse(Queue<String> queue, boolean stm){
         this.queue = queue;
@@ -20,77 +17,79 @@ public class Parse implements Runnable{
     public void run() {
         while(!queue.isEmpty()){
             String term = queue.remove();
+            /*if(stm)
+                doStem*/
             String nextWord = "";
             if (!term.equals(",")) {
-                if (isNumber(term)) {
+                if (isNumber(term)) { //if current term is a number
                     nextWord = nextWord();
-                    if (isMonth(nextWord) != -1) {
-                        int monthNum = isMonth(nextWord);
-                        if (monthNum < 9) term = "0" + isMonth(nextWord) + "-" + term;
-                        else term = isMonth(nextWord) + "-" + term;
-                    } else if (nextWord.equals("Dollars")) {
-                        term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
-                    } else if (nextWord.equals("%")) {
-                        term = term + nextWord;
-                    } else {
-                        term = parseNumber(Double.parseDouble(term.replace(",", "")));
-                        if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) {
+                    if (isMonth(nextWord) != -1) //if it is rule Hei - it is a Month term
+                        term = handleMonthDay(nextWord, term);
+
+                    else if (nextWord.equals("Dollars"))  //if it is rule Dalet - it is a Dollar term
+                        term = handleDollars(Double.parseDouble(term.replace(",", "")));
+
+                    else if (nextWord.equals("%")) // if it is rule Gimel - it is a percent term
+                        term = handlePercent(term,nextWord);
+
+                    else {
+                        term = handleNumber(Double.parseDouble(term.replace(",", "")));
+                        if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) { //if a number returned is smaller than 1000
                             if (nextWord.equals("T")) {
-                                term = intOrDouble(Double.parseDouble(term) * 1000);
+                                term = numberValue(Double.parseDouble(term) * 1000);
                                 nextWord = "B";
                             }
                             term += nextWord;
 
                             nextWord = queue.peek();
-                            if (nextWord != null && isFraction(queue.peek())) {
+                            if (nextWord != null && isFraction(queue.peek())) { //rule Alef 2 - fraction rule
                                 queue.remove();
                                 term += " " + nextWord;
                                 nextWord = nextWord();
-                                if (nextWord.equals("Dollars")) term += " " + nextWord;
+                                if (nextWord.equals("Dollars"))
+                                    term += " " + nextWord;
 
                             }
-                            if (nextWord != null && nextWord.equals("U.S.")) {
+                            else if (nextWord != null && nextWord.equals("U.S.")) {
                                 queue.remove();
                                 nextWord = queue.peek();
                                 if (nextWord != null && nextWord.equalsIgnoreCase("dollars")) {
                                     queue.remove();
+                                    double d = Double.parseDouble(term.substring(0, term.length() - 1));
                                     if (term.charAt(term.length() - 1) == 'M')
-                                        term = term.substring(0, term.length() - 1) + " M Dollars";
-                                    if (term.charAt(term.length() - 1) == 'B') {
-                                        double d = Double.parseDouble(term.substring(0, term.length() - 1));
-                                        if (d < 1000)
-                                            term = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 1)) * 1000) + " M Dollars";
-                                        else term = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 1)) * 1000000) + " M Dollars";
+                                        d*=1000000;
+                                    else if (term.charAt(term.length() - 1) == 'B') {
+                                        d*=1000000000;
                                     }
-
+                                    term = handleDollars(d);
                                 }
                             }
 
                         }
                     }
-                } else if (isNumber(term.substring(1))) {
-                    if (term.charAt(0) == '$') term = parseDollars(Double.parseDouble(term.substring(1).replace(",", ""))) + "Dollars";
+                }
+                else if (isNumber(term.substring(1))) {
+                    if (term.charAt(0) == '$') //rule Dalet - dollar sign at the begining of a number
+                        term = handleDollars(Double.parseDouble(term.substring(1).replace(",", "")));
+
                 } else if (isNumber(term.substring(0, term.length() - 1))) {
                     if (!term.substring(0, term.length() - 1).equals("%")) {
                         nextWord = nextWord();
-                        if (term.substring(term.length() - 1).equals("m") && nextWord.equals("Dollars")) {
-                            term = term.substring(0, term.length() - 1) + " M " + nextWord;
-                        }
+                        if (term.substring(term.length() - 1).equals("m") && nextWord.equals("Dollars"))
+                            term = numberValue(Double.parseDouble(term.substring(0, term.length() - 1))) + " M " + nextWord;
+
                     }
                 } else if (isNumber(term.substring(0, term.length() - 2))) {
                     nextWord = nextWord();
-                    if (term.substring(term.length() - 2).equals("bn") && nextWord.equals("Dollars")) {
-                        String s = intOrDouble(Double.parseDouble(term.substring(0, term.length() - 2)) * 1000);
-                        term = s + " M " + nextWord;
-                    }
-                } else if (isMonth(term) != -1) {
+                    if (term.substring(term.length() - 2).equals("bn") && nextWord.equals("Dollars"))
+                        term = numberValue(Double.parseDouble(term.substring(0, term.length() - 2)) * 1000) + " M " + nextWord;
+
+                } else if (isMonth(term) != -1) { // rule Vav - month year rule
                     if (!queue.isEmpty()) {
                         nextWord = queue.peek();
                         if (isNumber(nextWord)) {
                             queue.remove();
-                            int monthNum = isMonth((term));
-                            if (monthNum < 9) term = nextWord + "-0" + isMonth(term);
-                            else term = nextWord + "-" + isMonth(term);
+                            term = handleMonthYear(term,nextWord);
                         }
                     }
                 }
@@ -100,15 +99,33 @@ public class Parse implements Runnable{
 
     }
 
-    private boolean isFraction(String nextWord) {
-        int idx =nextWord.indexOf('/');
-        if (idx!=-1){
-            return isNumber(nextWord.substring(0,idx)) && isNumber(nextWord.substring(idx+1));
-        }
-        return false;
+
+    private String handlePercent(String term, String percentSign) {
+        return term+percentSign;
     }
 
-    private String parseDollars(double number) {
+    private String handleMonthDay(String month, String day){
+        int monthNum = isMonth(month);
+        String newTerm = isMonth(month) + "-" + day;
+        if (monthNum < 9)
+            newTerm = "0" + newTerm;
+        return newTerm;
+    }
+
+    private String handleMonthYear (String month, String year){
+        int monthNum = isMonth(month);
+        String newTerm = year + "-";
+        if (monthNum < 9)
+            newTerm += "0" + monthNum;
+        return newTerm + monthNum;
+    }
+
+    /**
+     * Rule DALET - changed number according to the rule
+     * @param number the number to be changed
+     * @return the number after rule
+     */
+    private String handleDollars(double number) {
         String ans = "";
         int multi = 1000000;
         if(number >= multi) {
@@ -123,10 +140,47 @@ public class Parse implements Runnable{
             ans = "M";
         }
         if (ans.equals(""))
-            return addCommas(intOrDouble(number))+ " " +ans;
-        return intOrDouble(number)+ " " +ans + " ";
+            return addCommas(numberValue(number))+ " Dollars";
+        return numberValue(number)+ " " + ans + " Dollars";
     }
 
+    /**
+     * Rule ALEF - change numbers according to their size
+     * @param number - number to be changed
+     * @return the number after changed
+     */
+    private String handleNumber(double number){
+        String ans = "";
+        int multi = 1000;
+        if(number > multi){//smaller than 1000
+            multi *= 1000;
+            if( number > multi){
+                multi *= 1000;
+                if( number > multi) { // is billion or trillion
+                    ans = "B";
+                    number = (number/multi);
+                }
+                else{ // is million
+                    ans = "M";
+                    multi /= 1000;
+                    number = number/multi;
+                }
+            }
+            else{ // is thousand
+                ans = "K";
+                multi /= 1000;
+                number = number/multi;
+            }
+        }
+        return numberValue(number)+ans;
+
+    }
+
+    /**
+     * adds commas to a number
+     * @param number number to add commas to
+     * @return returns number as a String with commas
+     */
     private String addCommas(String number) {
         String saveFraction="";
         if(number.indexOf('.')!=-1) {
@@ -139,93 +193,89 @@ public class Parse implements Runnable{
         return number+saveFraction;
     }
 
-    private String parseNumber(Double number){
-        String ans = "";
-        int multi = 1000;
-        if(number > multi){
-            multi *= 1000;
-            if( number > multi){
-                multi *= 1000;
-                if( number > multi) {
-                    ans = "B";
-                    number = (number/multi);
-                }
-                else{
-                    ans = "M";
-                    number = number/(multi/1000);
-                }
-            }
-            else{
-                ans = "K";
-                number = number/(multi/1000);
-            }
-        }
-        return intOrDouble(number)+ans;
-
-    }
-
-    private String intOrDouble(Double d){
+    /**
+     * checks if the number is int or double
+     * @param d number to be checked
+     * @return returns a string with the correct number
+     */
+    private String numberValue(Double d){
         if(isInteger(d))
             return ""+d.intValue();
         return ""+d;
     }
 
+    /**
+     * Checks if the next word is one of certain rules given to the parser
+     * @return returns a string according to the rules
+     */
     private String nextWord() {
-        String suffix="";
+        String nextWord="";
         if (!queue.isEmpty()) {
-            String nextWord = queue.peek();
-            if (nextWord.equalsIgnoreCase("Thousand")) {
+            String queuePeek = queue.peek();
+            if (queuePeek.equalsIgnoreCase("Thousand")) {
                 queue.remove();
-                suffix = "K";
-            } else if (nextWord.equalsIgnoreCase("Million")) {
+                nextWord = "K";
+            } else if (queuePeek.equalsIgnoreCase("Million")) {
                 queue.remove();
-                suffix = "M";
-            } else if (nextWord.equalsIgnoreCase("Billion")) {
+                nextWord = "M";
+            } else if (queuePeek.equalsIgnoreCase("Billion")) {
                 queue.remove();
-                suffix = "B";
-            } else if (nextWord.equalsIgnoreCase("Trillion")) {
+                nextWord = "B";
+            } else if (queuePeek.equalsIgnoreCase("Trillion")) {
                 queue.remove();
-                suffix = "T";
-            } else if (nextWord.equalsIgnoreCase("percent") || nextWord.equalsIgnoreCase("percentage")) {
+                nextWord = "T";
+            } else if (queuePeek.equalsIgnoreCase("percent") || queuePeek.equalsIgnoreCase("percentage")) {
                 queue.remove();
-                suffix = "%";
-            } else if (nextWord.equalsIgnoreCase("Dollars")) {
+                nextWord = "%";
+            } else if (queuePeek.equalsIgnoreCase("Dollars")) {
                 queue.remove();
-                suffix = "Dollars";
-            } else if( isMonth(nextWord)!=-1){
+                nextWord = "Dollars";
+            } else if(isMonth(queuePeek)!=-1){
                 queue.remove();
-                suffix = nextWord;
+                nextWord = queuePeek;
             }
-
-
         }
-        return suffix;
+        return nextWord;
     }
 
+    /**
+     * Checks if the string given is a fraction of a number
+     * @param nextWord string to be checked
+     * @return true if string is a fraction, false otherwise
+     */
+    private boolean isFraction(String nextWord) {
+        int idx =nextWord.indexOf('/');
+        if (idx!=-1)
+            return isNumber(nextWord.substring(0,idx)) && isNumber(nextWord.substring(idx+1));
+        return false;
+    }
+
+    /**
+     * Checks if a number is integer or double
+     * @param word number to be checked
+     * @return returns true if it is integer, false it is double
+     */
     private boolean isInteger(double word) {
-        return String.valueOf(word).endsWith(".0");
+        return word == Math.floor(word) && !Double.isInfinite(word);
     }
 
+    /**
+     * Checks if a string is a month
+     * @param month - the string to be checked
+     * @return true if it is a month, false otherwise
+     */
     private int isMonth(String month){
-        String[] s = new String[]{
-                "JAN", "Jan",
-                "FEB", "Feb",
-                "MAR", "Mar",
-                "APR", "Apr",
-                "MAY","May",
-                "JUN","Jun",
-                "JUL","Jul",
-                "AUG","Aug",
-                "SEP","Sep",
-                "OCT","Oct",
-                "NOV","Nov",
-                "DEC","Dec"};
-        int monthNumber = ArrayUtils.indexOf(s,month);
-        if (monthNumber!=-1)
-            return (monthNumber/2)+1;
+        for (int i = 0; i < shortMonth.length; i++)
+            if(month.equalsIgnoreCase(shortMonth[i]) || month.equalsIgnoreCase(longMonth[i]))
+                return i+1;
         return -1;
     }
 
+    /**
+     * Checks is a string is a number
+     * @param word - the string to be checked
+     * @return returns true if it is a number, false otherwise
+     */
     private boolean isNumber(String word) {
         for(int i = 0; i < word.length(); i++)
             if(word.charAt(i) < '0' || word.charAt(i) > '9')
