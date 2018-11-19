@@ -15,7 +15,6 @@ public class Parse implements Runnable{
     public Parse(Queue<String> queue, boolean stm){
         this.queue = queue;
         this.stm = stm;
-
     }
 
     public void run() {

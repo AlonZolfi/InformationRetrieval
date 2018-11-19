@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MiniDictionary {
-    private String m_name;
-    private Map<String,Integer> dictionary;
+    private String m_name; //name of the doc that past pars
+    private Map<String,Integer> dictionary; //string - the term ; int - TF in the doc
+
 
     public MiniDictionary (String name){
         m_name=name;
@@ -34,6 +35,12 @@ public class MiniDictionary {
     public String getName() {
         return m_name;
     }
+
+    public int giveMaxFrequency(){
+        return 0;
+    }
+
+
 
 
 }
