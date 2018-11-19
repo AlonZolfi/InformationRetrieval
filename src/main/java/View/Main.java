@@ -19,7 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        /*Model model = new Model();
+        Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
         //--------------
@@ -33,8 +33,8 @@ public class Main extends Application {
         view.setViewModel(viewModel);
         viewModel.addObserver(view);
         //--------------
-        primaryStage.show();*/
-
+        primaryStage.show();
+/*
         Queue<String> s= new LinkedList<String>();
         Parse p = new Parse(s);
         s.add("999");
@@ -97,5 +97,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+*/
     }
 }
