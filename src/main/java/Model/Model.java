@@ -9,8 +9,9 @@ public class Model extends Observable implements IModel {
     }
 
 
-    public void onStartClick(String path){
-        Parse(path);
+    public void onStartClick(String pathOfDocs,String pathOfStopWords,boolean stm){
+        Parse(pathOfDocs);
+
     }
 
     public void onStartOverClick(String path) {

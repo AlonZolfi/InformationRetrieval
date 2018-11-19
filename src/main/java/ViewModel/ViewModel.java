@@ -21,8 +21,8 @@ public class ViewModel extends Observable implements Observer {
     }
 
 
-    public void onStartClick(String path){
-        model.onStartClick(path);
+    public void onStartClick(String pathOfDocs,String pathOfStopWords,boolean stm){
+        model.onStartClick(pathOfDocs,pathOfStopWords,stm);
     }
 
     public void onStartOverClick(String path) {

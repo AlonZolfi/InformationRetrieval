@@ -13,11 +13,13 @@
       <TextField fx:id="destination" layoutX="233.0" layoutY="78.0" />
       <Label layoutX="25.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Sourse path" />
       <Label layoutX="233.0" layoutY="51.0" prefHeight="17.0" prefWidth="149.0" text="Dastination path" />
-      <CheckBox layoutX="23.0" layoutY="115.0" mnemonicParsing="false" text="Stemming" />
+      <CheckBox fx:id="cb_stm" layoutX="23.0" layoutY="115.0" mnemonicParsing="false" text="Stemming" />
       <ChoiceBox layoutX="23.0" layoutY="152.0" prefWidth="150.0" />
-      <Button fx:id="btn_startOver" layoutX="421.0" layoutY="259.0" mnemonicParsing="false" prefHeight="25.0" onAction="#onStartOverClick" prefWidth="102.0" text="Start Over" />
+      <Button fx:id="btn_startOver" layoutX="421.0" layoutY="259.0" mnemonicParsing="false" onAction="#onStartOverClick" prefHeight="25.0" prefWidth="102.0" text="Start Over" />
       <Button fx:id="btn_showDic" layoutX="421.0" layoutY="176.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="Show Dictionary" />
       <Button fx:id="btn_loadDic" layoutX="421.0" layoutY="219.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="102.0" text="Load Dictionary" />
-      <Button fx:id="btn_start" layoutX="421.0" layoutY="78.0" mnemonicParsing="false" prefHeight="25.0" onAction="#onStartClick" prefWidth="102.0" text="START PARS"/>
+      <Button fx:id="btn_start" layoutX="421.0" layoutY="78.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="25.0" prefWidth="102.0" text="START PARS" />
+      <Button fx:id="btn_browse_corpus" layoutX="108.0" layoutY="47.0" mnemonicParsing="false" text="browse" onAction="#browseSource" />
+      <Button fx:id="btn_browse_saveDic" layoutX="330.0" layoutY="47.0" mnemonicParsing="false" text="browse" onAction="#browseDest" />
    </children>
 </AnchorPane>
