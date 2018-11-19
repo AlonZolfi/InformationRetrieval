@@ -10,31 +10,17 @@ import java.util.Queue;
 public class Parse implements Runnable{
 
     private Queue<String> queue;
-    public Parse(Queue<String> queue){
+    private  boolean stm;
+
+    public Parse(Queue<String> queue, boolean stm){
         this.queue = queue;
+        this.stm = stm;
+
     }
 
     public void run() {
-
-        Set<String> stopWords = new HashSet<String>();
-
-        String fileName = "stopWords.txt";
-        String line = null;
-
-        try {
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while((line = bufferedReader.readLine()) != null) {
-                stopWords.add(line);
-            }
-            bufferedReader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         while(!queue.isEmpty()){
             String term = queue.remove();
-            if (stopWords.contains(term))
-                continue;
             String nextWord = "";
             if (isNumber(term)) {
                 nextWord = nextWord();

@@ -31,7 +31,17 @@ public class View implements Observer, IView {
     }
 
     public void onStartClick(){
-        viewModel.onStartClick("","", doStemming());
+        String pathOfDocs=""+source.getText(),pathOfStopWords=""+source.getText();
+        File dir = new File(source.getText());
+        File[] directoryListing = dir.listFiles();
+        if(directoryListing!= null && dir.isDirectory()){
+            for(File file: directoryListing){
+                if (file.isDirectory())
+                    pathOfDocs += "/"+file.getName();
+                else pathOfStopWords += "/"+file.getName();
+            }
+        }
+        viewModel.onStartClick(pathOfDocs,pathOfStopWords, doStemming());
     }
 
     public void onStartOverClick() {

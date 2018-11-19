@@ -4,14 +4,13 @@ import java.util.Observable;
 
 public class Model extends Observable implements IModel {
 
-    public void Parse(String path) {
-        ReadFile.readFiles(path);
+    public void Parse(String pathOfDocs,String pathOfStopWords, boolean stm) {
+        ReadFile.readFiles(pathOfDocs,pathOfStopWords,stm);
     }
 
 
-    public void onStartClick(String pathOfDocs,String pathOfStopWords,boolean stm){
-        Parse(pathOfDocs);
-
+    public void onStartClick(String pathOfDocs, String pathOfStopWords, boolean stm){
+        Parse(pathOfDocs,pathOfStopWords,stm);
     }
 
     public void onStartOverClick(String path) {
