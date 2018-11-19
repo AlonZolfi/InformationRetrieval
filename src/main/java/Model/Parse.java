@@ -25,7 +25,11 @@ public class Parse implements Runnable{
             if (isNumber(term)) {
                 nextWord = nextWord();
                 if(isMonth(nextWord)!=-1) {
-                    term = "0" + isMonth(nextWord) + "-" + term;
+                    int monthNum = isMonth(nextWord);
+                    if(monthNum<9)
+                        term = "0" + isMonth(nextWord) + "-" + term;
+                    else
+                        term = isMonth(nextWord) + "-" + term;
                 }
                 else if (nextWord.equals("Dollars")){
                     term = parseDollars(Double.parseDouble(term.replace(",", ""))) + nextWord;
@@ -91,8 +95,22 @@ public class Parse implements Runnable{
                     term = s+ " M " + nextWord;
                 }
             }
+            else if(isMonth(term)!=-1){
+                if(!queue.isEmpty()) {
+                    nextWord = queue.peek();
+                    if (isNumber(nextWord)) {
+                        queue.remove();
+                        int monthNum = isMonth((term));
+                        if(monthNum<9)
+                            term = nextWord + "-0" + isMonth(term);
+                        else
+                            term = nextWord + "-" + isMonth(term);
+                    }
+                }
+            }
             System.out.println(term);
         }
+
     }
     //stam
     private boolean isFraction(String nextWord) {

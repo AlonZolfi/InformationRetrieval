@@ -87,9 +87,12 @@ public class Main extends Application {
         s.add("U.S.");
         s.add("dollars");
         s.add("14");
-        s.add("JAN");
+        s.add("DEC");
         s.add("14");
         s.add("Feb");
+        s.add("Nov");
+        s.add("1994");
+
         p.run();
 
     }
