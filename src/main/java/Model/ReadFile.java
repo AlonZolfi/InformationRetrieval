@@ -66,14 +66,13 @@ public class ReadFile {
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("DOC");
             for(Element element: elements){
-                String s = element.getElementsByTag("TEXT").toString();
-                /*String docNum = element.getElementsByTag("DOCNO").toString();
+                String docNum = element.getElementsByTag("DOCNO").toString();
                 String docDate = element.getElementsByTag("DATE1").toString();
                 String docText = element.getElementsByTag("TEXT").toString();
                 String docTitle = element.getElementsByTag("TI").toString();
                 String docCity =  element.getElementsByTag("F P=104").toString();
-                //CorpusDocument docu = new Document(docNum,docDate,docTitle,docText,docCity);*/
-                Queue<String> tokensQueue = StringToQueue(StringUtils.split(s," .\n\r\t"));
+                CorpusDocument docu = new CorpusDocument(docNum,docDate,docTitle,docText,docCity);
+                Queue<String> tokensQueue = StringToQueue(StringUtils.split(docu.getM_docText()," .\n\r\t"));
                 Parse p = new Parse(tokensQueue,stm);
                 new Thread(p).start();
             }
