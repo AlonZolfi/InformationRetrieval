@@ -9,29 +9,17 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class ReadFile {
 
     public static Set<String> stopWords;
 
-
-    public static void readFiles(String pathOfDocs,String pathOfStopWords, boolean stm){
-        initStopWords(pathOfStopWords);
-        File dir = new File(pathOfDocs);
-        File[] directoryListing = dir.listFiles();
-        if(directoryListing!= null && dir.isDirectory()){
-            for(File file: directoryListing){
-                iterateOverFolders(file,stm);
-            }
-        }
-        else{
-            System.out.println("Not a directory");
-        }
-    }
-
-
-    public static void initStopWords(String pathOfStopWords){
-        stopWords = new HashSet<String>();
+    private static void initStopWords(String pathOfStopWords){
+        stopWords = new HashSet<>();
         String fileName = pathOfStopWords;
         String line = null;
 
@@ -48,21 +36,53 @@ public class ReadFile {
 
     }
 
-    private static void iterateOverFolders(File dir,boolean stm){
+    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords){
+        initStopWords(pathOfStopWords);
+        File dir = new File(pathOfDocs);
+        File[] directoryListing = dir.listFiles();
+        LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();
+        if(directoryListing!= null && dir.isDirectory()){
+            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
+            LinkedList<Future> futureDocsInFile = new LinkedList<>();
+            for(File file: directoryListing){
+                Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(file));
+                futureDocsInFile.add(f);
+            }
+            for(Future f: futureDocsInFile){
+                try {
+                    allDocsInCorpus.addAll((LinkedList<CorpusDocument>)(f.get()));
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+            pool.shutdown();
+        }
+        else{
+            System.out.println("Not a directory");
+        }
+
+        return allDocsInCorpus;
+    }
+
+
+    /*private static LinkedList<LinkedList<CorpusDocument>> iterateOverFolders(File dir,boolean stm){
         File[] directoryListing = dir.listFiles();
         if(directoryListing!= null && dir.isDirectory()){
+            LinkedList<LinkedList<CorpusDocument>> fileList= new LinkedList<>();
             for(File file: directoryListing){
-                separateFileToDocs(file,stm);
+                fileList.add(separateFileToDocs(file,stm));
             }
+            return fileList;
         }
         else{
             System.out.println("Not a directory");
         }
     }
 
-    private static void separateFileToDocs(File fileToSeparate,boolean stm) {
+    private static LinkedList<CorpusDocument> separateFileToDocs(File docToSeparate){//, boolean stm) {
+        LinkedList<CorpusDocument> docList = new LinkedList<>();
         try {
-            FileInputStream fis = new FileInputStream(fileToSeparate);
+            FileInputStream fis = new FileInputStream(docToSeparate);
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("DOC");
             for(Element element: elements){
@@ -71,22 +91,25 @@ public class ReadFile {
                 String docText = element.getElementsByTag("TEXT").toString();
                 String docTitle = element.getElementsByTag("TI").toString();
                 String docCity =  element.getElementsByTag("F P=104").toString();
-                CorpusDocument docu = new CorpusDocument(docNum,docDate,docTitle,docText,docCity);
-                Queue<String> tokensQueue = StringToQueue(StringUtils.split(docu.getM_docText()," .\n\r\t"));
-                Parse p = new Parse(tokensQueue,stm);
+                CorpusDocument document = new CorpusDocument(docToSeparate.getName(),docNum,docDate,docTitle,docText,docCity);
+                docList.add(document);
+                //Queue<String> tokensQueue = StringToQueue(StringUtils.split(document.getM_docText()," .\n\r\t"));
+                //Parse p = new Parse(tokensQueue,stm);
+                /*Parse p = new Parse(document,stm);
                 new Thread(p).start();
             }
+            return docList;
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
-            return;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return docList;
     }
 
-    private static Queue<String> StringToQueue(String[] splitted) {
+    private static Queue<String> StringToQueue(String[] split) {
         Queue<String> queue = new LinkedList<String>();
-        Collections.addAll(queue,splitted);
+        Collections.addAll(queue,split);
         return queue;
-    }
+    }*/
 }

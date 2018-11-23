@@ -1,10 +1,15 @@
 package Model;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class Parse implements Runnable{
 
     private Queue<String> queue;
+    private CorpusDocument corpus_doc;
     private boolean stm;
     private static String[] shortMonth = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
     private static String[] longMonth = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
@@ -14,7 +19,19 @@ public class Parse implements Runnable{
         this.stm = stm;
     }
 
+    public Parse(CorpusDocument corpus_doc, boolean stm){
+        this.corpus_doc = corpus_doc;
+        this.stm = stm;
+    }
+
+    private static Queue<String> StringToQueue(String[] split) {
+        Queue<String> queue = new LinkedList<String>();
+        Collections.addAll(queue,split);
+        return queue;
+    }
+
     public void run() {
+        queue = StringToQueue(StringUtils.split(corpus_doc.getM_docText()," .\n\r\t"));
         while(!queue.isEmpty()){
             String term = queue.remove();
             /*if(stm)
@@ -94,11 +111,11 @@ public class Parse implements Runnable{
                     }
                 }
             }
-            System.out.println(term);
+            if(!ReadFile.stopWords.contains(term))
+                System.out.println(term);
         }
 
     }
-
 
     private String handlePercent(String term, String percentSign) {
         return term+percentSign;
