@@ -5,8 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 
-public class Parse implements Runnable{
+public class Parse implements Callable<MiniDictionary> {
 
     private Queue<String> queue;
     private CorpusDocument corpus_doc;
@@ -24,13 +25,13 @@ public class Parse implements Runnable{
         this.stm = stm;
     }
 
-    private static Queue<String> StringToQueue(String[] split) {
+    private Queue<String> StringToQueue(String[] split) {
         Queue<String> queue = new LinkedList<String>();
         Collections.addAll(queue,split);
         return queue;
     }
 
-    public void run() {
+    public MiniDictionary call() {
         queue = StringToQueue(StringUtils.split(corpus_doc.getM_docText()," \n\r\t"));
         while(!queue.isEmpty()){
             String term = queue.remove();
@@ -120,6 +121,7 @@ public class Parse implements Runnable{
             //if(!ReadFile.stopWords.contains(term))
                 System.out.println(term);
         }
+        return null;
 
     }
 
