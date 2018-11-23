@@ -8,7 +8,6 @@ public class MiniDictionary {
     private String m_name; //name of the doc that past pars
     private Map<String,Integer> dictionary; //string - the term ; int - TF in the doc
 
-
     public MiniDictionary (String name){
         m_name=name;
         dictionary = new HashMap<String, Integer>();
@@ -39,5 +38,4 @@ public class MiniDictionary {
     public int giveMaxFrequency(){
         return 0;
     }
-
 }
