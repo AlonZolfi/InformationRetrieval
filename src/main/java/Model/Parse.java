@@ -24,7 +24,7 @@ public class Parse implements Runnable{
         this.stm = stm;
     }
 
-    private static Queue<String> StringToQueue(String[] split) {
+    private Queue<String> StringToQueue(String[] split) {
         Queue<String> queue = new LinkedList<String>();
         Collections.addAll(queue,split);
         return queue;
