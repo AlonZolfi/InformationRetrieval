@@ -31,14 +31,15 @@ public class Parse implements Runnable{
     }
 
     public void run() {
-        queue = StringToQueue(StringUtils.split(corpus_doc.getM_docText()," .\n\r\t"));
+        queue = StringToQueue(StringUtils.split(corpus_doc.getM_docText()," \n\r\t"));
         while(!queue.isEmpty()){
             String term = queue.remove();
             /*if(stm)
                 doStem*/
             String nextWord = "";
             if (!term.equals(",")) {
-                if (isNumber(term)) { //if current term is a number
+                if (isNumber(term))
+                { //if current term is a number
                     nextWord = nextWord();
                     if (isMonth(nextWord) != -1) //if it is rule Hei - it is a Month term
                         term = handleMonthDay(nextWord, term);
@@ -85,23 +86,27 @@ public class Parse implements Runnable{
                         }
                     }
                 }
-                else if (isNumber(term.substring(1))) {
+                else if (isNumber(term.substring(1)))
+                {
                     if (term.charAt(0) == '$') //rule Dalet - dollar sign at the begining of a number
                         term = handleDollars(Double.parseDouble(term.substring(1).replace(",", "")));
 
-                } else if (isNumber(term.substring(0, term.length() - 1))) {
+                } else if (isNumber(term.substring(0, term.length() - 1)))
+                {
                     if (!term.substring(0, term.length() - 1).equals("%")) {
                         nextWord = nextWord();
                         if (term.substring(term.length() - 1).equals("m") && nextWord.equals("Dollars"))
                             term = numberValue(Double.parseDouble(term.substring(0, term.length() - 1))) + " M " + nextWord;
 
                     }
-                } else if (isNumber(term.substring(0, term.length() - 2))) {
+                } else if (isNumber(term.substring(0, term.length() - 2)))
+                {
                     nextWord = nextWord();
                     if (term.substring(term.length() - 2).equals("bn") && nextWord.equals("Dollars"))
                         term = numberValue(Double.parseDouble(term.substring(0, term.length() - 2)) * 1000) + " M " + nextWord;
 
-                } else if (isMonth(term) != -1) { // rule Vav - month year rule
+                } else if (isMonth(term) != -1)
+                { // rule Vav - month year rule
                     if (!queue.isEmpty()) {
                         nextWord = queue.peek();
                         if (isNumber(nextWord)) {
@@ -111,7 +116,8 @@ public class Parse implements Runnable{
                     }
                 }
             }
-            if(!ReadFile.stopWords.contains(term))
+
+            //if(!ReadFile.stopWords.contains(term))
                 System.out.println(term);
         }
 
@@ -295,9 +301,12 @@ public class Parse implements Runnable{
      */
     private boolean isNumber(String word) {
         for(int i = 0; i < word.length(); i++)
-            if(word.charAt(i) < '0' || word.charAt(i) > '9')
-                if(!(word.charAt(i)=='.') && !(word.charAt(i)==','))
+            if(word.charAt(i) < '0' || word.charAt(i) > '9') {
+                if(word.charAt(0)=='-')
+                    continue;
+                if (!(word.charAt(i) == '.') && !(word.charAt(i) == ','))
                     return false;
+            }
         return true;
     }
 }
