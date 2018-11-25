@@ -2,28 +2,32 @@ package Model;
 
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 public class MiniDictionary {
     private String m_name; //name of the doc that past pars
-    private Map<String,Integer> dictionary; //string - the term ; int - TF in the doc
+    private Map<String,LinkedList> dictionary; //string - the term ; int - TF in the doc
 
     public MiniDictionary (String name){
         m_name=name;
-        dictionary = new HashMap<String, Integer>();
+        dictionary = new HashMap<String, LinkedList>();
     }
 
-    public void addWord(String word){
-        if (!dictionary.containsKey(word))
-            dictionary.put(word,1);
+    public void addWord(String word,int placeInText){
+        if (!containsKey(word)) {
+            LinkedList root = new LinkedList();
+            root.add(placeInText);
+            dictionary.put(word, root);
+        }
         else {
-            int i = dictionary.get(word);
-            dictionary.remove(word);
-            dictionary.put(word, i+1);
+            LinkedList linkl = dictionary.get(word);
+            linkl.add(placeInText);
         }
     }
 
-    public boolean containsKey( String word){
+    public boolean containsKey(String word){
         return dictionary.containsKey(word);
     }
 
@@ -35,7 +39,51 @@ public class MiniDictionary {
         return m_name;
     }
 
-    public int giveMaxFrequency(){
+    public int getFrequency(String word){
+        if (size()>0 && containsKey(word))
+            return dictionary.get(word).size();
         return 0;
     }
+
+    public int giveMaxFrequency(){
+        int max = 0;
+        for (String word: dictionary.keySet() ) {
+            int tmp= getFrequency(word);
+            if (max <= tmp)
+                max = tmp;
+        }
+        return max;
+    }
+
+    public Set<String> listOfWords(){
+        return dictionary.keySet();
+    }
+
+    public LinkedList<Integer> listOfIndexes(String word){
+        if (containsKey(word))
+            return dictionary.get(word);
+        return null;
+    }
+
+    public int numOfUniqueWords(){
+        int count=0;
+        for (String word: dictionary.keySet() ) {
+            int tmp= getFrequency(word);
+            if (tmp==1)
+                count++;
+        }
+        return count;
+    }
+
+    public void listOfData(){
+        //take all of the words in the mini dic and save the data for them in a tmp file in the name came
+        // from the minidic under "name" and contains "word" | "num of apirens" | "where" (list)
+        System.out.println("****"+getName()+"****");
+        for (String word: listOfWords()){
+            if (listOfIndexes(word)!=null)
+                System.out.println(""+word+" "+getFrequency(word)+" "+listOfIndexes(word));
+        }
+
+    }
+
 }

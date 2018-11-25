@@ -1,24 +1,35 @@
 package View;
 
 import Model.*;
-import ViewModel.*;
-import View.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        //the semtemce ia "hila kesem hadad the malka"
+        String line = "hila kesem hadad ha malka ve ha kesem";
+        MiniDictionary miniDictionary = new MiniDictionary("hila");
+        String[] lineMem = line.split(" ");
+        for (int i = 0; i < lineMem.length; i++) {
+            miniDictionary.addWord(lineMem[i], i);
+        }
+        miniDictionary.listOfData();
 
+
+        String lineTwo = "alon zolfi zylfi ha shamen ve ha mechoar";
+        MiniDictionary miniDictionaryTwo = new MiniDictionary("alon");
+        String[] lineMemTwo = lineTwo.split(" ");
+        for (int i = 0; i < lineMemTwo.length; i++) {
+            miniDictionaryTwo.addWord(lineMemTwo[i], i);
+        }
+
+        miniDictionaryTwo.listOfData();
+
+    }
+
+/*
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
@@ -35,7 +46,7 @@ public class Main extends Application {
         //--------------
         primaryStage.show();
 
-        /*CorpusDocument cd = new CorpusDocument("","","","",
+        CorpusDocument cd = new CorpusDocument("","","","",
                 "$ " +
                 "4/9-11 " +
                 "1/5 " +
@@ -134,11 +145,10 @@ public class Main extends Application {
         Parse p = new Parse(cd,true);
 
         p.call();*/
-    }
+
 
 
     public static void main(String[] args) {
         launch(args);
     }
-
 }
