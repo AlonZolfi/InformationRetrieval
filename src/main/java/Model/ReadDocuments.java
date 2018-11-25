@@ -42,11 +42,12 @@ public class ReadDocuments implements Callable<LinkedList<CorpusDocument>> {
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("DOC");
             for (Element element : elements) {
-                String docNum = element.getElementsByTag("DOCNO").toString();
-                String docDate = element.getElementsByTag("DATE1").toString();
-                String docText = element.getElementsByTag("TEXT").toString();
-                String docTitle = element.getElementsByTag("TI").toString();
-                String docCity = element.getElementsByTag("F P=104").toString();
+                String s = element.ownText();
+                String docNum = element.getElementsByTag("DOCNO").text();
+                String docDate = element.getElementsByTag("DATE1").text();
+                String docText = element.getElementsByTag("TEXT").text();
+                String docTitle = element.getElementsByTag("TI").text();
+                String docCity = element.getElementsByTag("F P=104").text();
                 CorpusDocument document = new CorpusDocument(fileToSeparate.getName(), docNum, docDate, docTitle, docText, docCity);
                 docList.add(document);
             }

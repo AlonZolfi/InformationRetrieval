@@ -19,7 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        /*Model model = new Model();
+        Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
         //--------------
@@ -33,23 +33,41 @@ public class Main extends Application {
         view.setViewModel(viewModel);
         viewModel.addObserver(view);
         //--------------
-        primaryStage.show();*/
+        primaryStage.show();
 
-        CorpusDocument cd = new CorpusDocument("","","","",
-                "10 " +
+        /*CorpusDocument cd = new CorpusDocument("","","","",
+                "$ " +
                 "4/9-11 " +
                 "1/5 " +
+                "4/9-11 " +
+                "1/5 " +
+                "187 " +
+                "4/9-1/8 " +
                 "999 " +
-                /*"between " +
+                "between " +
                 "18 " +
                 "and " +
-                "24 " +*/
+                "24 " +
                 "between " +
-                //"10 " +
+                "3/5 " +
+                "and " +
+                "78/96 " +
+                "between " +
+                "10 " +
+                "3/5 " +
+                "and " +
+                "78/96 " +
+                "between " +
                 "1/8 " +
                 "and " +
                 "3 " +
-                //"1/83 " +
+                "1/83 " +
+                "between " +
+                "7879 " +
+                "1/8 " +
+                "and " +
+                "3 " +
+                "1/83 " +
                 "24 " +
                 "Value-added " +
                 "step-by-step " +
@@ -113,66 +131,9 @@ public class Main extends Application {
                 "1994 "+
                 "10-11",
             "");
-        Parse p = new Parse(cd,false);
+        Parse p = new Parse(cd,true);
 
-        /*s.add("999");
-        s.add("1,010,560");
-        s.add("10,123");
-        s.add("123");
-        s.add("Thousand");
-        s.add("1010.56");
-        s.add("10,123,000");
-        s.add("55");
-        s.add("Million");
-        s.add("10,123,000,000");
-        s.add("55");
-        s.add("Billion");
-        s.add("7");
-        s.add("Trillion");
-        s.add("6%");
-        s.add("6");
-        s.add("percent");
-        s.add("6000");
-        s.add("percentage");
-        s.add("1102.7320");
-        s.add("Dollars");
-        s.add("$450,000");
-        s.add("1,000,000");
-        s.add("Dollars");
-        s.add("$450,000,000");
-        s.add("$100");
-        s.add("million");
-        s.add("20.6m");
-        s.add("Dollars");
-        s.add("$100");
-        s.add("billion");
-        s.add("100bn");
-        s.add("Dollars");
-        s.add("22");
-        s.add("3/7");
-        s.add("Dollars");
-        s.add("654");
-        s.add("1451919/116161");
-        s.add("100");
-        s.add("billion");
-        s.add("U.S.");
-        s.add("dollars");
-        s.add("320.5");
-        s.add("million");
-        s.add("U.S.");
-        s.add("dollars");
-        s.add("1.2");
-        s.add("trillion");
-        s.add("U.S.");
-        s.add("dollars");
-        s.add("14");
-        s.add("DEC");
-        s.add("14");
-        s.add("Feb");
-        s.add("Nov");
-        s.add("1994");
-*/
-        p.call();
+        p.call();*/
     }
 
 

@@ -1,7 +1,7 @@
 package View;
 
+import Model.Alert;
 import ViewModel.ViewModel;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -40,7 +40,7 @@ public class View implements Observer, IView {
      */
     public void onStartClick() {
         if (source.getText().equals("") || destination.getText().equals("")) {
-            //cheks cheks cheks cheks cheks cheks
+            Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
         } else {
             String pathOfDocs = "" + source.getText(), pathOfStopWords = "" + source.getText();
             File dir = new File(source.getText());

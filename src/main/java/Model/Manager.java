@@ -8,6 +8,7 @@ import java.util.concurrent.Future;
 
 public class Manager {
     public void Manage(String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
+        long start = System.currentTimeMillis();
         LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath);
         ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
         LinkedList<Future<MiniDictionary>> futureMiniDicList = new LinkedList<Future<MiniDictionary>>();
@@ -22,6 +23,8 @@ public class Manager {
                 e.printStackTrace();
             }
         }
+        long end = System.currentTimeMillis();
+        System.out.println(end-start);
         for (MiniDictionary miniDic: miniDicList) {
             // DO WHAT YOU WANT HERE
         }
