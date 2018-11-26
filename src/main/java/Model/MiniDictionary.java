@@ -76,14 +76,13 @@ public class MiniDictionary {
     }
 
     public void listOfData(){
-        //take all of the words in the mini dic and save the data for them in a tmp file in the name came
-        // from the minidic under "name" and contains "word" | "num of apirens" | "where" (list)
+        //take all of the words in the mini dic and save the data for them in a **tmp** file(?)
+        // under the name "name" and contains "word" | "num of apirens" | "where" (list)
         System.out.println("****"+getName()+"****");
         for (String word: listOfWords()){
             if (listOfIndexes(word)!=null)
                 System.out.println(""+word+" "+getFrequency(word)+" "+listOfIndexes(word));
         }
-
     }
 
 }
