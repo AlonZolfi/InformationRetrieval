@@ -18,7 +18,7 @@ public class ReadFile {
 
     public static Set<String> stopWords;
 
-    private static void initStopWords(String pathOfStopWords){
+    public static void initStopWords(String pathOfStopWords){
         stopWords = new HashSet<>();
         String fileName = pathOfStopWords;
         String line = null;
@@ -36,28 +36,33 @@ public class ReadFile {
 
     }
 
-    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords){
-        initStopWords(pathOfStopWords);
+    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();
-        if(directoryListing!= null && dir.isDirectory()){
-            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
+        int start = mone*directoryListing.length/mechane;
+        int end = ((mone+1)*directoryListing.length/mechane)-1;
+        if (directoryListing != null && dir.isDirectory()) {
+            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             LinkedList<Future> futureDocsInFile = new LinkedList<>();
-            for(File file: directoryListing){
+            /*for (File file : directoryListing) {
                 Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(file));
                 futureDocsInFile.add(f);
+            }*/
+            for (int i = start; i <= end; i++) {
+                Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(directoryListing[i]));
+                futureDocsInFile.add(f);
             }
-            for(Future f: futureDocsInFile){
+
+            for (Future f : futureDocsInFile) {
                 try {
-                    allDocsInCorpus.addAll((LinkedList<CorpusDocument>)(f.get()));
+                    allDocsInCorpus.addAll((LinkedList<CorpusDocument>) (f.get()));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
             }
             pool.shutdown();
-        }
-        else{
+        } else {
             System.out.println("Not a directory");
         }
 

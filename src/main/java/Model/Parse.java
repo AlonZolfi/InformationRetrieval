@@ -23,6 +23,8 @@ public class Parse implements Callable<MiniDictionary> {
     public MiniDictionary call() {
         wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " \n\r\t"));
         LinkedList<String> nextWord = new LinkedList<>();
+        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getM_fileName()+"_"+corpus_doc.getM_docNum(),corpus_doc.getM_docCity());
+        int index = 0;
         while (!wordList.isEmpty()) {
             String term = wordList.remove();
             if (isNumber(term)) { //if current term is a number
@@ -145,11 +147,13 @@ public class Parse implements Callable<MiniDictionary> {
             }
 
 
-            //if(!ReadFile.stopWords.contains(term))
-            System.out.println(term);
+            if(!ReadFile.stopWords.contains(term)) {
+                miniDic.addWord(term, index);
+                index++;
+            }
         }
 
-        return null;
+        return miniDic;
 
     }
 

@@ -1,7 +1,11 @@
 package View;
 
 import Model.*;
+import ViewModel.ViewModel;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -9,7 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         //the semtemce ia "hila kesem hadad the malka"
-        String line = "hila kesem hadad ha malka ve ha kesem";
+        /*String line = "hila kesem hadad ha malka ve ha kesem";
         MiniDictionary miniDictionary = new MiniDictionary("hila");
         String[] lineMem = line.split(" ");
         for (int i = 0; i < lineMem.length; i++) {
@@ -25,11 +29,10 @@ public class Main extends Application {
             miniDictionaryTwo.addWord(lineMemTwo[i], i);
         }
 
-        miniDictionaryTwo.listOfData();
+        miniDictionaryTwo.listOfData();*/
 
-    }
 
-/*
+
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
@@ -46,6 +49,7 @@ public class Main extends Application {
         //--------------
         primaryStage.show();
 
+/*
         CorpusDocument cd = new CorpusDocument("","","","",
                 "$ " +
                 "4/9-11 " +
@@ -145,7 +149,7 @@ public class Main extends Application {
         Parse p = new Parse(cd,true);
 
         p.call();*/
-
+    }
 
 
     public static void main(String[] args) {

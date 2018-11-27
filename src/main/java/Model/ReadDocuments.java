@@ -42,7 +42,6 @@ public class ReadDocuments implements Callable<LinkedList<CorpusDocument>> {
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("DOC");
             for (Element element : elements) {
-                String s = element.ownText();
                 String docNum = element.getElementsByTag("DOCNO").text();
                 String docDate = element.getElementsByTag("DATE1").text();
                 String docText = element.getElementsByTag("TEXT").text();

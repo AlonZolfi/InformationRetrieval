@@ -2,7 +2,7 @@ package Model;
 
 public class WriteFile {
 
-    public void writeToDest(String paht,BigDicitionary dictionary){
+    public void writeToDest(String path,BigDicitionary dictionary){
         //get all the inpo needed and write it to dest
     }
 
@@ -11,5 +11,7 @@ public class WriteFile {
         //how shoes it when press on "show dictionary"
         return null;
     }
+
+    //public void writeTemporaryPosting (List<MiniDic> dic>)
 
 }
