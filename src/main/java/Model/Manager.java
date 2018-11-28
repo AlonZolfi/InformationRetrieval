@@ -1,9 +1,7 @@
 package Model;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.concurrent.*;
 
 public class Manager {
@@ -30,11 +28,12 @@ public class Manager {
                 }
             }
 
-            Index index = new Index(miniDicList);
+            Indexer index = new Indexer(miniDicList);
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
             HashMap<String, StringBuilder> temporaryPosting = null;
             try {
                 temporaryPosting = futureTemporaryPosting.get();
+
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }

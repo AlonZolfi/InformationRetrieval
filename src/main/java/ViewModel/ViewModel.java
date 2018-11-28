@@ -17,12 +17,15 @@ public class ViewModel extends Observable implements Observer {
     }
 
     public void update(Observable o, Object arg) {
-
+        if(o==model){
+            setChanged();
+            notifyObservers(arg);
+        }
     }
 
 
-    public void onStartClick(String pathOfDocs,String pathOfStopWords,boolean stm){
-        model.onStartClick(pathOfDocs,pathOfStopWords,stm);
+    public void onStartClick(String pathOfDocs, String pathOfStopWords, String destinationPath, boolean stm){
+        model.onStartClick(pathOfDocs,pathOfStopWords,destinationPath,stm);
     }
 
     public void onStartOverClick(String path) {

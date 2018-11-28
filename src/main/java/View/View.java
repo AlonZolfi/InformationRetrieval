@@ -40,16 +40,29 @@ public class View implements Observer, IView {
         if (source.getText().equals("") || destination.getText().equals("")) {
             Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
         } else {
-            String pathOfDocs = "" + source.getText(), pathOfStopWords = "" + source.getText();
-            File dir = new File(source.getText());
-            File[] directoryListing = dir.listFiles();
-            if (directoryListing != null && dir.isDirectory()) {
+            String pathOfDocs = "" , pathOfStopWords = "";
+            File dirSource = new File(source.getText());
+            File[] directoryListing = dirSource.listFiles();
+            if (directoryListing != null && dirSource.isDirectory()) {
                 for (File file : directoryListing) {
-                    if (file.isDirectory()) pathOfDocs += "/" + file.getName();
-                    else pathOfStopWords += "/" + file.getName();
+                    if (file.isDirectory())
+                        pathOfDocs = file.getAbsolutePath();
+                    else
+                        pathOfStopWords = file.getAbsolutePath();
                 }
             }
-            viewModel.onStartClick(pathOfDocs, pathOfStopWords, doStemming());
+            else {
+                Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stop words is unreachable");
+                return;
+            }
+            File dirDest = new File(destination.getText());
+            if(!dirDest.isDirectory()){
+                Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
+                return;
+            }
+
+
+            viewModel.onStartClick(pathOfDocs, pathOfStopWords,dirDest.getAbsolutePath(), doStemming());
         }
     }
 
@@ -57,19 +70,30 @@ public class View implements Observer, IView {
      * This function delete all of the work and let the option of clear start
      */
     public void onStartOverClick() {
-        viewModel.onStartOverClick(destination.getText());
+        if(!destination.getText().equals(""))
+            viewModel.onStartOverClick(destination.getText());
+        else
+            Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
+
+
     }
 
     /**
      * This function determen if we shuld stem or not
-     * @return if we shuld stem or not
+     * @return if we should stem or not
      */
     public boolean doStemming(){
          return cb_stm.isSelected();
     }
 
     public void update(Observable o, Object arg) {
-
+        if(o==viewModel){
+            if(arg instanceof String[]){
+                String[] toUpdate = (String[])arg;
+                if(toUpdate[0].equals("Raise Alert"))
+                    Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,toUpdate[1]);
+            }
+        }
     }
 
 
@@ -78,13 +102,14 @@ public class View implements Observer, IView {
      */
     public void browseSource(){
         DirectoryChooser fileChooser = new DirectoryChooser();
-        fileChooser.setTitle("Load Path");
-        File defaultDirectory = new File("src");
+        fileChooser.setTitle("Load Source Path");
+        File defaultDirectory = new File("C:\\Users\\alonz\\Desktop");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
-            source.setText(chosen.getName());
-        else source.setText(defaultDirectory.getName());
+            source.setText(chosen.getAbsolutePath());
+        /*else
+            source.setText(defaultDirectory.getName());*/
     }
 
 
@@ -94,12 +119,13 @@ public class View implements Observer, IView {
 
     public void browseDest(){
         DirectoryChooser fileChooser = new DirectoryChooser();
-        fileChooser.setTitle("Load Path");
-        File defaultDirectory = new File("src");
+        fileChooser.setTitle("Load Destination Path");
+        File defaultDirectory = new File("C:\\Users\\alonz\\Desktop");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
-            destination.setText(chosen.getName());
-        else destination.setText(defaultDirectory.getName());
+            destination.setText(chosen.getAbsolutePath());
+        /*else
+            destination.setText(defaultDirectory.getName());*/
     }
 }

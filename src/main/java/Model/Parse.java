@@ -228,7 +228,7 @@ public class Parse implements Callable<MiniDictionary> {
     /**
      * Rule DALET - changed number according to the rule
      * @param number the number to be changed
-     * @param containsComma
+     * @param containsComma ghfg
      * @return the number after rule
      */
     private String handleDollars(double number, boolean containsComma) {
