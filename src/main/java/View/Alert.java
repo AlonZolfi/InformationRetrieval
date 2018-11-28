@@ -1,4 +1,4 @@
-package Model;
+package View;
 
 public class Alert {
     public static void showAlert(javafx.scene.control.Alert.AlertType at, String text){

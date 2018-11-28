@@ -3,13 +3,14 @@ package Model;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Index implements Callable<HashMap<String,StringBuilder>> {
     private LinkedList<DocDictionaryNode> m_documentDictionary;
     private InvertedIndex m_invertedIndex;
-    private LinkedList<MiniDictionary> m_miniDicList;
+    private ConcurrentLinkedDeque<MiniDictionary> m_miniDicList;
 
-    public Index(LinkedList<MiniDictionary> minidic){//LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex){
+    public Index(ConcurrentLinkedDeque<MiniDictionary> minidic){//LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex){
         /*m_documentDictionary = documentDictionary;
         m_invertedIndex = invertedIndex;*/
         m_miniDicList = minidic;

@@ -31,8 +31,6 @@ public class Main extends Application {
 
         miniDictionaryTwo.listOfData();*/
 
-
-
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
@@ -49,8 +47,8 @@ public class Main extends Application {
         //--------------
         primaryStage.show();
 
-/*
-        CorpusDocument cd = new CorpusDocument("","","","",
+
+        /*CorpusDocument cd = new CorpusDocument("","","","",
                 "$ " +
                 "4/9-11 " +
                 "1/5 " +
@@ -110,6 +108,7 @@ public class Main extends Application {
                 "1102.7320 " +
                 "Dollars " +
                 "$450,000 " +
+                "$450000 " +
                 "1,000,000 " +
                 "Dollars " +
                 "$450,000,000 " +
