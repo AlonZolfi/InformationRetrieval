@@ -1,15 +1,17 @@
 package View;
 
 import ViewModel.ViewModel;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
+import Model.ShowDictionaryRecord;
+
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 
 public class View implements Observer, IView {
@@ -24,6 +26,16 @@ public class View implements Observer, IView {
     public CheckBox cb_stm;
     public Button btn_browse_corpus;
     public Button btn_browse_saveDic;
+    public TableColumn<ShowDictionaryRecord,String> tableCol_term;
+    public TableColumn<ShowDictionaryRecord,String> tableCol_count;
+    public TableView<ShowDictionaryRecord> table_showDic;
+    public Label lbl_resultTitle;
+    public Label lbl_totalDocs;
+    public Label lbl_totalTerms;
+    public Label lbl_totalTime;
+    public Label lbl_totalDocsNum;
+    public Label lbl_totalTermsNum;
+    public Label lbl_totalTimeNum;
 
     /**
      * constractor of view, connect the view to the viewModel
@@ -38,7 +50,7 @@ public class View implements Observer, IView {
      */
     public void onStartClick() {
         if (source.getText().equals("") || destination.getText().equals("")) {
-            Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
+            MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
         } else {
             String pathOfDocs = "" , pathOfStopWords = "";
             File dirSource = new File(source.getText());
@@ -52,12 +64,12 @@ public class View implements Observer, IView {
                 }
             }
             else {
-                Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stop words is unreachable");
+                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stop words is unreachable");
                 return;
             }
             File dirDest = new File(destination.getText());
             if(!dirDest.isDirectory()){
-                Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
+                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
                 return;
             }
 
@@ -70,10 +82,16 @@ public class View implements Observer, IView {
      * This function delete all of the work and let the option of clear start
      */
     public void onStartOverClick() {
-        if(!destination.getText().equals(""))
-            viewModel.onStartOverClick(destination.getText());
+        if(!destination.getText().equals("")) {
+            ButtonType stay = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+            ButtonType leave = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,"Are you sure?",leave,stay);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == stay)
+                viewModel.onStartOverClick(destination.getText());
+        }
         else
-            Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
+            MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
 
 
     }
@@ -82,7 +100,7 @@ public class View implements Observer, IView {
      * This function determen if we shuld stem or not
      * @return if we should stem or not
      */
-    public boolean doStemming(){
+    private boolean doStemming(){
          return cb_stm.isSelected();
     }
 
@@ -90,10 +108,31 @@ public class View implements Observer, IView {
         if(o==viewModel){
             if(arg instanceof String[]){
                 String[] toUpdate = (String[])arg;
-                if(toUpdate[0].equals("Raise Alert"))
-                    Alert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,toUpdate[1]);
+                if(toUpdate[0].equals("RaiseAlert"))
+                    MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,toUpdate[1]);
+            } else if( arg instanceof ObservableList){
+                showDictionary((ObservableList)arg);
+            } else if( arg instanceof double[]){
+                showResults((double[])arg);
             }
         }
+    }
+
+    private void showResults(double[] results) {
+        lbl_totalDocsNum.setText(""+(int)results[0]);
+        lbl_totalTermsNum.setText(""+(int)results[1]);
+        lbl_totalTimeNum.setText(""+results[2]+" Minutes");
+        lbl_resultTitle.setVisible(true);
+        lbl_totalDocs.setVisible(true);
+        lbl_totalDocsNum.setVisible(true);
+        lbl_totalTerms.setVisible(true);
+        lbl_totalTermsNum.setVisible(true);
+        lbl_totalTime.setVisible(true);
+        lbl_totalTimeNum.setVisible(true);
+
+
+
+
     }
 
 
@@ -127,5 +166,17 @@ public class View implements Observer, IView {
             destination.setText(chosen.getAbsolutePath());
         /*else
             destination.setText(defaultDirectory.getName());*/
+    }
+
+    public void showDictionaryClick() {
+        viewModel.showDictionary();
+    }
+
+    private void showDictionary(ObservableList<ShowDictionaryRecord> records){
+        if(records != null){
+            tableCol_term.setCellValueFactory(cellData -> cellData.getValue().getTermProperty());
+            tableCol_count.setCellValueFactory(cellData -> cellData.getValue().getCountProperty());
+            table_showDic.setItems(records);
+        }
     }
 }

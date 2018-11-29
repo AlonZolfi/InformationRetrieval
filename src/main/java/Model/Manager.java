@@ -7,7 +7,8 @@ import java.util.concurrent.*;
 public class Manager {
 
 
-    public void Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
+    public double[] Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
+        int numOfDocs = 0;
         ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
         int iter = 150;
@@ -23,6 +24,7 @@ public class Manager {
             for (Future<MiniDictionary> fMiniDic : futureMiniDicList) {
                 try {
                     miniDicList.add(fMiniDic.get());
+                    numOfDocs++;
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
@@ -43,10 +45,11 @@ public class Manager {
             }*/
 
             //write temporary posting to the disk
-            System.out.println(System.currentTimeMillis()-startInner);
+            //System.out.println(System.currentTimeMillis()-startInner);
             pool.shutdown();
         }
-        System.out.println(System.currentTimeMillis()-start);
+        //System.out.println(System.currentTimeMillis()-start);
+        return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
         //MERGE ALL POSTINGS
         //fix link in the inverted index
     }

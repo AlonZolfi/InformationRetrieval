@@ -1,8 +1,7 @@
 package ViewModel;
 
 import Model.IModel;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.shape.Path;
+import javafx.application.Platform;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -12,8 +11,7 @@ public class ViewModel extends Observable implements Observer {
     private IModel model;
 
     public ViewModel(IModel model) {
-        if (model != null)
-            this.model = model;
+        this.model = model;
     }
 
     public void update(Observable o, Object arg) {
@@ -23,13 +21,16 @@ public class ViewModel extends Observable implements Observer {
         }
     }
 
-
     public void onStartClick(String pathOfDocs, String pathOfStopWords, String destinationPath, boolean stm){
-        model.onStartClick(pathOfDocs,pathOfStopWords,destinationPath,stm);
+        Platform.runLater(()->model.onStartClick(pathOfDocs,pathOfStopWords,destinationPath,stm));
     }
 
     public void onStartOverClick(String path) {
-        model.onStartOverClick(path);
+        Platform.runLater(()->model.onStartOverClick(path));
+    }
+
+    public void showDictionary(){
+        Platform.runLater(()->model.showDictionary());
     }
 
 }
