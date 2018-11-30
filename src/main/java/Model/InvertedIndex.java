@@ -1,21 +1,26 @@
 package Model;
 
-import javafx.util.Pair;
-
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InvertedIndex {
     // term  | num Of appearance | pointer(path of posting file, line number in the posting)
-    private ConcurrentHashMap<Pair<String, Integer>, Pair<String, Integer>> invertedIndexDic;
+    private ConcurrentHashMap<String,InvertedIndexNode> invertedIndexDic;
 
     public InvertedIndex() {
         invertedIndexDic = new ConcurrentHashMap<>();
     }
 
-    public void addTerm (String term, String posting){
-        // if the term exists increase counter and add the new posting
-        //otherwise
+    public void addTerm (String term){
+        if (!invertedIndexDic.containsKey(term)){
+            InvertedIndexNode first = new InvertedIndexNode(term,1,null,-1);
+            invertedIndexDic.put(term,first);
+        }
+        else{
+            //if the word already exist we shold fo to the posting and add the new postin to him
+            InvertedIndexNode notFirst = invertedIndexDic.remove(term);
+            notFirst.incrisAppirnces();
+            invertedIndexDic.put(term,notFirst);
+        }
     }
 
     public int getNumOfUniqueTerms(){
