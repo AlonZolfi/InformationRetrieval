@@ -16,14 +16,25 @@ public class Model extends Observable implements IModel {
     private LinkedList<DocDictionaryNode> documentDictionary;
 
     @Override
-    public void onStartClick(String pathOfDocs, String pathOfStopWords,String destinationPath, boolean stm){
+    /*public void onStartClick(String pathOfDocs, String stopWordsPath,String destinationPath, boolean stm){
         Manager man = new Manager();
         invertedIndex = new InvertedIndex();
         documentDictionary = new LinkedList<>();
         double[] results = man.Manage(documentDictionary, invertedIndex, pathOfDocs, pathOfStopWords, "", stm);
         setChanged();
         notifyObservers(results);
+    }*/
+
+    public void onStartClick(String pathOfDocs, String stopWordsPath,String destinationPath, boolean stm){
+        Manager man = new Manager();
+        invertedIndex = new InvertedIndex();
+        documentDictionary = new LinkedList<>();
+        ReadFile.initStopWords(stopWordsPath);
+        double[] results = man.Manage(documentDictionary, invertedIndex, pathOfDocs, stopWordsPath, "", stm);
+        setChanged();
+        notifyObservers(results);
     }
+
 
     @Override
     public void onStartOverClick(String path) {

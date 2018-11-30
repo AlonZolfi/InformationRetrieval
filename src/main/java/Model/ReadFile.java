@@ -1,12 +1,5 @@
 package Model;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.Elements;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +29,7 @@ public class ReadFile {
 
     }
 
-    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
+    /*public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();
@@ -48,7 +41,7 @@ public class ReadFile {
             /*for (File file : directoryListing) {
                 Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(file));
                 futureDocsInFile.add(f);
-            }*/
+            }
             for (int i = start; i <= end; i++) {
                 Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(directoryListing[i]));
                 futureDocsInFile.add(f);
@@ -67,54 +60,27 @@ public class ReadFile {
         }
 
         return allDocsInCorpus;
-    }
+    }*///
 
-
-    /*private static LinkedList<LinkedList<CorpusDocument>> iterateOverFolders(File dir,boolean stm){
+    public static void readFiles(String pathOfDocs) {
+        File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
-        if(directoryListing!= null && dir.isDirectory()){
-            LinkedList<LinkedList<CorpusDocument>> fileList= new LinkedList<>();
-            for(File file: directoryListing){
-                fileList.add(separateFileToDocs(file,stm));
+        if (directoryListing != null && dir.isDirectory()) {
+            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+            LinkedList<Future<LinkedList<CorpusDocument>>> futureBulk = new LinkedList<>();
+            for (File file : directoryListing) {
+                try {
+                    Manager.emptyCorpusDoc.acquire();
+                    Manager.corpusDocQueue.add(pool.submit(new ReadDocuments(file)));
+                    Manager.fullCorpusDoc.release();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-            return fileList;
-        }
-        else{
+            Manager.stopReadAndParse=true;
+            pool.shutdown();
+        } else {
             System.out.println("Not a directory");
         }
     }
-
-    private static LinkedList<CorpusDocument> separateFileToDocs(File docToSeparate){//, boolean stm) {
-        LinkedList<CorpusDocument> docList = new LinkedList<>();
-        try {
-            FileInputStream fis = new FileInputStream(docToSeparate);
-            Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
-            Elements elements = doc.select("DOC");
-            for(Element element: elements){
-                String docNum = element.getElementsByTag("DOCNO").toString();
-                String docDate = element.getElementsByTag("DATE1").toString();
-                String docText = element.getElementsByTag("TEXT").toString();
-                String docTitle = element.getElementsByTag("TI").toString();
-                String docCity =  element.getElementsByTag("F P=104").toString();
-                CorpusDocument document = new CorpusDocument(docToSeparate.getName(),docNum,docDate,docTitle,docText,docCity);
-                docList.add(document);
-                //Queue<String> tokensQueue = StringToQueue(StringUtils.split(document.getM_docText()," .\n\r\t"));
-                //Parse p = new Parse(tokensQueue,stm);
-                /*Parse p = new Parse(document,stm);
-                new Thread(p).start();
-            }
-            return docList;
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return docList;
-    }
-
-    private static Queue<String> StringToQueue(String[] split) {
-        Queue<String> queue = new LinkedList<String>();
-        Collections.addAll(queue,split);
-        return queue;
-    }*/
 }

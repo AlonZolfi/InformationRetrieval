@@ -64,7 +64,7 @@ public class View implements Observer, IView {
                 }
             }
             else {
-                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stop words is unreachable");
+                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stopReadAndParse words is unreachable");
                 return;
             }
             File dirDest = new File(destination.getText());
@@ -137,7 +137,7 @@ public class View implements Observer, IView {
 
 
     /***
-     * This function let the user select his corpus and stop word list
+     * This function let the user select his corpus and stopReadAndParse word list
      */
     public void browseSource(){
         DirectoryChooser fileChooser = new DirectoryChooser();

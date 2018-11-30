@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Indexer implements Callable<HashMap<String,StringBuilder>> {
     private ConcurrentLinkedDeque<MiniDictionary> m_miniDicList;
+    //private LinkedList<MiniDictionary> m_miniDicList;
 
-    public Indexer(ConcurrentLinkedDeque<MiniDictionary> minidic){//LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex){
-        /*m_documentDictionary = documentDictionary;
-        m_invertedIndex = invertedIndex;*/
+    public Indexer(ConcurrentLinkedDeque minidic){//LinkedList<MiniDictionary> minidic){//LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex){
+        //m_miniDicList = minidic;
         m_miniDicList = minidic;
     }
 
