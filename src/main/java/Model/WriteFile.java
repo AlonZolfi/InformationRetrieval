@@ -2,8 +2,8 @@ package Model;
 
 public class WriteFile {
 
-    public void writeToDest(String path,BigDicitionary dictionary){
-        //get all the inpo needed and write it to dest
+    public void writeToDest(String path,InvertedIndex dictionary){
+        //get all the info needed and write it to dest
     }
 
     public String[][] showDictionay(){

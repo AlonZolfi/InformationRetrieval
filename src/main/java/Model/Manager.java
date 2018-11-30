@@ -82,17 +82,22 @@ public class Manager {
                 e.printStackTrace();
             }
 
-
-            Indexer index = new Indexer(new ConcurrentLinkedDeque(miniDicQueue.poll()));
-
+            LinkedList<MiniDictionary> tmp = miniDicQueue.poll();
+            Indexer index = new Indexer(new ConcurrentLinkedDeque(tmp));
 
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
 
 
 
+
+
+
+
+
+
+
+
             HashMap<String, StringBuilder> temporaryPosting = null;
-
-
             try {
                 temporaryPosting = futureTemporaryPosting.get();
 
