@@ -17,9 +17,11 @@ public class InvertedIndex {
         }
         else{
             //if the word already exist we shold fo to the posting and add the new postin to him
-            InvertedIndexNode notFirst = invertedIndexDic.remove(term);
+            /*InvertedIndexNode notFirst = invertedIndexDic.remove(term);
             notFirst.incrisAppirnces();
             invertedIndexDic.put(term,notFirst);
+        */
+            invertedIndexDic.get(term).incrisAppirnces();
         }
     }
 
