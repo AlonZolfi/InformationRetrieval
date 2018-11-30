@@ -3,6 +3,7 @@ package Model;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import javafx.application.Platform;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.*;
@@ -37,33 +38,25 @@ public class Manager {
             //CONSUME
             try {
                 fullCorpusDoc.acquire();
-            } catch (InterruptedException e) {
+
+                LinkedList<CorpusDocument> docsOfOneBulk = corpusDocQueue.poll().get();
+                LinkedList<Future<MiniDictionary>> futureListOfMiniDics = new LinkedList<Future<MiniDictionary>>();
+                for(CorpusDocument cd: docsOfOneBulk) {
+                    futureListOfMiniDics.add(pool.submit(new Parse(cd, stem)));
+                }
+
+                for(Future<MiniDictionary> f: futureListOfMiniDics){
+                    try {
+                        listOfMiniDics.add(f.get());
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                emptyCorpusDoc.release();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-
-
-            LinkedList<CorpusDocument> docsOfOneBulk = corpusDocQueue.poll();
-
-
-            LinkedList<Future<MiniDictionary>> futureListOfMiniDics = new LinkedList<Future<MiniDictionary>>();
-            for(CorpusDocument cd: docsOfOneBulk) {
-                futureListOfMiniDics.add(pool.submit(new Parse(cd, stem)));
-            }
-
-            for(Future<MiniDictionary> f: futureListOfMiniDics){
-                try {
-                    listOfMiniDics.add(f.get());
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-            emptyCorpusDoc.release();
-
-
-
-
-
-
 
             //PRODUCE
             try {
@@ -90,7 +83,7 @@ public class Manager {
             }
 
 
-            Indexer index = new Indexer(miniDicQueue.poll());
+            Indexer index = new Indexer(new ConcurrentLinkedDeque(miniDicQueue.poll()));
 
 
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
