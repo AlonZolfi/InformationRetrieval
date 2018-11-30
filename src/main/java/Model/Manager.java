@@ -87,8 +87,7 @@ public class Manager {
                 e.printStackTrace();
             }
 
-            LinkedList<MiniDictionary> tmp = miniDicQueue.poll();
-            Indexer index = new Indexer(new ConcurrentLinkedDeque(tmp));
+            Indexer index = new Indexer(new ConcurrentLinkedDeque(bulkToIndex));
 
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
 
