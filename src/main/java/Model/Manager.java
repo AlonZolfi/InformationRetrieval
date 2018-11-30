@@ -1,19 +1,15 @@
 package Model;
 
-import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
-import javafx.application.Platform;
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.*;
 
 public class Manager {
     private final int NUM_OF = 5;
-    public static Semaphore fullCorpusDoc = new Semaphore(0);
-    public static Semaphore emptyCorpusDoc = new Semaphore(5);
-    public static Semaphore fullMiniDic = new Semaphore(0);
-    public static Semaphore emptyMiniDic = new Semaphore(5);
+    public static Semaphore fullCorpusDocSemaphore = new Semaphore(0);
+    public static Semaphore emptyCorpusDocSemaphore = new Semaphore(5);
+    public static Semaphore fullMiniDicSemaphore = new Semaphore(0);
+    public static Semaphore emptyMiniDicSemaphore = new Semaphore(5);
     public static ConcurrentLinkedDeque<Future<LinkedList<CorpusDocument>>> corpusDocQueue = new ConcurrentLinkedDeque<Future<LinkedList<CorpusDocument>>>();
     public static ConcurrentLinkedDeque<LinkedList<MiniDictionary>> miniDicQueue = new ConcurrentLinkedDeque<LinkedList<MiniDictionary>>();
     public static boolean stopReadAndParse = false;
@@ -24,25 +20,27 @@ public class Manager {
 
         double start = System.currentTimeMillis();
         new Thread(() -> ReadFile.readFiles(corpusPath)).start();
-        new Thread(()->readAndParse(corpusPath,stem)).start();
+        new Thread(()-> Parse(stem)).start();
         new Thread(this::indexAndWriteTemporaryPosting).start();
         while(!stopIndexAndTempPosting);
         return new double[]{numOfDocs, invertedIndex.getNumOfUniqueTerms(), (System.currentTimeMillis() - start) / 60000};
 
     }
 
-    private void readAndParse(String corpusPath, boolean stem) {
+    private void Parse( boolean stem) {
 
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         while (!stopReadAndParse) {
+            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             //CONSUME
             LinkedList<MiniDictionary> listOfMiniDics = new LinkedList<MiniDictionary>();
             try {
-                fullCorpusDoc.acquire();
+                fullCorpusDocSemaphore.acquire();
 
-                LinkedList<CorpusDocument> docsOfOneBulk = corpusDocQueue.poll().get();
+                LinkedList<CorpusDocument> docsOfOneFile = corpusDocQueue.poll().get();
                 LinkedList<Future<MiniDictionary>> futureListOfMiniDics = new LinkedList<Future<MiniDictionary>>();
-                for(CorpusDocument cd: docsOfOneBulk) {
+                emptyCorpusDocSemaphore.release();
+                for(CorpusDocument cd: docsOfOneFile) {
+                    numOfDocs++;
                     futureListOfMiniDics.add(pool.submit(new Parse(cd, stem)));
                 }
 
@@ -54,35 +52,32 @@ public class Manager {
                     }
                 }
 
-                emptyCorpusDoc.release();
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
 
             //PRODUCE
             try {
-                emptyMiniDic.acquire();
+                emptyMiniDicSemaphore.acquire();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             miniDicQueue.add(listOfMiniDics);
-            fullMiniDic.release();
+            fullMiniDicSemaphore.release();
+            pool.shutdown();
         }
-        pool.shutdown();
         stopIndexAndTempPosting = true;
     }
 
     private void indexAndWriteTemporaryPosting() {
         //CONSUME
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         while(!stopIndexAndTempPosting) {
+            ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
             LinkedList<MiniDictionary> bulkToIndex = new LinkedList<MiniDictionary>();
             try {
-                for (int i = 0; i < NUM_OF; i++) {
-                    fullMiniDic.acquire();
-                    bulkToIndex.addAll(miniDicQueue.poll());
-
-                }
+                fullMiniDicSemaphore.acquire();
+                bulkToIndex.addAll(miniDicQueue.poll());
+                emptyMiniDicSemaphore.release();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -91,16 +86,6 @@ public class Manager {
 
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
 
-
-
-
-
-
-
-
-
-
-
             HashMap<String, StringBuilder> temporaryPosting = null;
             try {
                 temporaryPosting = futureTemporaryPosting.get();
@@ -108,9 +93,8 @@ public class Manager {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-            emptyMiniDic.release();
+            pool.shutdown();
         }
-        pool.shutdown();
     }
 
     /*public double[] Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {

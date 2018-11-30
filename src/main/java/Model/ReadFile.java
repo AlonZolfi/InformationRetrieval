@@ -2,10 +2,7 @@ package Model;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 public class ReadFile {
 
@@ -70,14 +67,19 @@ public class ReadFile {
             LinkedList<Future<LinkedList<CorpusDocument>>> futureBulk = new LinkedList<>();
             for (File file : directoryListing) {
                 try {
-                    Manager.emptyCorpusDoc.acquire();
+                    Manager.emptyCorpusDocSemaphore.acquire();
                     Manager.corpusDocQueue.add(pool.submit(new ReadDocuments(file)));
-                    Manager.fullCorpusDoc.release();
+                    Manager.fullCorpusDocSemaphore.release();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
             Manager.stopReadAndParse=true;
+            try {
+                pool.awaitTermination(1,TimeUnit.DAYS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             pool.shutdown();
         } else {
             System.out.println("Not a directory");
