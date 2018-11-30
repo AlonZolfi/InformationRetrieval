@@ -1,5 +1,10 @@
 package Model;
 
+import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
+import javafx.application.Platform;
+
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.*;
@@ -15,13 +20,14 @@ public class Manager {
     public static boolean stopReadAndParse = false;
     public static boolean stopIndexAndTempPosting = false;
     private int numOfDocs = 0;
+    private int numOfPostings=0;
 
     public double[] Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
 
         double start = System.currentTimeMillis();
         new Thread(() -> ReadFile.readFiles(corpusPath)).start();
-        new Thread(()-> Parse(stem)).start();
-        new Thread(this::indexAndWriteTemporaryPosting).start();
+        new Thread(()->readAndParse(corpusPath,stem)).start();
+        new Thread(()->indexAndWriteTemporaryPosting(destinationPath,invertedIndex)).start();
         while(!stopIndexAndTempPosting);
         return new double[]{numOfDocs, invertedIndex.getNumOfUniqueTerms(), (System.currentTimeMillis() - start) / 60000};
 
@@ -69,7 +75,7 @@ public class Manager {
         stopIndexAndTempPosting = true;
     }
 
-    private void indexAndWriteTemporaryPosting() {
+    private void indexAndWriteTemporaryPosting(String destinationPath,InvertedIndex invertedIndex) {
         //CONSUME
         while(!stopIndexAndTempPosting) {
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
@@ -89,8 +95,16 @@ public class Manager {
             HashMap<String, StringBuilder> temporaryPosting = null;
             try {
                 temporaryPosting = futureTemporaryPosting.get();
+                //first Write the posting to the disk, thene get the "link" of hitch word in list from the "WriteFile"
+                WriteFile.writeToDest(destinationPath,numOfPostings++,temporaryPosting);
+                //second fill the InvertedIndex with words and linkes
+                for (MiniDictionary mini:bulkToIndex) {
+                    for (String word:mini.listOfWords()) {
+                        invertedIndex.addTerm(word);
+                    }
+                }
 
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException | IOException e) {
                 e.printStackTrace();
             }
             pool.shutdown();
