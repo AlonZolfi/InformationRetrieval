@@ -26,7 +26,7 @@ public class ReadFile {
 
     }
 
-    /*public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
+    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();
@@ -38,7 +38,7 @@ public class ReadFile {
             /*for (File file : directoryListing) {
                 Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(file));
                 futureDocsInFile.add(f);
-            }
+            }*/
             for (int i = start; i <= end; i++) {
                 Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(directoryListing[i]));
                 futureDocsInFile.add(f);
@@ -57,12 +57,13 @@ public class ReadFile {
         }
 
         return allDocsInCorpus;
-    }*///
+    }
 
-    public static void readFiles(String pathOfDocs) {
+    /*public static void readFiles(String pathOfDocs) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null && dir.isDirectory()) {
+            Manager.stopReadAndParse = directoryListing.length;
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             LinkedList<Future<LinkedList<CorpusDocument>>> futureBulk = new LinkedList<>();
             for (File file : directoryListing) {
@@ -73,8 +74,8 @@ public class ReadFile {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                Manager.continueReadandParse++;
             }
-            Manager.stopReadAndParse=true;
             try {
                 pool.awaitTermination(1,TimeUnit.DAYS);
             } catch (InterruptedException e) {
@@ -84,5 +85,5 @@ public class ReadFile {
         } else {
             System.out.println("Not a directory");
         }
-    }
+    }*/
 }

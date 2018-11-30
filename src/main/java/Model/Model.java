@@ -30,7 +30,7 @@ public class Model extends Observable implements IModel {
         invertedIndex = new InvertedIndex();
         documentDictionary = new LinkedList<>();
         ReadFile.initStopWords(stopWordsPath);
-        double[] results = man.Manage(documentDictionary, invertedIndex, pathOfDocs, stopWordsPath, "", stm);
+        double[] results = man.Manage(documentDictionary, invertedIndex, pathOfDocs, stopWordsPath, destinationPath, stm);
         setChanged();
         notifyObservers(results);
     }
