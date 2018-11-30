@@ -26,7 +26,7 @@ public class Manager {
 
         double start = System.currentTimeMillis();
         new Thread(() -> ReadFile.readFiles(corpusPath)).start();
-        new Thread(()->readAndParse(corpusPath,stem)).start();
+        new Thread(()->Parse(stem)).start();
         new Thread(()->indexAndWriteTemporaryPosting(destinationPath,invertedIndex)).start();
         while(!stopIndexAndTempPosting);
         return new double[]{numOfDocs, invertedIndex.getNumOfUniqueTerms(), (System.currentTimeMillis() - start) / 60000};
