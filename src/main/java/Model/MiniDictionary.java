@@ -65,17 +65,6 @@ public class MiniDictionary {
         return null;
     }
 
-    public int numOfUniqueWords(){
-        return size();
-        /*int count=0;
-        for (String word: m_dictionary.keySet() ) {
-            int tmp= getFrequency(word);
-            if (tmp==1)
-                count++;
-        }
-        return count;*/
-    }
-
     public String listOfData(String word){
         //take all of the words in the mini dic and save the data for them in a **tmp** file(?)
         // under the name "name" and contains "word" | "num of apirens" | "where" (list)

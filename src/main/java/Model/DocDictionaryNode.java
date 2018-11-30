@@ -4,9 +4,9 @@ public class DocDictionaryNode {
     private String m_docName;
     private int m_maxFreq;
     private int m_numOfUniWords;
-    private int m_city;
+    private String m_city;
 
-    public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, int m_city) {
+    public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, String m_city) {
         this.m_docName = m_docName;
         this.m_maxFreq = m_maxFreq;
         this.m_numOfUniWords = m_numOfUniWords;
@@ -25,8 +25,13 @@ public class DocDictionaryNode {
         return m_numOfUniWords;
     }
 
-    public int getCity() {
+    public String getCity() {
         return m_city;
+    }
+
+    @Override
+    public int hashCode() {
+        return m_docName.hashCode();
     }
 }
 

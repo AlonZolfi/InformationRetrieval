@@ -132,14 +132,15 @@ public class Manager {
             try {
                 temporaryPosting = futureTemporaryPosting.get();
                 //first Write the posting to the disk, thene get the "link" of hitch word in list from the "WriteFile"
-                WriteFile.writeToDest(destinationPath, numOfPostings++, temporaryPosting);
+                WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting);
                 //second fill the InvertedIndex with words and linkes
                 for (MiniDictionary mini : miniDicList) {
+                    DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),mini.getCity());
+                    documentDictionary.add(cur);
                     for (String word : mini.listOfWords()) {
                         invertedIndex.addTerm(word);
                     }
                 }
-
 
             } catch (InterruptedException | ExecutionException | IOException e) {
                 e.printStackTrace();
@@ -154,9 +155,11 @@ public class Manager {
             pool.shutdown();
         }
         //System.out.println(System.currentTimeMillis()-start);
-        return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
         //MERGE ALL POSTINGS
         //fix link in the inverted index
+        WriteFile.writeDocDictionary(documentDictionary);
+        return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
+
     }
     //MERGE ALL POSTINGS
     //fix link in the inverted index

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 public class WriteFile {
 
-    public static void writeToDest(String path, int i , HashMap<String, StringBuilder> temporaryPosting) throws IOException {
+    public static void writeTmpPosting(String path, int i , HashMap<String, StringBuilder> temporaryPosting) throws IOException {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
         String [] words = temporaryPosting.keySet().toArray(new String[0]);
@@ -23,6 +23,22 @@ public class WriteFile {
         fileWriter.write(toWrite.toString());
         fileWriter.close();
     }
+
+    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary) throws IOException {
+        StringBuilder toWrite = new StringBuilder();
+        for (DocDictionaryNode cur:documentDictionary) {
+            toWrite.append(cur.getDocName()+"\t");
+            toWrite.append(cur.getNumOfUniWords()+"\t");
+            toWrite.append(cur.getMaxFreq()+"\t");
+            toWrite.append(cur.getCity()+"\n");
+        }
+        File dir = new File(path);
+        File actualFile = new File(dir,"docomentDictionay.txt");
+        FileWriter fileWriter = new FileWriter(actualFile);
+        fileWriter.write(toWrite.toString());
+        fileWriter.close();
+    }
+
 
     public String[][] showDictionay(){
         //fix the dic to string [][] of word|df|link and send it to model how updata it to VM how updata it to view
