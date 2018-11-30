@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.concurrent.*;
 
 public class Manager {
+    private final int NUM_OF = 5;
     public static Semaphore fullCorpusDoc = new Semaphore(0);
     public static Semaphore emptyCorpusDoc = new Semaphore(5);
     public static Semaphore fullMiniDic = new Semaphore(0);
@@ -33,9 +34,9 @@ public class Manager {
     private void readAndParse(String corpusPath, boolean stem) {
 
         ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-        LinkedList<MiniDictionary> listOfMiniDics = new LinkedList<MiniDictionary>();
         while (!stopReadAndParse) {
             //CONSUME
+            LinkedList<MiniDictionary> listOfMiniDics = new LinkedList<MiniDictionary>();
             try {
                 fullCorpusDoc.acquire();
 
@@ -65,7 +66,6 @@ public class Manager {
                 e.printStackTrace();
             }
             miniDicQueue.add(listOfMiniDics);
-            listOfMiniDics = new LinkedList<MiniDictionary>();
             fullMiniDic.release();
         }
         pool.shutdown();
@@ -76,14 +76,19 @@ public class Manager {
         //CONSUME
         ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
         while(!stopIndexAndTempPosting) {
+            LinkedList<MiniDictionary> bulkToIndex = new LinkedList<MiniDictionary>();
             try {
-                fullMiniDic.acquire();
+                for (int i = 0; i < NUM_OF; i++) {
+                    fullMiniDic.acquire();
+                    bulkToIndex.addAll(miniDicQueue.poll());
+
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
 
-            Indexer index = new Indexer(new ConcurrentLinkedDeque(miniDicQueue.poll()));
+            Indexer index = new Indexer(new ConcurrentLinkedDeque(bulkToIndex));
 
 
             Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
