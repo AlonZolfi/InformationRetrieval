@@ -142,7 +142,7 @@ public class View implements Observer, IView {
     public void browseSource(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Source Path");
-        File defaultDirectory = new File("C:\\Users\\alonz\\Desktop");
+        File defaultDirectory = new File("C:");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
@@ -159,7 +159,7 @@ public class View implements Observer, IView {
     public void browseDest(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Destination Path");
-        File defaultDirectory = new File("C:\\Users\\alonz\\Desktop");
+        File defaultDirectory = new File("C:");
         fileChooser.setInitialDirectory(defaultDirectory);
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
