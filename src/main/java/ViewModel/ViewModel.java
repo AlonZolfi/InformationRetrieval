@@ -21,8 +21,8 @@ public class ViewModel extends Observable implements Observer {
         }
     }
 
-    public void onStartClick(String pathOfDocs, String pathOfStopWords, String destinationPath, boolean stm){
-        Platform.runLater(()->model.onStartClick(pathOfDocs,pathOfStopWords,destinationPath,stm));
+    public void onStartClick(String pathOfDocs, String destinationPath, boolean stm){
+        Platform.runLater(()->model.onStartClick(pathOfDocs,destinationPath,stm));
     }
 
     public void onStartOverClick(String path) {
@@ -32,5 +32,4 @@ public class ViewModel extends Observable implements Observer {
     public void showDictionary(){
         Platform.runLater(()->model.showDictionary());
     }
-
 }
