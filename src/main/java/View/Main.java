@@ -12,24 +12,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //the semtemce ia "hila kesem hadad the malka"
-        /*String line = "hila kesem hadad ha malka ve ha kesem";
-        MiniDictionary miniDictionary = new MiniDictionary("hila");
-        String[] lineMem = line.split(" ");
-        for (int i = 0; i < lineMem.length; i++) {
-            miniDictionary.addWord(lineMem[i], i);
-        }
-        miniDictionary.listOfData();
-
-
-        String lineTwo = "alon zolfi zylfi ha shamen ve ha mechoar";
-        MiniDictionary miniDictionaryTwo = new MiniDictionary("alon");
-        String[] lineMemTwo = lineTwo.split(" ");
-        for (int i = 0; i < lineMemTwo.length; i++) {
-            miniDictionaryTwo.addWord(lineMemTwo[i], i);
-        }
-
-        miniDictionaryTwo.listOfData();*/
 
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
@@ -38,7 +20,6 @@ public class Main extends Application {
         primaryStage.setTitle("Information Retrieval Project");
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = fxmlLoader.load(getClass().getClassLoader().getResource("View.fxml").openStream());
-        //scene.getStylesheets().add(getClass().getResource("ViewStyle.css").toExternalForm());
         primaryStage.setScene(new Scene(root));
         //--------------
         View view = fxmlLoader.getController();
