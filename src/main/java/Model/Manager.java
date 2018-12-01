@@ -103,11 +103,11 @@ public class Manager {
     }*/
 
 
-    public double[] Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
+    public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) throws IOException {
         int numOfDocs = 0;
         ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
-        int iter = 200;
+        int iter = 10;
         for (int i = 0; i < iter; i++) {
             double startInner = System.currentTimeMillis();
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
@@ -162,11 +162,23 @@ public class Manager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
 
+
+        fillTheCityDictionary(documentDictionary,cityDictionary);
+
+        return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
-    //MERGE ALL POSTINGS
-    //fix link in the inverted index
+
+    private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) throws IOException {
+        CitysMemoryDataBase citysMemoryDataBase = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+        for (DocDictionaryNode cur:documentDictionary){
+            String curCity = cur.getCity();
+            if (!curCity.equals("")) {
+                CityInfoNode toPut = citysMemoryDataBase.getCountryByCapital(curCity);
+                cityDictionary.put(curCity, toPut);
+            }
+        }
+    }
 }
 
 

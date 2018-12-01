@@ -3,6 +3,7 @@ package ViewModel;
 import Model.IModel;
 import javafx.application.Platform;
 
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -22,7 +23,13 @@ public class ViewModel extends Observable implements Observer {
     }
 
     public void onStartClick(String pathOfDocs, String pathOfStopWords, String destinationPath, boolean stm){
-        Platform.runLater(()->model.onStartClick(pathOfDocs,pathOfStopWords,destinationPath,stm));
+        Platform.runLater(() -> {
+            try {
+                model.onStartClick(pathOfDocs, pathOfStopWords, destinationPath, stm);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void onStartOverClick(String path) {
