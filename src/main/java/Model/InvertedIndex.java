@@ -3,6 +3,7 @@ package Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.File;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,5 +40,9 @@ public class InvertedIndex {
         for (String s : sorted.keySet())
             showDictionaryRecords.add(new ShowDictionaryRecord(s,invertedIndexDic.get(s).getNumOfAppearances()+""));
         return showDictionaryRecords;
+    }
+
+    public void loadDictionary(File file) {
+
     }
 }

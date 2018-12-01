@@ -28,11 +28,11 @@
          </items>
       </ChoiceBox>
       <Button fx:id="btn_startOver" layoutX="502.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartOverClick" prefHeight="31.0" prefWidth="165.0" text="Start Over" />
-      <Button fx:id="btn_showDic" layoutX="502.0" layoutY="155.0" mnemonicParsing="false" onAction="#showDictionaryClick" prefHeight="31.0" prefWidth="165.0" text="Show Dictionary" disable="true"/>
-      <Button fx:id="btn_loadDic" layoutX="501.0" layoutY="103.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="165.0" text="Load Dictionary"/>
-      <Button fx:id="btn_start" layoutX="24.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="31.0" prefWidth="149.0" text="START INDEXING" />
-      <Button fx:id="btn_browse_corpus" layoutX="261.0" layoutY="51.0" mnemonicParsing="false" onAction="#browseSource" text="browse" />
-      <Button fx:id="btn_browse_saveDic" layoutX="261.0" layoutY="118.0" mnemonicParsing="false" onAction="#browseDest" text="browse" />
+      <Button fx:id="btn_showDic" disable="true" layoutX="502.0" layoutY="155.0" mnemonicParsing="false" onAction="#showDictionaryClick" prefHeight="31.0" prefWidth="165.0" text="Show Dictionary" />
+      <Button fx:id="btn_loadDic" layoutX="501.0" layoutY="103.0" mnemonicParsing="false" onAction="#loadDictionary" prefHeight="31.0" prefWidth="165.0" text="Load Dictionary" />
+      <Button fx:id="btn_start" layoutX="24.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="31.0" prefWidth="149.0" text="Start Indexing" />
+      <Button fx:id="btn_browse_corpus" layoutX="261.0" layoutY="51.0" mnemonicParsing="false" onAction="#browseSourceClick" text="browse" />
+      <Button fx:id="btn_browse_saveDic" layoutX="261.0" layoutY="118.0" mnemonicParsing="false" onAction="#browseDestClick" text="browse" />
       <TableView fx:id="table_showDic" layoutY="276.0" prefHeight="339.0" prefWidth="680.0">
          <placeholder>
             <Label text="Press 'Show Dictionary' to see data " />

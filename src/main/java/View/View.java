@@ -3,7 +3,10 @@ package View;
 import ViewModel.ViewModel;
 import Model.ShowDictionaryRecord;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class View implements Observer, IView {
 
     private ViewModel viewModel;
+
     public TextField source;
     public TextField destination;
     public Button btn_start;
@@ -49,33 +53,10 @@ public class View implements Observer, IView {
      * This function start the procces of pars and index the dictionary
      */
     public void onStartClick() {
-        if (source.getText().equals("") || destination.getText().equals("")) {
+        if (source.getText().equals("") || destination.getText().equals(""))
             MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
-        } else {
-            /*String pathOfDocs = "" , pathOfStopWords = "";
-            File dirSource = new File(source.getText());
-            File[] directoryListing = dirSource.listFiles();
-            if (directoryListing != null && dirSource.isDirectory()) {
-                for (File file : directoryListing) {
-                    if (file.isDirectory())
-                        pathOfDocs = file.getAbsolutePath();
-                    else
-                        pathOfStopWords = file.getAbsolutePath();
-                }
-            }
-            else {
-                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "path of corpus and stopReadAndParse words is unreachable");
-                return;
-            }
-            File dirDest = new File(destination.getText());
-            if(!dirDest.isDirectory()){
-                MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
-                return;
-            }*/
-
-
+        else
             viewModel.onStartClick(source.getText(),destination.getText(), doStemming());
-        }
     }
 
     /**
@@ -121,23 +102,10 @@ public class View implements Observer, IView {
         }
     }
 
-    private void showIndexResults(double[] results) {
-        lbl_totalDocsNum.setText(""+(int)results[0]);
-        lbl_totalTermsNum.setText(""+(int)results[1]);
-        lbl_totalTimeNum.setText(""+results[2]+" Minutes");
-        lbl_resultTitle.setVisible(true);
-        lbl_totalDocs.setVisible(true);
-        lbl_totalDocsNum.setVisible(true);
-        lbl_totalTerms.setVisible(true);
-        lbl_totalTermsNum.setVisible(true);
-        lbl_totalTime.setVisible(true);
-        lbl_totalTimeNum.setVisible(true);
-    }
-
     /***
      * This function let the user select his corpus and stopReadAndParse word list
      */
-    public void browseSource(){
+    public void browseSourceClick(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Source Path");
         File defaultDirectory = new File("C:");
@@ -148,11 +116,12 @@ public class View implements Observer, IView {
         /*else
             source.setText(defaultDirectory.getName());*/
     }
+
     /***
      * This function let the user select his favorite location to save the documents
      */
 
-    public void browseDest(){
+    public void browseDestClick(){
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Destination Path");
         File defaultDirectory = new File("C:");
@@ -168,6 +137,19 @@ public class View implements Observer, IView {
         viewModel.showDictionary();
     }
 
+    private void showIndexResults(double[] results) {
+        lbl_totalDocsNum.setText(""+(int)results[0]);
+        lbl_totalTermsNum.setText(""+(int)results[1]);
+        lbl_totalTimeNum.setText(""+results[2]+" Minutes");
+        lbl_resultTitle.setVisible(true);
+        lbl_totalDocs.setVisible(true);
+        lbl_totalDocsNum.setVisible(true);
+        lbl_totalTerms.setVisible(true);
+        lbl_totalTermsNum.setVisible(true);
+        lbl_totalTime.setVisible(true);
+        lbl_totalTimeNum.setVisible(true);
+    }
+
     private void showDictionary(ObservableList<ShowDictionaryRecord> records){
         if(records != null){
             tableCol_term.setCellValueFactory(cellData -> cellData.getValue().getTermProperty());
@@ -175,5 +157,12 @@ public class View implements Observer, IView {
             table_showDic.setItems(records);
         }
         btn_showDic.setDisable(false);
+    }
+
+    public void loadDictionary() {
+        if(!destination.getText().equals(""))
+            viewModel.loadDictionary(destination.getText(),doStemming());
+        else
+            MyAlert.showAlert(Alert.AlertType.ERROR,"Destination path cannot be empty");
     }
 }

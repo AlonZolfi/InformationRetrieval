@@ -32,4 +32,8 @@ public class ViewModel extends Observable implements Observer {
     public void showDictionary(){
         Platform.runLater(()->model.showDictionary());
     }
+
+    public void loadDictionary(String path, boolean stem) {
+        Platform.runLater(()->model.loadDictionary(path,stem));
+    }
 }

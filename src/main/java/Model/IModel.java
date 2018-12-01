@@ -7,4 +7,6 @@ public interface IModel {
     void onStartOverClick(String path);
 
     void showDictionary();
+
+    void loadDictionary(String path, boolean stem);
 }

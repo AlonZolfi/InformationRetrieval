@@ -2,14 +2,10 @@ package Model;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 
-import View.MyAlert;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import org.apache.commons.io.FileUtils;
 
 public class Model extends Observable implements IModel {
@@ -73,24 +69,23 @@ public class Model extends Observable implements IModel {
         return new String[]{corpusPath,destinationPath,pathOfStopWords};
     }
 
-
     @Override
     public void onStartOverClick(String path) {
         File dir = new File(path);
+        String[] update;
         if(dir.isDirectory()){
             try {
                 FileUtils.cleanDirectory(dir);
-                setChanged();
-                notifyObservers(new String[]{"Successful","The folder is clean now"});
+                update = new String[]{"Successful","The folder is clean now"};
             } catch (IOException e) {
-                e.printStackTrace();
+                update = new String[]{"Fail","Cleaning the folder was unsuccessful"};
             }
         }
         else {
-            String[] update = {"Fail","Path given is not a directory or could not be reached"};
-            setChanged();
-            notifyObservers(update);
+            update = new String[]{"Fail","Path given is not a directory or could not be reached"};
         }
+        setChanged();
+        notifyObservers(update);
     }
 
     @Override
@@ -105,5 +100,29 @@ public class Model extends Observable implements IModel {
             setChanged();
             notifyObservers(records);
         }
+    }
+
+    @Override
+    public void loadDictionary(String path, boolean stem) {
+        boolean found = false;
+        File dirSource = new File(path);
+        File[] directoryListing = dirSource.listFiles();
+        String[] update=new String[0];
+        if (directoryListing != null && dirSource.isDirectory()) {
+            for (File file : directoryListing) {
+                if ((file.getName().equals("invertedIndexWithStem") && stem)||(file.getName().equals("invertedIndexWithoutStem"))&&!stem) {
+                    invertedIndex.loadDictionary(file);
+                    update = new String[]{"Successful","Dictionary was loaded successfully"};
+                    found = true;
+                }
+            }
+            if(!found)
+                update =new String[] {"Fail","could not find dictionary"};
+        }
+        else
+            update =new String[] {"Fail","destination path is illegal or unreachable"};
+
+        setChanged();
+        notifyObservers(update);
     }
 }
