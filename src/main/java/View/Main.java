@@ -13,7 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Model model = new Model();
+        /*Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
         //--------------
@@ -26,11 +26,12 @@ public class Main extends Application {
         view.setViewModel(viewModel);
         viewModel.addObserver(view);
         //--------------
-        primaryStage.show();
+        primaryStage.show();*/
 
 
-        /*CorpusDocument cd = new CorpusDocument("","","","",
-                "$ " +
+        CorpusDocument cd = new CorpusDocument("","","","",
+                "1000 " +
+                "Thousand " +
                 "4/9-11 " +
                 "1/5 " +
                 "4/9-11 " +
@@ -128,7 +129,7 @@ public class Main extends Application {
             "");
         Parse p = new Parse(cd,true);
 
-        p.call();*/
+        p.call();
     }
 
 

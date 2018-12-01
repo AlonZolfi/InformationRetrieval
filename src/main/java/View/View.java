@@ -108,8 +108,10 @@ public class View implements Observer, IView {
         if(o==viewModel){
             if(arg instanceof String[]){
                 String[] toUpdate = (String[])arg;
-                if(toUpdate[0].equals("RaiseAlert"))
-                    MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,toUpdate[1]);
+                if(toUpdate[0].equals("Fail"))
+                    MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
+                else if(toUpdate[0].equals("Successful"))
+                    MyAlert.showAlert(Alert.AlertType.CONFIRMATION,toUpdate[1]);
             } else if( arg instanceof ObservableList){
                 showDictionary((ObservableList)arg);
             } else if( arg instanceof double[]){

@@ -42,12 +42,14 @@ public class Model extends Observable implements IModel {
         if(dir.isDirectory()){
             try {
                 FileUtils.cleanDirectory(dir);
+                setChanged();
+                notifyObservers(new String[]{"Successful","The folder is clean now"});
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         else {
-            String[] update = {"RaiseAlert","Path given is not a directory or could not be reached"};
+            String[] update = {"Fail","Path given is not a directory or could not be reached"};
             setChanged();
             notifyObservers(update);
         }
@@ -55,12 +57,15 @@ public class Model extends Observable implements IModel {
 
     @Override
     public void showDictionary() {
-        ObservableList<ShowDictionaryRecord> observableList = FXCollections.observableArrayList();
-        observableList.add(new ShowDictionaryRecord("ALon","5"));
-        observableList.add(new ShowDictionaryRecord("Hila","45"));
-        observableList.add(new ShowDictionaryRecord("dsa","5453"));
-        observableList.add(new ShowDictionaryRecord("dsds","53"));
-        setChanged();
-        notifyObservers(observableList);
+        if(invertedIndex==null){
+            String[] update = {"Fail","Please load the dictionary first"};
+            setChanged();
+            notifyObservers(update);
+        }
+        else {
+            ObservableList records = invertedIndex.getRecords();
+            setChanged();
+            notifyObservers(records);
+        }
     }
 }

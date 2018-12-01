@@ -1,5 +1,9 @@
 package Model;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InvertedIndex {
@@ -18,14 +22,22 @@ public class InvertedIndex {
         else{
             //if the word already exist we shold fo to the posting and add the new postin to him
             /*InvertedIndexNode notFirst = invertedIndexDic.remove(term);
-            notFirst.incrisAppirnces();
+            notFirst.increaseAppearances();
             invertedIndexDic.put(term,notFirst);
         */
-            invertedIndexDic.get(term).incrisAppirnces();
+            invertedIndexDic.get(term).increaseAppearances();
         }
     }
 
     public int getNumOfUniqueTerms(){
         return invertedIndexDic.size();
+    }
+
+    public ObservableList<ShowDictionaryRecord> getRecords() {
+        ObservableList<ShowDictionaryRecord> showDictionaryRecords = FXCollections.observableArrayList();
+        TreeMap<String,InvertedIndexNode> sorted = new TreeMap<String, InvertedIndexNode>(invertedIndexDic);
+        for (String s : sorted.keySet())
+            showDictionaryRecords.add(new ShowDictionaryRecord(s,invertedIndexDic.get(s).getNumOfAppearances()+""));
+        return showDictionaryRecords;
     }
 }
