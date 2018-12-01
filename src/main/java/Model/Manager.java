@@ -107,7 +107,7 @@ public class Manager {
         ReadFile.initStopWords(stopWordsPath);
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 1;
+        int iter = 1800;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
