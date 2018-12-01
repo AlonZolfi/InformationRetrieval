@@ -173,6 +173,7 @@ public class Parse implements Callable<MiniDictionary> {
         LinkedList<String> wordsList = new LinkedList<>();
         for (String word: split) {
             word = cleanTerm(word);
+
             if(!word.equals(""))
                 wordsList.add(word);
         }
@@ -189,10 +190,8 @@ public class Parse implements Callable<MiniDictionary> {
                 }
             }
             if (term.length()>1 && !(term.charAt(0) == '$') && !isNumber(term)) {
-                int j = 0;
-                while (j < term.length() && !Character.isLetterOrDigit(term.charAt(j))) {
+                while (term.length()>0 && !Character.isLetterOrDigit(term.charAt(0))) {
                     term = term.substring(1);
-                    j++;
                 }
             }
         }

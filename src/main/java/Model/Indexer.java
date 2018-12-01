@@ -9,8 +9,7 @@ public class Indexer implements Callable<HashMap<String,StringBuilder>> {
     private ConcurrentLinkedDeque<MiniDictionary> m_miniDicList;
     //private LinkedList<MiniDictionary> m_miniDicList;
 
-    public Indexer(ConcurrentLinkedDeque minidic){//LinkedList<MiniDictionary> minidic){//LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex){
-        //m_miniDicList = minidic;
+    public Indexer(ConcurrentLinkedDeque minidic){
         m_miniDicList = minidic;
     }
 
@@ -23,7 +22,7 @@ public class Indexer implements Callable<HashMap<String,StringBuilder>> {
             for (MiniDictionary miniDic: m_miniDicList) {
                 for (String word : miniDic.listOfWords()) {
                     if (toReturn.containsKey(word)) {
-                        toReturn.get(word).append(miniDic.listOfData(word)+"|");
+                        toReturn.get(word).append(miniDic.listOfData(word)).append("|");
                     }
                     else{
                         StringBuilder sb = new StringBuilder(miniDic.listOfData(word)+"|");
@@ -34,4 +33,6 @@ public class Indexer implements Callable<HashMap<String,StringBuilder>> {
         }
         return toReturn;
     }
+
+
 }

@@ -107,7 +107,7 @@ public class Manager {
         int numOfDocs = 0;
         ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
-        int iter = 2;
+        int iter = 200;
         for (int i = 0; i < iter; i++) {
             double startInner = System.currentTimeMillis();
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
@@ -135,6 +135,8 @@ public class Manager {
                 WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting);
                 //second fill the InvertedIndex with words and linkes
                 for (MiniDictionary mini : miniDicList) {
+                    if(!mini.getCity().equals(""))
+                        System.out.println("fds");
                     DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),mini.getCity());
                     documentDictionary.add(cur);
                     for (String word : mini.listOfWords()) {
@@ -157,7 +159,7 @@ public class Manager {
         //System.out.println(System.currentTimeMillis()-start);
         //MERGE ALL POSTINGS
         //fix link in the inverted index
-        WriteFile.writeDocDictionary(documentDictionary);
+        //WriteFile.writeDocDictionary(documentDictionary);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
 
     }
