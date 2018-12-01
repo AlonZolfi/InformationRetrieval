@@ -107,7 +107,7 @@ public class Manager {
         int numOfDocs = 0;
         ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
-        int iter = 2;
+        int iter = 200;
         for (int i = 0; i < iter; i++) {
             double startInner = System.currentTimeMillis();
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
@@ -157,7 +157,11 @@ public class Manager {
         //System.out.println(System.currentTimeMillis()-start);
         //MERGE ALL POSTINGS
         //fix link in the inverted index
-        WriteFile.writeDocDictionary(documentDictionary);
+        try {
+            WriteFile.writeDocDictionary(destinationPath,documentDictionary);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
 
     }
