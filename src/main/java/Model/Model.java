@@ -2,6 +2,7 @@ package Model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 
@@ -28,8 +29,9 @@ public class Model extends Observable implements IModel {
             Manager man = new Manager();
             invertedIndex = new InvertedIndex();
             documentDictionary = new LinkedList<>();
+            cityDictionary = new HashMap<String, CityInfoNode>();
             ReadFile.initStopWords(paths[2]);
-            double[] results = man.Manage(cityDictionary,documentDictionary, invertedIndex, paths[0], paths[1], destinationPath, stm);
+            double[] results = man.Manage(cityDictionary,documentDictionary, invertedIndex, paths[0], paths[1], stm);
             setChanged();
             notifyObservers(results);
         }

@@ -103,13 +103,12 @@ public class Manager {
     }*/
 
 
-    public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
+    public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
         int numOfDocs = 0;
-        ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
-        int iter = 1800;
+        int iter = 2;
         for (int i = 0; i < iter; i++) {
-            LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
+            LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             ConcurrentLinkedDeque<Future<MiniDictionary>> futureMiniDicList = new ConcurrentLinkedDeque<Future<MiniDictionary>>();
             for (CorpusDocument cd : l) {
@@ -141,7 +140,7 @@ public class Manager {
                     }
                 }
 
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
             pool.shutdown();
@@ -149,30 +148,32 @@ public class Manager {
 
         //MERGE ALL POSTINGS
         //fix link in the inverted index
-        try {
-            WriteFile.writeDocDictionary(destinationPath,documentDictionary);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+        WriteFile.writeDocDictionary(destinationPath,documentDictionary);
         fillTheCityDictionary(documentDictionary,cityDictionary);
+        WriteFile.writeCityDictionary(destinationPath,cityDictionary);
 
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
     private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) {
-        CitysMemoryDataBase citysMemoryDataBase = null;
+        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
+        CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = null;
         try {
-            citysMemoryDataBase = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+            citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
+            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         for (DocDictionaryNode cur:documentDictionary){
             String curCity = cur.getCity();
-            if (!curCity.equals("")) {
-                CityInfoNode toPut = citysMemoryDataBase.getCountryByCapital(curCity);
-                cityDictionary.put(curCity, toPut);
+            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(curCity);
+                if(toPut!=null)
+                    cityDictionary.put(curCity, toPut);
+                else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
+                if(toPut!=null)
+                    System.out.println("couldnt find city in API");
             }
         }
     }

@@ -33,6 +33,11 @@ public class DocDictionaryNode {
     public int hashCode() {
         return m_docName.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return m_docName+"\t"+m_numOfUniWords+"\t"+m_maxFreq+"\t"+m_city+"\n";
+    }
 }
 
 

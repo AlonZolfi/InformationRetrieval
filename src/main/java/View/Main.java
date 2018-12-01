@@ -12,8 +12,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
 
-        Model model = new Model();
+        /*Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
         //--------------
@@ -26,7 +27,7 @@ public class Main extends Application {
         view.setViewModel(viewModel);
         viewModel.addObserver(view);
         //--------------
-        primaryStage.show();
+        primaryStage.show();*/
 
 
         /*CorpusDocument cd = new CorpusDocument("","","","",

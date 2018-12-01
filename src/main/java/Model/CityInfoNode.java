@@ -30,4 +30,9 @@ public class CityInfoNode {
     public String getCurrency_sign() {
         return  currency_sign;
     }
+
+    @Override
+    public String toString() {
+        return city_name+"\t"+country_name+"\t"+population_amount+"\t"+currency_sign+"\n";
+    }
 }

@@ -22,7 +22,7 @@ public class CitysMemoryDataBase {
             String countryName = data.get("name").toString();
             String capitalName = data.get("capital").toString();
             String population = data.get("population").toString();
-            CityInfoNode cur = new CityInfoNode(capitalName,countryName,population,currency);
+            CityInfoNode cur = new CityInfoNode(capitalName.toUpperCase(),countryName,population,currency);
             this.CountryDB.put(cur.getCity_name(),cur);
         }
     }

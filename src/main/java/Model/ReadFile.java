@@ -25,7 +25,7 @@ public class ReadFile {
 
     }
 
-    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, String pathOfStopWords,int mone,int mechane) {
+    public static LinkedList<CorpusDocument> readFiles(String pathOfDocs,int mone,int mechane) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();

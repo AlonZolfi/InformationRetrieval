@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 public class WriteFile {
 
-    public static void writeTmpPosting(String path, int i , HashMap<String, StringBuilder> temporaryPosting) throws IOException {
+    public static void writeTmpPosting(String path, int i , HashMap<String, StringBuilder> temporaryPosting) {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
         TreeMap<String, StringBuilder> sorted = new TreeMap<>(temporaryPosting);
@@ -17,27 +17,41 @@ public class WriteFile {
         for (int j = 0; j <sorted.size() ; j++) {
             toWrite.append(words[j]).append(" ").append(sorted.get(words[j])).append("\n");
         }
-
         File dir = new File(path);
         File actualFile = new File(dir,"posting_"+i+".txt");
-        FileWriter fileWriter = new FileWriter(actualFile);
-        fileWriter.write(toWrite.toString());
-        fileWriter.close();
+        write(actualFile,toWrite);
     }
 
-    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary) throws IOException {
+    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary) {
         StringBuilder toWrite = new StringBuilder();
-        for (DocDictionaryNode cur:documentDictionary) {
-            toWrite.append(cur.getDocName()).append("\t");
-            toWrite.append(cur.getNumOfUniWords()).append("\t");
-            toWrite.append(cur.getMaxFreq()).append("\t");
-            toWrite.append(cur.getCity()).append("\n");
+        for (DocDictionaryNode cur :documentDictionary) {
+            toWrite.append(cur.toString());
         }
         File dir = new File(path);
-        File actualFile = new File(dir,"docomentDictionay.txt");
-        FileWriter fileWriter = new FileWriter(actualFile);
-        fileWriter.write(toWrite.toString());
-        fileWriter.close();
+        File actualFile = new File(dir,"documentDictionary.txt");
+        write(actualFile,toWrite);
+    }
+
+    public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
+        StringBuilder toWrite = new StringBuilder();
+        for (CityInfoNode cur : cityDictionary.values()) {
+            toWrite.append(cur.toString());
+        }
+        File dir = new File(path);
+        File actualFile = new File(dir,"cityDictionary.txt");
+        write(actualFile,toWrite);
+    }
+
+    private static void write(File actualFile, StringBuilder toWrite){
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(actualFile);
+            fileWriter.write(toWrite.toString());
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
