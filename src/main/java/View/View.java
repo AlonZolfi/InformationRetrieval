@@ -52,7 +52,7 @@ public class View implements Observer, IView {
         if (source.getText().equals("") || destination.getText().equals("")) {
             MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
         } else {
-            String pathOfDocs = "" , pathOfStopWords = "";
+            /*String pathOfDocs = "" , pathOfStopWords = "";
             File dirSource = new File(source.getText());
             File[] directoryListing = dirSource.listFiles();
             if (directoryListing != null && dirSource.isDirectory()) {
@@ -71,10 +71,10 @@ public class View implements Observer, IView {
             if(!dirDest.isDirectory()){
                 MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "destination path is unreachable");
                 return;
-            }
+            }*/
 
 
-            viewModel.onStartClick(pathOfDocs, pathOfStopWords,dirDest.getAbsolutePath(), doStemming());
+            viewModel.onStartClick(source.getText(),destination.getText(), doStemming());
         }
     }
 
@@ -108,17 +108,20 @@ public class View implements Observer, IView {
         if(o==viewModel){
             if(arg instanceof String[]){
                 String[] toUpdate = (String[])arg;
-                if(toUpdate[0].equals("RaiseAlert"))
-                    MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,toUpdate[1]);
+                if(toUpdate[0].equals("Fail"))
+                    MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
+                else if(toUpdate[0].equals("Successful"))
+                    MyAlert.showAlert(Alert.AlertType.CONFIRMATION,toUpdate[1]);
             } else if( arg instanceof ObservableList){
-                showDictionary((ObservableList)arg);
+                showDictionary((ObservableList<ShowDictionaryRecord>)arg);
             } else if( arg instanceof double[]){
-                showResults((double[])arg);
+                showIndexResults((double[])arg);
+                btn_showDic.setDisable(false);
             }
         }
     }
 
-    private void showResults(double[] results) {
+    private void showIndexResults(double[] results) {
         lbl_totalDocsNum.setText(""+(int)results[0]);
         lbl_totalTermsNum.setText(""+(int)results[1]);
         lbl_totalTimeNum.setText(""+results[2]+" Minutes");
@@ -129,12 +132,7 @@ public class View implements Observer, IView {
         lbl_totalTermsNum.setVisible(true);
         lbl_totalTime.setVisible(true);
         lbl_totalTimeNum.setVisible(true);
-
-
-
-
     }
-
 
     /***
      * This function let the user select his corpus and stopReadAndParse word list
@@ -150,8 +148,6 @@ public class View implements Observer, IView {
         /*else
             source.setText(defaultDirectory.getName());*/
     }
-
-
     /***
      * This function let the user select his favorite location to save the documents
      */
@@ -178,5 +174,6 @@ public class View implements Observer, IView {
             tableCol_count.setCellValueFactory(cellData -> cellData.getValue().getCountProperty());
             table_showDic.setItems(records);
         }
+        btn_showDic.setDisable(false);
     }
 }

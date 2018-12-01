@@ -8,9 +8,8 @@ public class ReadFile {
 
     public static Set<String> stopWords;
 
-    public static void initStopWords(String pathOfStopWords){
+    public static void initStopWords(String fileName){
         stopWords = new HashSet<>();
-        String fileName = pathOfStopWords;
         String line = null;
 
         try {
@@ -30,23 +29,18 @@ public class ReadFile {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
         LinkedList<CorpusDocument> allDocsInCorpus = new LinkedList<>();
-        int start = mone*directoryListing.length/mechane;
-        int end = ((mone+1)*directoryListing.length/mechane)-1;
         if (directoryListing != null && dir.isDirectory()) {
+            int start = mone*directoryListing.length/mechane;
+            int end = ((mone+1)*directoryListing.length/mechane)-1;
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
-            LinkedList<Future> futureDocsInFile = new LinkedList<>();
-            /*for (File file : directoryListing) {
-                Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(file));
-                futureDocsInFile.add(f);
-            }*/
+            LinkedList<Future<LinkedList<CorpusDocument>>> futureDocsInFile = new LinkedList<>();
             for (int i = start; i <= end; i++) {
-                Future<LinkedList<CorpusDocument>> f = pool.submit(new ReadDocuments(directoryListing[i]));
-                futureDocsInFile.add(f);
+                futureDocsInFile.add(pool.submit(new ReadDocuments(directoryListing[i])));
             }
 
-            for (Future f : futureDocsInFile) {
+            for (Future<LinkedList<CorpusDocument>> f : futureDocsInFile) {
                 try {
-                    allDocsInCorpus.addAll((LinkedList<CorpusDocument>) (f.get()));
+                    allDocsInCorpus.addAll(f.get());
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }

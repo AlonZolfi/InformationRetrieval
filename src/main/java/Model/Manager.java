@@ -12,8 +12,8 @@ public class Manager {
     public static Semaphore fullMiniDicSemaphore = new Semaphore(0);
     public static Semaphore emptyMiniDicSemaphore = new Semaphore(5);
     public static ConcurrentLinkedDeque<Future<LinkedList<CorpusDocument>>> corpusDocQueue = new ConcurrentLinkedDeque<Future<LinkedList<CorpusDocument>>>();
-    public static ConcurrentLinkedDeque<LinkedList<MiniDictionary>> miniDicQueue = new ConcurrentLinkedDeque<LinkedList<MiniDictionary>>();*/
-    private int numOfDocs = 0;
+    public static ConcurrentLinkedDeque<LinkedList<MiniDictionary>> miniDicQueue = new ConcurrentLinkedDeque<LinkedList<MiniDictionary>>();
+    private int numOfDocs = 0;*/
     private int numOfPostings = 0;
 
     /*public double[] Manage(LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String stopWordsPath, String destinationPath, boolean stem) {
@@ -107,9 +107,8 @@ public class Manager {
         int numOfDocs = 0;
         ReadFile.initStopWords(stopWordsPath);
         double start = System.currentTimeMillis();
-        int iter = 10;
+        int iter = 1800;
         for (int i = 0; i < iter; i++) {
-            double startInner = System.currentTimeMillis();
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, stopWordsPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             ConcurrentLinkedDeque<Future<MiniDictionary>> futureMiniDicList = new ConcurrentLinkedDeque<Future<MiniDictionary>>();
@@ -145,16 +144,9 @@ public class Manager {
             } catch (InterruptedException | ExecutionException | IOException e) {
                 e.printStackTrace();
             }
-
-            /*for (String s: temporaryPosting.keySet()) {
-                //add to inverted index and doc index and bla bla bla
-            }*/
-
-            //write temporary posting to the disk
-            //System.out.println(System.currentTimeMillis()-startInner);
             pool.shutdown();
         }
-        //System.out.println(System.currentTimeMillis()-start);
+
         //MERGE ALL POSTINGS
         //fix link in the inverted index
         try {

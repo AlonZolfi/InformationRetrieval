@@ -35,15 +35,13 @@ public class Parse implements Callable<MiniDictionary> {
                     if (isFraction(nextWord.peekFirst())) {
                         term += " " + nextWord.pollLast();
                     }
-                }
-                else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)) //if it is rule Hei - it is a Month term
+                } else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)) //if it is rule Hei - it is a Month term
                     term = handleMonthDay(nextWord.pollFirst(), term);
 
                 else if (nextWord.peekFirst().equalsIgnoreCase("Dollars")) {  //if it is rule Dalet - it is a Dollar term
                     nextWord.pollFirst();
-                    term = handleDollars(Double.parseDouble(term.replace(",", "")),term.contains(","));
-                }
-                else if (nextWord.peekFirst().equals("%")) // if it is rule Gimel - it is a percent term
+                    term = handleDollars(Double.parseDouble(term.replace(",", "")), term.contains(","));
+                } else if (nextWord.peekFirst().equals("%")) // if it is rule Gimel - it is a percent term
                     term = handlePercent(term, nextWord.pollFirst());
 
                 else {
@@ -66,28 +64,33 @@ public class Parse implements Callable<MiniDictionary> {
                                 if (nextWord.peekFirst().equals("Dollars"))
                                     term += " " + nextWord.pollFirst();
 
-                            } else if (nextWord.peekFirst().equals("U.S")) {
+                            } else if (!wordList.isEmpty() && nextWord.peekFirst().equals("U.S")) {
                                 nextWord.addFirst(wordList.poll());
-                                if (nextWord.peekFirst().equalsIgnoreCase("dollars")) {
-                                    nextWord.clear();
-                                    double d;
-                                    if(Character.isLetter(term.charAt(term.length()-1)))
-                                        d= Double.parseDouble(term.substring(0, term.length() - 1));
-                                    else
-                                        d=Double.parseDouble(term);
-                                    if (term.charAt(term.length() - 1) == 'M')
-                                        d *= 1000000;
-                                    else if (term.charAt(term.length() - 1) == 'B') {
-                                        d *= 1000000000;
+                                try {
+                                    if (nextWord.peekFirst().equalsIgnoreCase("dollars")) {
+                                        nextWord.clear();
+                                        double d;
+                                        if (Character.isLetter(term.charAt(term.length() - 1)))
+                                            d = Double.parseDouble(term.substring(0, term.length() - 1));
+                                        else
+                                            d = Double.parseDouble(term);
+                                        if (term.charAt(term.length() - 1) == 'M')
+                                            d *= 1000000;
+                                        else if (term.charAt(term.length() - 1) == 'B') {
+                                            d *= 1000000000;
+                                        }
+                                        term = handleDollars(d, term.contains(","));
                                     }
-                                    term = handleDollars(d, term.contains(","));
+                                } catch (Exception e) {
+                                    System.out.println(corpus_doc.getM_fileName()+" "+corpus_doc.getM_docNum());
                                 }
                             }
                         }
                     }
                 }
-            } else if (term.length()>=1 && isNumber(term.substring(1))) {
-                if (term.charAt(0) == '$'){ //rule Dalet - dollar sign at the beginning of a number
+            }
+             else if (term.length()>=1 && isNumber(term.substring(1))) {
+                if (term.charAt(0) == '$') { //rule Dalet - dollar sign at the beginning of a number
                     try {
                         term = handleDollars(Double.parseDouble(term.substring(1).replace(",", "")), term.contains(","));
                     } catch (NumberFormatException e) {
@@ -119,7 +122,6 @@ public class Parse implements Callable<MiniDictionary> {
             } else if (term.equalsIgnoreCase("between")) {
                 if (!wordList.isEmpty()) {
                     nextWord.addFirst(wordList.poll());
-                    ;
                     if ((isNumber(nextWord.peekFirst()) || isFraction(nextWord.peekFirst())) && !wordList.isEmpty()) {
                         nextWord.addFirst(wordList.pollFirst());
                         if (isFraction(nextWord.peekFirst()) && !wordList.isEmpty())
@@ -155,8 +157,12 @@ public class Parse implements Callable<MiniDictionary> {
 
             while (!nextWord.isEmpty()) {
                 String s = nextWord.pollFirst();
-                if (!s.equals(""))
-                    wordList.addFirst(s);
+                try {
+                    if (s!= null && !s.equals(""))
+                        wordList.addFirst(s);
+                }catch (Exception e){
+                    System.out.println(corpus_doc.getM_fileName()+" "+corpus_doc.getM_docNum());
+                }
             }
 
             if(!ReadFile.stopWords.contains(term.toLowerCase())) {

@@ -30,7 +30,8 @@ public class Main extends Application {
 
 
         /*CorpusDocument cd = new CorpusDocument("","","","",
-                "$ " +
+                "1000 " +
+                "Thousand " +
                 "4/9-11 " +
                 "1/5 " +
                 "4/9-11 " +
