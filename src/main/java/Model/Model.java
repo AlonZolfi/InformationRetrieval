@@ -11,7 +11,7 @@ import org.apache.commons.io.FileUtils;
 public class Model extends Observable implements IModel {
     private InvertedIndex invertedIndex;
     private LinkedList<DocDictionaryNode> documentDictionary;
-
+    private HashMap<String,CityInfoNode> cityDictionary;
     @Override
     /*public void onStartClick(String pathOfDocs, String stopWordsPath,String destinationPath, boolean stm){
         Manager man = new Manager();
@@ -29,7 +29,7 @@ public class Model extends Observable implements IModel {
             invertedIndex = new InvertedIndex();
             documentDictionary = new LinkedList<>();
             ReadFile.initStopWords(paths[2]);
-            double[] results = man.Manage(documentDictionary, invertedIndex, paths[0], paths[1], destinationPath, stm);
+            double[] results = man.Manage(cityDictionary,documentDictionary, invertedIndex, paths[0], paths[1], destinationPath, stm);
             setChanged();
             notifyObservers(results);
         }

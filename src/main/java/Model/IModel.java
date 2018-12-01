@@ -1,5 +1,7 @@
 package Model;
 
+import java.io.IOException;
+
 public interface IModel {
 
     void onStartClick(String pathOfDocs, String destinationPath, boolean stm);
