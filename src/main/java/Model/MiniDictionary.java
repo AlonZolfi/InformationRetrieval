@@ -68,7 +68,7 @@ public class MiniDictionary {
     public String listOfData(String word){
         //take all of the words in the mini dic and save the data for them in a **tmp** file(?)
         // under the name "name" and contains "word" | "num of apirens" | "where" (list)
-        return ""+m_name+" "+getFrequency(word)+" "+listOfIndexes(word);
+        return ""+m_name+","+getFrequency(word)+","+listOfIndexes(word);
 
     }
 

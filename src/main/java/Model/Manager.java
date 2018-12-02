@@ -1,6 +1,6 @@
 package Model;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.*;
@@ -106,7 +106,7 @@ public class Manager {
     public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 2;
+        int iter = 3;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -143,23 +143,33 @@ public class Manager {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
+
             pool.shutdown();
         }
 
         //MERGE ALL POSTINGS
         //fix link in the inverted index
-        WriteFile.writeDocDictionary(destinationPath,documentDictionary);
         fillTheCityDictionary(documentDictionary,cityDictionary);
-        WriteFile.writeCityDictionary(destinationPath,cityDictionary);
+        Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary));
+        tCity.start();
+        Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));
+        tDocs.start();
 
+        try {
+            tCity.join();
+            tDocs.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mergePostings(destinationPath);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
     private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) {
         CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
-        CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = null;
+        //CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = null;
         try {
-            citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
+            ///citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
             citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
 
         } catch (IOException e) {
@@ -171,11 +181,106 @@ public class Manager {
                 CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(curCity);
                 if(toPut!=null)
                     cityDictionary.put(curCity, toPut);
-                else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
-                if(toPut!=null)
-                    System.out.println("couldnt find city in API");
+                //else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
+                if(toPut==null)
+                    System.out.println(curCity+"   couldnt find city in API");
             }
         }
+    }
+
+    private void mergePostings(String tempPostingPath){
+
+        LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
+        String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
+        char c = (char)127;
+        int postingNum = 0;
+        LinkedList<StringBuilder> writeToPosting = new LinkedList<>();
+        File curPosting = new File(tempPostingPath+"/finalPosting"+postingNum+".txt");
+        do {
+            StringBuilder finalPostingLine = new StringBuilder();
+            String minTerm = ""+c;
+            String[] saveSentences = new String[firstSentenceOfFile.length];
+            for (int i = 0; i < firstSentenceOfFile.length; i++) {
+                if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
+                    String[] termAndData = firstSentenceOfFile[i].split("~");
+                    int result = termAndData[0].compareTo(minTerm);
+                    if (result == 0) {
+                        finalPostingLine.append(termAndData[1]);
+                        firstSentenceOfFile[i] = null;
+                        saveSentences[i] =  termAndData[0]+"~"+termAndData[1];
+                    } else if (result < 0) {
+                        minTerm = termAndData[0];
+                        finalPostingLine.delete(0, finalPostingLine.length());
+                        finalPostingLine.append(termAndData[0]).append("~").append(termAndData[1]);
+                        firstSentenceOfFile[i] = null;
+                        saveSentences[i] = termAndData[0]+"~"+termAndData[1];
+                    }
+                }
+            }
+            for (int i = 0; i < saveSentences.length; i++) {
+                if (saveSentences[i] != null) {
+                    String[] termAndData = saveSentences[i].split("~");
+                    if (!termAndData[0].equals(minTerm)) {
+                        firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1];
+                    }
+                    else
+                        firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));
+                }
+            }
+            writeToPosting.add(finalPostingLine);
+        }while(containsNull(firstSentenceOfFile));
+        WriteFile.writeToEndOfFile(curPosting,writeToPosting);
+
+    }
+
+    private boolean containsNull(String[] firstSentenceOfFile) {
+        for (String sentence: firstSentenceOfFile) {
+            if(sentence!=null)
+                return true;
+        }
+        return false;
+    }
+
+    private String getNextSentence(BufferedReader bf){
+        String line = null;
+        try {
+            if((line= bf.readLine())!=null)
+                return line;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return line;
+    }
+
+    private String[] initiateMergingArray(LinkedList<BufferedReader> bufferedReaderList){
+        String[] firstSentenceOfFile = new String[bufferedReaderList.size()];
+        int i = 0;
+        for (BufferedReader bf: bufferedReaderList) {
+            String line = getNextSentence(bf);
+            if(line!= null) {
+                firstSentenceOfFile[i]= line;
+            }
+            i++;
+        }
+        return firstSentenceOfFile;
+    }
+
+    private LinkedList<BufferedReader> initiateBufferedReaderList(String tempPostingPath){
+        File dirSource = new File(tempPostingPath);
+        File[] directoryListing = dirSource.listFiles();
+        LinkedList<BufferedReader> bufferedReaderList = new LinkedList<>();
+        if (directoryListing != null && dirSource.isDirectory()) {
+            for (File file : directoryListing) {
+                if (file.getName().startsWith("posting")) {
+                    try {
+                        bufferedReaderList.add(new BufferedReader(new FileReader(file)));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return bufferedReaderList;
     }
 }
 

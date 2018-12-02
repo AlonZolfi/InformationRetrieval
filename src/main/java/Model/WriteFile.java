@@ -15,7 +15,7 @@ public class WriteFile {
         TreeMap<String, StringBuilder> sorted = new TreeMap<>(temporaryPosting);
         String [] words = sorted.keySet().toArray(new String[0]);
         for (int j = 0; j <sorted.size() ; j++) {
-            toWrite.append(words[j]).append(" ").append(sorted.get(words[j])).append("\n");
+            toWrite.append(words[j]).append("~").append(sorted.get(words[j])).append("\n");
         }
         File dir = new File(path);
         File actualFile = new File(dir,"posting_"+i+".txt");
@@ -52,6 +52,20 @@ public class WriteFile {
             e.printStackTrace();
         }
 
+    }
+
+    public static void writeToEndOfFile(File file, LinkedList<StringBuilder> finalPostingLine) {
+        try {
+            StringBuilder ans = new StringBuilder();
+            for (StringBuilder s : finalPostingLine)
+                ans.append(s+"\n");
+
+            FileWriter fileWriter = new FileWriter(file,true);
+            fileWriter.write(ans.toString());
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
