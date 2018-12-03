@@ -91,8 +91,11 @@ public class View implements Observer, IView {
                 String[] toUpdate = (String[])arg;
                 if(toUpdate[0].equals("Fail"))
                     MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
-                else if(toUpdate[0].equals("Successful"))
-                    MyAlert.showAlert(Alert.AlertType.CONFIRMATION,toUpdate[1]);
+                else if(toUpdate[0].equals("Successful")) {
+                    MyAlert.showAlert(Alert.AlertType.CONFIRMATION, toUpdate[1]);
+                    if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary"))
+                        btn_showDic.setDisable(false);
+                }
             } else if( arg instanceof ObservableList){
                 showDictionary((ObservableList<ShowDictionaryRecord>)arg);
             } else if( arg instanceof double[]){
