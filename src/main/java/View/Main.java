@@ -32,8 +32,14 @@ public class Main extends Application {
 
 
         /*CorpusDocument cd = new CorpusDocument("","","","",
+                "1001 " +
+                "Grams " +
+                "54.546456 " +
+                "Tons " +
                 "1000 " +
-                "Thousand " +
+                "Seconds " +
+                "3.2 " +
+                "Minutes " +
                 "4/9-11 " +
                 "1/5 " +
                 "4/9-11 " +
