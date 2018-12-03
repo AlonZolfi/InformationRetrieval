@@ -172,7 +172,6 @@ public class Parse implements Callable<MiniDictionary> {
                 miniDic.addWord(term, index);
                 index++;
             }
-            System.out.println(term);
         }
 
         return miniDic;
@@ -182,18 +181,13 @@ public class Parse implements Callable<MiniDictionary> {
     private String handleWeight(String term, String unit) {
         switch (unit){
             case "Ton":
-                term = numberValue(Double.parseDouble(term) *1000);
+                term = numberValue(Double.parseDouble(term.replace(",","")) *1000);
                 break;
             case "Gram":
-                term = numberValue(Double.parseDouble(term) /1000);
+                term = numberValue(Double.parseDouble(term.replace(",","")) /1000);
         }
         return term + " Kilograms";
     }
-
-    /*private String handleWeight(String term, String unit) {
-        return "";
-
-    }*/
 
     private LinkedList<String> StringToList(String[] split) {
         LinkedList<String> wordsList = new LinkedList<>();
@@ -227,10 +221,10 @@ public class Parse implements Callable<MiniDictionary> {
     private String handleTime(String term, String unit){
         switch (unit) {
             case "Sec":
-                term = numberValue(Double.parseDouble(term) / 3600);
+                term = numberValue(Double.parseDouble(term.replace(",","")) / 3600);
                 break;
             case "Min":
-                term = numberValue(Double.parseDouble(term) / 60);
+                term = numberValue(Double.parseDouble(term.replace(",","")) / 60);
         }
         return term + " Hours";
     }

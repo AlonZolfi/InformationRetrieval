@@ -108,7 +108,7 @@ public class Manager {
     public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 900;
+        int iter = 3;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -177,7 +177,7 @@ public class Manager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (DocDictionaryNode cur:documentDictionary){
+        /*for (DocDictionaryNode cur:documentDictionary){
             String curCity = cur.getCity();
             if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
                 CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(curCity);
@@ -186,6 +186,25 @@ public class Manager {
                 //else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
                 if(toPut==null)
                     System.out.println(curCity+"   couldnt find city in API");
+            }
+        }*/
+        for (DocDictionaryNode cur:documentDictionary){
+            String curCity = cur.getCity();
+            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                String[] cityWords = curCity.split(" ");
+                int i = 0;
+                StringBuilder cityTry = new StringBuilder();
+                while(i < cityWords.length && !cityDictionary.containsKey(cityTry.toString())) {
+                    cityTry.append(cityWords[i]);
+                    CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                    if (toPut != null ) {
+                        if(!cityDictionary.containsKey(cityTry.toString()))
+                            cityDictionary.put(cityTry.toString(), toPut);
+                        break;
+                    }
+                    i++;
+                    cityTry.append(" ");
+                }
             }
         }
     }
