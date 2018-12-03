@@ -36,7 +36,7 @@ public class DocDictionaryNode {
 
     @Override
     public String toString() {
-        return m_docName+"\t"+m_numOfUniWords+"\t"+m_maxFreq+"\t"+m_city+"\n";
+        return m_docName+"\t\t\t"+m_numOfUniWords+"\t\t\t"+m_maxFreq+"\t\t\t"+m_city+"\n";
     }
 }
 

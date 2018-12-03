@@ -26,20 +26,26 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
-    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary) {
+    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary,boolean stem) {
         StringBuilder toWrite = new StringBuilder();
         for (DocDictionaryNode cur :documentDictionary) {
             toWrite.append(cur.toString());
         }
         File dir = new File(path);
-        File actualFile = new File(dir,"documentDictionary.txt");
+        String fileName = "StemDocumentDictionary.txt";
+        if (!stem)
+            fileName= "DocumentDictionary.txt";
+        File actualFile = new File(dir,fileName);
         write(actualFile,toWrite);
     }
 
-    public static void writeInvertedFile(String path, InvertedIndex invertedIndex) {
+    public static void writeInvertedFile(String path, InvertedIndex invertedIndex,boolean stem) {
         String toWrite = invertedIndex.toString();
         File dir = new File(path);
-        File actualFile = new File(dir,"invertedFile.txt");
+        String fileName = "StemInvertedFile.txt";
+        if (!stem)
+            fileName= "InvertedFile.txt";
+        File actualFile = new File(dir,fileName);
         write(actualFile,new StringBuilder(toWrite));
     }
 
@@ -49,7 +55,8 @@ public class WriteFile {
             toWrite.append(cur.toString());
         }
         File dir = new File(path);
-        File actualFile = new File(dir,"cityDictionary.txt");
+        String fileName= "CityDictionary.txt";
+        File actualFile = new File(dir,fileName);
         write(actualFile,toWrite);
     }
 
