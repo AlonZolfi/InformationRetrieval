@@ -15,7 +15,12 @@ public class WriteFile {
         TreeMap<String, StringBuilder> sorted = new TreeMap<>(temporaryPosting);
         String [] words = sorted.keySet().toArray(new String[0]);
         for (int j = 0; j <sorted.size() ; j++) {
-            toWrite.append(words[j]).append("~").append(sorted.get(words[j])).append("\n");
+            int shows = 0;
+            for (int k=0; k<words[j].length();k++){
+                if(temporaryPosting.get(words[j]).charAt(k)=='|')
+                    shows++;
+            }
+            toWrite.append(words[j]).append("~").append(shows).append("~").append(sorted.get(words[j])).append("\n");
         }
         File dir = new File(path);
         File actualFile = new File(dir,"posting_"+i+".txt");
