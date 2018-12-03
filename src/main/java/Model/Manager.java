@@ -1,5 +1,7 @@
 package Model;
 
+import javafx.util.Pair;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -125,8 +127,8 @@ public class Manager {
             }
 
             Indexer index = new Indexer(miniDicList);
-            Future<HashMap<String, StringBuilder>> futureTemporaryPosting = pool.submit(index);
-            HashMap<String, StringBuilder> temporaryPosting = null;
+            Future<HashMap<String, Pair<Integer,StringBuilder>>> futureTemporaryPosting = pool.submit(index);
+            HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = null;
             try {
                 temporaryPosting = futureTemporaryPosting.get();
                 //first Write the posting to the disk, thene get the "link" of hitch word in list from the "WriteFile"

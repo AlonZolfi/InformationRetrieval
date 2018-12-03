@@ -1,5 +1,7 @@
 package Model;
 
+import javafx.util.Pair;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,18 +11,15 @@ import java.util.TreeMap;
 
 public class WriteFile {
 
-    public static void writeTmpPosting(String path, int i , HashMap<String, StringBuilder> temporaryPosting) {
+    public static void writeTmpPosting(String path, int i , HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting) {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
-        TreeMap<String, StringBuilder> sorted = new TreeMap<>(temporaryPosting);
+        TreeMap<String, Pair<Integer,StringBuilder>> sorted = new TreeMap<>(temporaryPosting);
         String [] words = sorted.keySet().toArray(new String[0]);
         for (int j = 0; j <sorted.size() ; j++) {
-            int shows = 0;
-            for (int k=0; k<words[j].length();k++){
-                if(temporaryPosting.get(words[j]).charAt(k)=='|')
-                    shows++;
-            }
-            toWrite.append(words[j]).append("~").append(shows).append("~").append(sorted.get(words[j])).append("\n");
+            int shows = sorted.get(words[j]).getKey();
+            StringBuilder stringBuilder = sorted.get(words[j]).getValue();
+            toWrite.append(words[j]).append("~").append(shows).append("~").append(stringBuilder+"\n");
         }
         File dir = new File(path);
         File actualFile = new File(dir,"posting_"+i+".txt");
