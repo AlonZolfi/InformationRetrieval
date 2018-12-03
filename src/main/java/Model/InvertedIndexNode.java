@@ -33,4 +33,9 @@ public class InvertedIndexNode {
     public int getPostingLine() {
         return m_postingLine;
     }
+
+    public void setPointer(String postingFile, int postingLine){
+        this.m_postingLink = postingFile;
+        this.m_postingLine =postingLine;
+    }
 }
