@@ -53,4 +53,13 @@ public class InvertedIndex {
     public void setNumOfAppearance(String term, int numOfAppearance){
         invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder toWrite=new StringBuilder();
+        for (InvertedIndexNode cur :invertedIndexDic.values()) {
+            toWrite.append(cur.toString());
+        }
+        return toWrite.toString();
+    }
 }

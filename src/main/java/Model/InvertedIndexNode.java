@@ -48,4 +48,9 @@ public class InvertedIndexNode {
     public void setNumOfAppearance(int numOfAppearance){
         this.m_numOfAppearances = numOfAppearance;
     }
+
+    @Override
+    public String toString() {
+        return m_word+"\t\t\t"+m_termFreq+"\t\t\t"+m_numOfAppearances+"\t\t\t"+m_postingLink+"\t\t\t"+m_postingLine+"\n";
+    }
 }

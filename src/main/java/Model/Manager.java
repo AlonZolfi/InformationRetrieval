@@ -141,7 +141,6 @@ public class Manager {
                         invertedIndex.addTerm(word);
                     }
                 }
-
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -152,7 +151,7 @@ public class Manager {
         //MERGE ALL POSTINGS
         //fix link in the inverted index
         fillTheCityDictionary(documentDictionary,cityDictionary);
-        Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary));
+        Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary,stem));
         tCity.start();
         Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));
         tDocs.start();
@@ -163,7 +162,8 @@ public class Manager {
             e.printStackTrace();
         }
 
-        mergePostings(invertedIndex,destinationPath);
+        mergePostings(invertedIndex,destinationPath,stem);
+        WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
@@ -190,13 +190,16 @@ public class Manager {
         }
     }
 
-    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath){
+    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
 
         LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
         int postingNum = 0;
         LinkedList<StringBuilder> writeToPosting = new LinkedList<>();
-        File curPosting = new File(tempPostingPath+"/finalPosting"+postingNum+".txt");
+        String fileName = "Stem"+tempPostingPath+"/finalPosting"+postingNum+".txt";
+        if (!stem)
+            fileName= tempPostingPath+"/finalPosting"+postingNum+".txt";
+        File curPosting = new File(fileName);
         do {
             int numOfAppearances = 0;
             StringBuilder finalPostingLine = new StringBuilder();
@@ -238,7 +241,6 @@ public class Manager {
             writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
         } while(containsNull(firstSentenceOfFile));
         WriteFile.writeToEndOfFile(curPosting,writeToPosting);
-
     }
 
     private boolean containsNull(String[] firstSentenceOfFile) {
