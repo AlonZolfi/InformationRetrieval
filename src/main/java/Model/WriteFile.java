@@ -36,6 +36,13 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
+    public static void writeInvertedFile(String path, InvertedIndex invertedIndex) {
+        String toWrite = invertedIndex.toString();
+        File dir = new File(path);
+        File actualFile = new File(dir,"invertedFile.txt");
+        write(actualFile,new StringBuilder(toWrite));
+    }
+
     public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
         StringBuilder toWrite = new StringBuilder();
         for (CityInfoNode cur : cityDictionary.values()) {

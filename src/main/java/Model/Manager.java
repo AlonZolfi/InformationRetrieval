@@ -141,6 +141,7 @@ public class Manager {
                         invertedIndex.addTerm(word);
                     }
                 }
+            WriteFile.writeInvertedFile(destinationPath,invertedIndex);
 
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
