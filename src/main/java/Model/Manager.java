@@ -163,7 +163,7 @@ public class Manager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        mergePostings(destinationPath);
+        mergePostings(invertedIndex,destinationPath);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
@@ -190,17 +190,16 @@ public class Manager {
         }
     }
 
-    private void mergePostings(String tempPostingPath){
+    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath){
 
         LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
-        char c = (char)127;
         int postingNum = 0;
         LinkedList<StringBuilder> writeToPosting = new LinkedList<>();
         File curPosting = new File(tempPostingPath+"/finalPosting"+postingNum+".txt");
         do {
             StringBuilder finalPostingLine = new StringBuilder();
-            String minTerm = ""+c;
+            String minTerm = ""+(char)127;
             String[] saveSentences = new String[firstSentenceOfFile.length];
             for (int i = 0; i < firstSentenceOfFile.length; i++) {
                 if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
@@ -229,8 +228,10 @@ public class Manager {
                         firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));
                 }
             }
+            if(!finalPostingLine.toString().equals(""))
+                invertedIndex.setPointer(minTerm,curPosting.getName(),writeToPosting.size());
             writeToPosting.add(finalPostingLine);
-        }while(containsNull(firstSentenceOfFile));
+        } while(containsNull(firstSentenceOfFile));
         WriteFile.writeToEndOfFile(curPosting,writeToPosting);
 
     }

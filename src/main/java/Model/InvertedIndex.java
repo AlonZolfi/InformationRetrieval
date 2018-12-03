@@ -45,4 +45,8 @@ public class InvertedIndex {
     public void loadDictionary(File file) {
 
     }
+
+    public void setPointer(String minTerm, String fileName, int lineNumber){
+        invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+    }
 }
