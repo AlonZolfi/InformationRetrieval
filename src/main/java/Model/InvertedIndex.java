@@ -17,7 +17,7 @@ public class InvertedIndex {
 
     public void addTerm (String term){
         if (!invertedIndexDic.containsKey(term)){
-            InvertedIndexNode first = new InvertedIndexNode(term,1,null,-1);
+            InvertedIndexNode first = new InvertedIndexNode(term,1,0,null,-1);
             invertedIndexDic.put(term,first);
         }
         else{
@@ -48,5 +48,9 @@ public class InvertedIndex {
 
     public void setPointer(String minTerm, String fileName, int lineNumber){
         invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+    }
+
+    public void setNumOfAppearance(String term, int numOfAppearance){
+        invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
     }
 }

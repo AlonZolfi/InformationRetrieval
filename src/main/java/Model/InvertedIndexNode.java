@@ -2,24 +2,26 @@ package Model;
 
 public class InvertedIndexNode {
     private String m_word;
+    private int m_termFreq;
     private int m_numOfAppearances;
     private String m_postingLink;
     private int m_postingLine;
 
 
-    public InvertedIndexNode(String m_word, int m_numOfAppearances, String m_postingLink, int m_postingLine) {
-        this.m_word = m_word;
-        this.m_numOfAppearances = m_numOfAppearances;
-        this.m_postingLink = m_postingLink;
-        this.m_postingLine = m_postingLine;
+    public InvertedIndexNode(String word, int termFreq, int numOfAppearances, String postingLink, int postingLine) {
+        this.m_word = word;
+        this.m_termFreq = termFreq;
+        this.m_numOfAppearances = numOfAppearances;
+        this.m_postingLink = postingLink;
+        this.m_postingLine = postingLine;
     }
 
     public void increaseAppearances(){
-        m_numOfAppearances++;
+        m_termFreq++;
     }
 
-    public int getNumOfAppearances() {
-        return m_numOfAppearances;
+    public int getTermFreq() {
+        return m_termFreq;
     }
 
     public String getWord() {
@@ -34,8 +36,16 @@ public class InvertedIndexNode {
         return m_postingLine;
     }
 
+    public int getNumOfAppearances() {
+        return m_numOfAppearances;
+    }
+
     public void setPointer(String postingFile, int postingLine){
         this.m_postingLink = postingFile;
         this.m_postingLine =postingLine;
+    }
+
+    public void setNumOfAppearance(int numOfAppearance){
+        this.m_numOfAppearances = numOfAppearance;
     }
 }

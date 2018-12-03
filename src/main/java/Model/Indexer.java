@@ -25,7 +25,7 @@ public class Indexer implements Callable<HashMap<String, Pair<Integer,StringBuil
                 for (String word : miniDic.listOfWords()) {
                     if (toReturn.containsKey(word)) {
                         Pair<Integer,StringBuilder> all = toReturn.remove(word);
-                        int newShows = all.getKey();
+                        int newShows = all.getKey()+miniDic.getFrequency(word);
                         StringBuilder newSb = all.getValue().append(miniDic.listOfData(word)).append("|");
                         Pair<Integer,StringBuilder> newAll = new Pair<>(newShows,newSb);
                         toReturn.put(word,newAll);

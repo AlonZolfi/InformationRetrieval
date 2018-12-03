@@ -156,13 +156,13 @@ public class Manager {
         tCity.start();
         Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));
         tDocs.start();
-
         try {
             tCity.join();
             tDocs.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         mergePostings(invertedIndex,destinationPath);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
@@ -198,6 +198,7 @@ public class Manager {
         LinkedList<StringBuilder> writeToPosting = new LinkedList<>();
         File curPosting = new File(tempPostingPath+"/finalPosting"+postingNum+".txt");
         do {
+            int numOfAppearances = 0;
             StringBuilder finalPostingLine = new StringBuilder();
             String minTerm = ""+(char)127;
             String[] saveSentences = new String[firstSentenceOfFile.length];
@@ -206,15 +207,17 @@ public class Manager {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
                     int result = termAndData[0].compareTo(minTerm);
                     if (result == 0) {
-                        finalPostingLine.append(termAndData[1]);
+                        finalPostingLine.append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
-                        saveSentences[i] =  termAndData[0]+"~"+termAndData[1];
+                        saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                        numOfAppearances += Integer.parseInt(termAndData[1]);
                     } else if (result < 0) {
                         minTerm = termAndData[0];
                         finalPostingLine.delete(0, finalPostingLine.length());
-                        finalPostingLine.append(termAndData[0]).append("~").append(termAndData[1]);
+                        finalPostingLine.append(termAndData[0]).append("~").append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
-                        saveSentences[i] = termAndData[0]+"~"+termAndData[1];
+                        saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                        numOfAppearances = Integer.parseInt(termAndData[1]);
                     }
                 }
             }
@@ -222,15 +225,17 @@ public class Manager {
                 if (saveSentences[i] != null) {
                     String[] termAndData = saveSentences[i].split("~");
                     if (!termAndData[0].equals(minTerm)) {
-                        firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1];
+                        firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
                     }
                     else
                         firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));
                 }
             }
-            if(!finalPostingLine.toString().equals(""))
-                invertedIndex.setPointer(minTerm,curPosting.getName(),writeToPosting.size());
-            writeToPosting.add(finalPostingLine);
+            if(!finalPostingLine.toString().equals("")) {
+                invertedIndex.setPointer(minTerm, curPosting.getName(), writeToPosting.size());
+                invertedIndex.setNumOfAppearance(minTerm,numOfAppearances);
+            }
+            writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
         } while(containsNull(firstSentenceOfFile));
         WriteFile.writeToEndOfFile(curPosting,writeToPosting);
 
