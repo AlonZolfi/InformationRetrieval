@@ -3,7 +3,10 @@ package Model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +16,25 @@ public class InvertedIndex {
 
     public InvertedIndex() {
         invertedIndexDic = new ConcurrentHashMap<>();
+    }
+
+    public InvertedIndex(File file) {
+        String line = null;
+        invertedIndexDic = new ConcurrentHashMap<String, InvertedIndexNode>();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            line = bufferedReader.readLine();
+            while(line != null) {
+                String [] curLine = line.split("\t");
+                InvertedIndexNode cur = new InvertedIndexNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],Integer.parseInt(curLine[4]));
+                invertedIndexDic.put(curLine[0],cur);
+                line = bufferedReader.readLine();
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addTerm (String term){
@@ -40,10 +62,6 @@ public class InvertedIndex {
         for (String s : sorted.keySet())
             showDictionaryRecords.add(new ShowDictionaryRecord(s,invertedIndexDic.get(s).getNumOfAppearances()+""));
         return showDictionaryRecords;
-    }
-
-    public void loadDictionary(File file) {
-
     }
 
     public void setPointer(String minTerm, String fileName, int lineNumber){
