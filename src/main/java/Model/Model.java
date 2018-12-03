@@ -112,8 +112,8 @@ public class Model extends Observable implements IModel {
         String[] update=new String[0];
         if (directoryListing != null && dirSource.isDirectory()) {
             for (File file : directoryListing) {
-                if ((file.getName().equals("invertedIndexWithStem") && stem)||(file.getName().equals("invertedIndexWithoutStem"))&&!stem) {
-                    invertedIndex.loadDictionary(file);
+                if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
+                    invertedIndex = new InvertedIndex(file);
                     update = new String[]{"Successful","Dictionary was loaded successfully"};
                     found = true;
                 }
