@@ -3,6 +3,7 @@ package Model;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public class Parse implements Callable<MiniDictionary> {
@@ -35,16 +36,18 @@ public class Parse implements Callable<MiniDictionary> {
                     if (isFraction(nextWord.peekFirst())) {
                         term += " " + nextWord.pollLast();
                     }
-                } else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)) //if it is rule Hei - it is a Month term
+                } else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)) { //if it is rule Hei - it is a Month term
                     term = handleMonthDay(nextWord.pollFirst(), term);
-
-                else if (nextWord.peekFirst().equalsIgnoreCase("Dollars")) {  //if it is rule Dalet - it is a Dollar term
+                } else if (nextWord.peekFirst().equalsIgnoreCase("Dollars")) {  //if it is rule Dalet - it is a Dollar term
                     nextWord.pollFirst();
                     term = handleDollars(Double.parseDouble(term.replace(",", "")), term.contains(","));
-                } else if (nextWord.peekFirst().equals("%")) // if it is rule Gimel - it is a percent term
+                } else if (nextWord.peekFirst().equals("%")) { // if it is rule Gimel - it is a percent term
                     term = handlePercent(term, nextWord.pollFirst());
-
-                else {
+                } else if(nextWord.peekFirst().equalsIgnoreCase("Min") || nextWord.peekFirst().equalsIgnoreCase("Sec")){
+                    term = handleTime(term, Objects.requireNonNull(nextWord.pollFirst()));
+                } else if(nextWord.peekFirst().equals("Ton") || nextWord.peekFirst().equals("Gram")){
+                    term = handleWeight(term, Objects.requireNonNull(nextWord.pollFirst()));
+                } else {
                     term = handleNumber(Double.parseDouble(term.replace(",", "")));
                     if (!(term.charAt(term.length() - 1) > 'A' && term.charAt(term.length() - 1) < 'Z')) { //if a number returned is smaller than 1000
                         if (nextWord.peekFirst().equals("T")) {
@@ -169,11 +172,28 @@ public class Parse implements Callable<MiniDictionary> {
                 miniDic.addWord(term, index);
                 index++;
             }
+            System.out.println(term);
         }
 
         return miniDic;
 
     }
+
+    private String handleWeight(String term, String unit) {
+        switch (unit){
+            case "Ton":
+                term = numberValue(Double.parseDouble(term) *1000);
+                break;
+            case "Gram":
+                term = numberValue(Double.parseDouble(term) /1000);
+        }
+        return term + " Kilograms";
+    }
+
+    /*private String handleWeight(String term, String unit) {
+        return "";
+
+    }*/
 
     private LinkedList<String> StringToList(String[] split) {
         LinkedList<String> wordsList = new LinkedList<>();
@@ -204,6 +224,17 @@ public class Parse implements Callable<MiniDictionary> {
         return term;
     }
 
+    private String handleTime(String term, String unit){
+        switch (unit) {
+            case "Sec":
+                term = numberValue(Double.parseDouble(term) / 3600);
+                break;
+            case "Min":
+                term = numberValue(Double.parseDouble(term) / 60);
+        }
+        return term + " Hours";
+    }
+
     private String handlePercent(String term, String percentSign) {
         return term+percentSign;
     }
@@ -212,7 +243,6 @@ public class Parse implements Callable<MiniDictionary> {
         int monthNum = isMonth(month);
         int dayNum=0;
         dayNum = Integer.parseInt(day);
-
         if(dayNum<10)
             day = "0"+day;
         String newTerm = monthNum + "-" + day;
@@ -339,6 +369,18 @@ public class Parse implements Callable<MiniDictionary> {
             } else if (queuePeek.equalsIgnoreCase("Trillion")) {
                 wordList.remove();
                 nextWord = "T";
+            } else if (queuePeek.equalsIgnoreCase("Minutes")) {
+                wordList.remove();
+                nextWord = "Min";
+            } else if (queuePeek.equalsIgnoreCase("Seconds")) {
+                wordList.remove();
+                nextWord = "Sec";
+            } else if (queuePeek.equalsIgnoreCase("Tons")) {
+                wordList.remove();
+                nextWord = "Ton";
+            } else if (queuePeek.equalsIgnoreCase("grams")) {
+                wordList.remove();
+                nextWord = "Gram";
             } else if (queuePeek.equalsIgnoreCase("percent") || queuePeek.equalsIgnoreCase("percentage")) {
                 wordList.remove();
                 nextWord = "%";
@@ -348,8 +390,7 @@ public class Parse implements Callable<MiniDictionary> {
             } else if(isMonth(queuePeek)!=-1){
                 wordList.remove();
                 nextWord = queuePeek;
-            }
-            else if(queuePeek.contains("-")){
+            } else if(queuePeek.contains("-")){
                 wordList.remove();
                 nextWord = queuePeek;
             }
