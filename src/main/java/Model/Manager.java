@@ -124,7 +124,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 4;
+        int iter = 900;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -152,27 +152,28 @@ public class Manager {
                 for (MiniDictionary mini : miniDicList) {
                     String curCity = mini.getCity();
                     StringBuilder cityTry = new StringBuilder();
-                    if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
-                        String[] cityWords = curCity.split(" ");
-                        int j = 0;
-                        boolean found = false;
-                        while (j < cityWords.length && !cityDictionary.containsKey(cityTry.toString()) && !found) {
-                            cityTry.append(cityWords[j]);
-                            CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
-                            if (toPut != null ) {
-                                if (!cityDictionary.containsKey(cityTry.toString())) {
-                                    cityDictionary.put(cityTry.toString(), toPut);
-                                    found = true;
-                                }
+                    if (!curCity.equals("")) {
+                        if (!cityDictionary.containsKey(curCity)) {
+                            String[] cityWords = curCity.split(" ");
+                            int j = 0;
+                            boolean found = false;
+                            while (j < cityWords.length && !cityDictionary.containsKey(cityTry.toString()) && !found) {
+                                cityTry.append(cityWords[j]);
+                                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                                if (toPut != null) {
+                                    if (!cityDictionary.containsKey(cityTry.toString())) {
+                                        cityDictionary.put(cityTry.toString(), toPut);
+                                        found = true;
+                                    }
+                                } else cityTry.append(" ");
+                                j++;
                             }
-                            else
-                                cityTry.append(" ");
-                            j++;
+                            if (!found) cityTry = new StringBuilder();
+                            DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString());
+                            documentDictionary.add(cur);
+                        } else {
+                            documentDictionary.add(new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityDictionary.get(curCity).getCity_name()));
                         }
-                        if(!found)
-                            cityTry = new StringBuilder();
-                        DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),cityTry.toString());
-                        documentDictionary.add(cur);
                     }
 
                     for (String word : mini.listOfWords()) {
