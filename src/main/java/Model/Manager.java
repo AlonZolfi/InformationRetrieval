@@ -156,18 +156,20 @@ public class Manager {
                         String[] cityWords = curCity.split(" ");
                         int j = 0;
                         boolean found = false;
-                        while (j < cityWords.length && !cityDictionary.containsKey(cityTry.toString()) && !found) {
-                            cityTry.append(cityWords[j]);
-                            CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
-                            if (toPut != null ) {
-                                if (!cityDictionary.containsKey(cityTry.toString())) {
-                                    cityDictionary.put(cityTry.toString(), toPut);
-                                    found = true;
-                                }
+                        while (j < cityWords.length  && !found) {
+                            if (!cityDictionary.containsKey(cityTry.toString())) {
+                                cityTry.append(cityWords[j]);
+                                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                                if (toPut != null) {
+                                    if (!cityDictionary.containsKey(cityTry.toString())) {
+                                        cityDictionary.put(cityTry.toString(), toPut);
+                                        found = true;
+                                    }
+                                } else cityTry.append(" ");
+                                j++;
                             }
                             else
-                                cityTry.append(" ");
-                            j++;
+                                found=true;
                         }
                         if(!found)
                             cityTry = new StringBuilder();
