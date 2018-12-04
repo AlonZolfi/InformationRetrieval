@@ -1,4 +1,4 @@
-package Model;
+package Web;
 
 import org.json.JSONObject;
 import java.io.IOException;

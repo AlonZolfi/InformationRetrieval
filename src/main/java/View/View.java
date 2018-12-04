@@ -1,12 +1,9 @@
 package View;
 
 import ViewModel.ViewModel;
-import Model.ShowDictionaryRecord;
+import Index.ShowDictionaryRecord;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;

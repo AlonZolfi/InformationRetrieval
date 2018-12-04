@@ -1,5 +1,6 @@
-package Model;
+package Web;
 
+import Index.CityInfoNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -7,7 +8,7 @@ import java.util.HashMap;
 
 public class CitysMemoryDataBase {
 
-    private HashMap<String,CityInfoNode> CountryDB;
+    private HashMap<String, CityInfoNode> CountryDB;
 
     public CitysMemoryDataBase(String WebServiceURL) throws IOException {
 

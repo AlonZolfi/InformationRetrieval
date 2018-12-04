@@ -1,5 +1,8 @@
-package Model;
+package IO;
 
+import Index.InvertedIndex;
+import Index.CityInfoNode;
+import Index.DocDictionaryNode;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -14,7 +17,8 @@ public class WriteFile {
     public static void writeTmpPosting(String path, int i , HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting) {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
-        TreeMap<String, Pair<Integer,StringBuilder>> sorted = new TreeMap<>(temporaryPosting);
+        TreeMap<String, Pair<Integer, StringBuilder>> sorted = new TreeMap<>(String::compareToIgnoreCase);
+        sorted.putAll(temporaryPosting);
         String [] words = sorted.keySet().toArray(new String[0]);
         for (int j = 0; j <sorted.size() ; j++) {
             int shows = sorted.get(words[j]).getKey();
@@ -26,7 +30,7 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
-    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary,boolean stem) {
+    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary, boolean stem) {
         StringBuilder toWrite = new StringBuilder();
         for (DocDictionaryNode cur :documentDictionary) {
             toWrite.append(cur.toString());
@@ -39,7 +43,7 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
-    public static void writeInvertedFile(String path, InvertedIndex invertedIndex,boolean stem) {
+    public static void writeInvertedFile(String path, InvertedIndex invertedIndex, boolean stem) {
         String toWrite = invertedIndex.toString();
         File dir = new File(path);
         String fileName = "StemInvertedFile.txt";
@@ -85,14 +89,5 @@ public class WriteFile {
             e.printStackTrace();
         }
     }
-
-
-    public String[][] showDictionay(){
-        //fix the dic to string [][] of word|df|link and send it to model how updata it to VM how updata it to view
-        //how shoes it when press on "show dictionary"
-        return null;
-    }
-
-    //public void writeTemporaryPosting (List<MiniDic> dic>)
 
 }

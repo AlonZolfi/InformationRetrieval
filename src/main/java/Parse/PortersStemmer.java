@@ -1,4 +1,6 @@
-package Model;
+package Parse;
+
+import Parse;
 
 public class PortersStemmer {
     private char[] b;

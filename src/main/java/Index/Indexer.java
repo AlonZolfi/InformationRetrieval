@@ -1,9 +1,9 @@
-package Model;
+package Index;
 
+import Parse.MiniDictionary;
 import javafx.util.Pair;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedDeque;
 

@@ -6,13 +6,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
 
+import IO.ReadFile;
+import Index.CityInfoNode;
+import Index.DocDictionaryNode;
+import Index.InvertedIndex;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
 
 public class Model extends Observable implements IModel {
     private InvertedIndex invertedIndex;
     private LinkedList<DocDictionaryNode> documentDictionary;
-    private HashMap<String,CityInfoNode> cityDictionary;
+    private HashMap<String, CityInfoNode> cityDictionary;
     @Override
     /*public void onStartClick(String pathOfDocs, String stopWordsPath,String destinationPath, boolean stm){
         Manager man = new Manager();

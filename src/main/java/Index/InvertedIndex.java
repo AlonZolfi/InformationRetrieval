@@ -1,4 +1,4 @@
-package Model;
+package Index;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InvertedIndex {
     // term  | num Of appearance | pointer(path of posting file, line number in the posting)
-    private ConcurrentHashMap<String,InvertedIndexNode> invertedIndexDic;
+    private ConcurrentHashMap<String, InvertedIndexNode> invertedIndexDic;
 
     public InvertedIndex() {
         invertedIndexDic = new ConcurrentHashMap<>();
@@ -71,7 +71,6 @@ public class InvertedIndex {
     public void setNumOfAppearance(String term, int numOfAppearance){
         invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
     }
-
     @Override
     public String toString() {
         StringBuilder toWrite=new StringBuilder();

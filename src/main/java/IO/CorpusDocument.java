@@ -1,4 +1,4 @@
-package Model;
+package IO;
 
 public class CorpusDocument {
     private String m_fileName;

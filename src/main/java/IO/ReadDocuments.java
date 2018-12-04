@@ -1,4 +1,4 @@
-package Model;
+package IO;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

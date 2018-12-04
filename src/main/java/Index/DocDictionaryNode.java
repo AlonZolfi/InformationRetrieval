@@ -1,4 +1,4 @@
-package Model;
+package Index;
 
 public class DocDictionaryNode {
     private String m_docName;

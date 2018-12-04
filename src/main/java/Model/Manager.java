@@ -1,5 +1,14 @@
 package Model;
 
+import IO.CorpusDocument;
+import IO.ReadFile;
+import IO.WriteFile;
+import Index.CityInfoNode;
+import Index.DocDictionaryNode;
+import Index.Indexer;
+import Index.InvertedIndex;
+import Parse.Parse;
+import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
 
 import java.io.*;
@@ -105,16 +114,17 @@ public class Manager {
     }*/
 
 
-    public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
+    public double[] Manage(HashMap<String, CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
         CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
         try {
             citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 3;
+        int iter = 1800;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -134,11 +144,10 @@ public class Manager {
 
             Indexer index = new Indexer(miniDicList);
             Future<HashMap<String, Pair<Integer,StringBuilder>>> futureTemporaryPosting = pool.submit(index);
-            HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = null;
             try {
-                temporaryPosting = futureTemporaryPosting.get();
-                //first Write the posting to the disk, thene get the "link" of hitch word in list from the "WriteFile"
-                WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting);
+                HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = futureTemporaryPosting.get();
+                //first Write the posting to the disk, then get the "link" of each word in list from the "WriteFile"
+                new Thread(()-> WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting));
                 //second fill the InvertedIndex with words and linkes
                 for (MiniDictionary mini : miniDicList) {
                     String curCity = mini.getCity();
@@ -173,10 +182,9 @@ public class Manager {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-
             pool.shutdown();
         }
-        
+
         Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary,stem));
         tCity.start();
         Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));

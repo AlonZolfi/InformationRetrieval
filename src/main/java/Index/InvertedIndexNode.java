@@ -1,4 +1,4 @@
-package Model;
+package Index;
 
 public class InvertedIndexNode {
     private String m_word;

@@ -1,5 +1,8 @@
-package Model;
+package Parse;
 
+import IO.ReadFile;
+import IO.CorpusDocument;
+import MiniDictionary;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.LinkedList;
@@ -168,10 +171,10 @@ public class Parse implements Callable<MiniDictionary> {
                 }
             }
 
-            //if(!ReadFile.stopWords.contains(term.toLowerCase())) {
+            if(!ReadFile.stopWords.contains(term.toLowerCase())) {
                 miniDic.addWord(term, index);
                 index++;
-            //}
+            }
         }
 
         return miniDic;
