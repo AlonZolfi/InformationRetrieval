@@ -30,8 +30,12 @@ public class Main extends Application {
         //--------------
         primaryStage.show();
 
+        /*String s = "Alon";
+        int i = s.compareToIgnoreCase("ALON");*/
 
         /*CorpusDocument cd = new CorpusDocument("","","","",
+                "First " +
+                "first " +
                 "1001 " +
                 "Grams " +
                 "54.546456 " +
@@ -135,7 +139,7 @@ public class Main extends Application {
                 "1994 "+
                 "10-11",
             "");
-        Parse p = new Parse(cd,true);
+        Parse p = new Parse(cd,false);
 
         p.call();*/
     }

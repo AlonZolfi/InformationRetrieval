@@ -168,10 +168,10 @@ public class Parse implements Callable<MiniDictionary> {
                 }
             }
 
-            if(!ReadFile.stopWords.contains(term.toLowerCase())) {
+            //if(!ReadFile.stopWords.contains(term.toLowerCase())) {
                 miniDic.addWord(term, index);
                 index++;
-            }
+            //}
         }
 
         return miniDic;

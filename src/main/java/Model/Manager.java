@@ -106,6 +106,12 @@ public class Manager {
 
 
     public double[] Manage(HashMap<String,CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
+        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
+        try {
+            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
         int iter = 3;
@@ -135,8 +141,31 @@ public class Manager {
                 WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting);
                 //second fill the InvertedIndex with words and linkes
                 for (MiniDictionary mini : miniDicList) {
-                    DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),mini.getCity());
-                    documentDictionary.add(cur);
+                    String curCity = mini.getCity();
+                    StringBuilder cityTry = new StringBuilder();
+                    if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                        String[] cityWords = curCity.split(" ");
+                        int j = 0;
+                        boolean found = false;
+                        while (j < cityWords.length && !cityDictionary.containsKey(cityTry.toString()) && !found) {
+                            cityTry.append(cityWords[j]);
+                            CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                            if (toPut != null ) {
+                                if (!cityDictionary.containsKey(cityTry.toString())) {
+                                    cityDictionary.put(cityTry.toString(), toPut);
+                                    found = true;
+                                }
+                            }
+                            else
+                                cityTry.append(" ");
+                            j++;
+                        }
+                        if(!found)
+                            cityTry = new StringBuilder();
+                        DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),cityTry.toString());
+                        documentDictionary.add(cur);
+                    }
+
                     for (String word : mini.listOfWords()) {
                         invertedIndex.addTerm(word);
                     }
@@ -147,10 +176,7 @@ public class Manager {
 
             pool.shutdown();
         }
-
-        //MERGE ALL POSTINGS
-        //fix link in the inverted index
-        fillTheCityDictionary(documentDictionary,cityDictionary);
+        
         Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary,stem));
         tCity.start();
         Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));
@@ -165,48 +191,6 @@ public class Manager {
         mergePostings(invertedIndex,destinationPath,stem);
         WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
-    }
-
-    private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) {
-        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
-        //CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = null;
-        try {
-            ///citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
-            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        /*for (DocDictionaryNode cur:documentDictionary){
-            String curCity = cur.getCity();
-            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
-                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(curCity);
-                if(toPut!=null)
-                    cityDictionary.put(curCity, toPut);
-                //else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
-                if(toPut==null)
-                    System.out.println(curCity+"   couldnt find city in API");
-            }
-        }*/
-        for (DocDictionaryNode cur:documentDictionary){
-            String curCity = cur.getCity();
-            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
-                String[] cityWords = curCity.split(" ");
-                int i = 0;
-                StringBuilder cityTry = new StringBuilder();
-                while(i < cityWords.length && !cityDictionary.containsKey(cityTry.toString())) {
-                    cityTry.append(cityWords[i]);
-                    CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
-                    if (toPut != null ) {
-                        if(!cityDictionary.containsKey(cityTry.toString()))
-                            cityDictionary.put(cityTry.toString(), toPut);
-                        break;
-                    }
-                    i++;
-                    cityTry.append(" ");
-                }
-            }
-        }
     }
 
     private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
@@ -311,6 +295,48 @@ public class Manager {
         }
         return bufferedReaderList;
     }
+
+    /*private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) {
+        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
+        //CitysMemoryDataBase citysMemoryDataBaseGeoBytesAPI = null;
+        try {
+            ///citysMemoryDataBaseGeoBytesAPI = new CitysMemoryDataBase("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=geobytescapital");
+            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        for (DocDictionaryNode cur:documentDictionary){
+            String curCity = cur.getCity();
+            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(curCity);
+                if(toPut!=null)
+                    cityDictionary.put(curCity, toPut);
+                //else toPut = citysMemoryDataBaseGeoBytesAPI.getCountryByCapital(curCity);
+                if(toPut==null)
+                    System.out.println(curCity+"   couldnt find city in API");
+            }
+        }
+        /*for (DocDictionaryNode cur : documentDictionary){
+            String curCity = cur.getCity();
+            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                String[] cityWords = curCity.split(" ");
+                int i = 0;
+                StringBuilder cityTry = new StringBuilder();
+                while(i < cityWords.length && !cityDictionary.containsKey(cityTry.toString())) {
+                    cityTry.append(cityWords[i]);
+                    CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                    if (toPut != null ) {
+                        if(!cityDictionary.containsKey(cityTry.toString()))
+                            cityDictionary.put(cityTry.toString(), toPut);
+                        break;
+                    }
+                    i++;
+                    cityTry.append(" ");
+                }
+            }
+        }
+    }*/
 }
 
 
