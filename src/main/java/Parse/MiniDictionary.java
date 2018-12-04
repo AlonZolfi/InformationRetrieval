@@ -74,4 +74,8 @@ public class MiniDictionary {
     public String getCity() {
         return m_city;
     }
+
+    public void setCity(String city) {
+        m_city=city;
+    }
 }
