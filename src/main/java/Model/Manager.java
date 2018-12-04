@@ -124,7 +124,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 4;
+        int iter = 1800;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -254,7 +254,7 @@ public class Manager {
                 writeToPosting = new LinkedList<>();
             }
             writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
-        } while(containsNull(firstSentenceOfFile));
+        } while(containsNull(firstSentenceOfFile) && postingNum<123);
         WriteFile.writeToEndOfFile(fileName + "_z" + ".txt", writeToPosting);
     }
 

@@ -38,7 +38,7 @@ public class InvertedIndex {
     }
 
     public void addTerm (String term){
-        if (!invertedIndexDic.containsKey(term)){
+        if (!invertedIndexDic.containsKey(term) && term.charAt(0)<123){
             InvertedIndexNode first = new InvertedIndexNode(term,1,0,null,-1);
             invertedIndexDic.put(term,first);
         }
