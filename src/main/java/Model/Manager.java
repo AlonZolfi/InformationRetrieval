@@ -124,7 +124,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 900;
+        int iter = 4;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -205,12 +205,11 @@ public class Manager {
 
         LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
-        int postingNum = 0;
+        char postingNum = '`';
         LinkedList<StringBuilder> writeToPosting = new LinkedList<>();
-        String fileName = "Stem"+tempPostingPath+"/finalPosting"+postingNum+".txt";
+        String fileName = "Stem"+tempPostingPath+"/finalPosting";
         if (!stem)
-            fileName= tempPostingPath+"/finalPosting"+postingNum+".txt";
-        File curPosting = new File(fileName);
+            fileName= tempPostingPath+"/finalPosting";
         do {
             int numOfAppearances = 0;
             StringBuilder finalPostingLine = new StringBuilder();
@@ -219,7 +218,7 @@ public class Manager {
             for (int i = 0; i < firstSentenceOfFile.length; i++) {
                 if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
-                    int result = termAndData[0].compareTo(minTerm);
+                    int result = termAndData[0].compareToIgnoreCase(minTerm);
                     if (result == 0) {
                         finalPostingLine.append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
@@ -246,12 +245,17 @@ public class Manager {
                 }
             }
             if(!finalPostingLine.toString().equals("")) {
-                invertedIndex.setPointer(minTerm, curPosting.getName(), writeToPosting.size());
+                invertedIndex.setPointer(minTerm, fileName, writeToPosting.size());
                 invertedIndex.setNumOfAppearance(minTerm,numOfAppearances);
+            }
+            if(minTerm.toLowerCase().charAt(0)>postingNum) {
+                WriteFile.writeToEndOfFile(fileName + "_"+ postingNum + ".txt", writeToPosting);
+                postingNum++;
+                writeToPosting = new LinkedList<>();
             }
             writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
         } while(containsNull(firstSentenceOfFile));
-        WriteFile.writeToEndOfFile(curPosting,writeToPosting);
+        WriteFile.writeToEndOfFile(fileName + "_z" + ".txt", writeToPosting);
     }
 
     private boolean containsNull(String[] firstSentenceOfFile) {

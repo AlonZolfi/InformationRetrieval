@@ -76,12 +76,12 @@ public class WriteFile {
 
     }
 
-    public static void writeToEndOfFile(File file, LinkedList<StringBuilder> finalPostingLine) {
+    public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
         try {
             StringBuilder ans = new StringBuilder();
             for (StringBuilder s : finalPostingLine)
                 ans.append(s+"\n");
-
+            File file = new File(fileName);
             FileWriter fileWriter = new FileWriter(file,true);
             fileWriter.write(ans.toString());
             fileWriter.close();
