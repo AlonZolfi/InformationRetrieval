@@ -7,7 +7,7 @@ import Index.CityInfoNode;
 import Index.DocDictionaryNode;
 import Index.Indexer;
 import Index.InvertedIndex;
-import Parse.Parse;
+import Parse.*;
 import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
 
@@ -124,7 +124,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 1800;
+        int iter = 900;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -147,7 +147,7 @@ public class Manager {
             try {
                 HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = futureTemporaryPosting.get();
                 //first Write the posting to the disk, then get the "link" of each word in list from the "WriteFile"
-                new Thread(()-> WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting));
+                new Thread(()-> WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting)).start();
                 //second fill the InvertedIndex with words and linkes
                 for (MiniDictionary mini : miniDicList) {
                     String curCity = mini.getCity();

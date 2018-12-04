@@ -1,6 +1,7 @@
-package View;
+package Main;
 
 import Model.*;
+import View.View;
 import ViewModel.ViewModel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

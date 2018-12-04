@@ -2,9 +2,7 @@ package Parse;
 
 import IO.ReadFile;
 import IO.CorpusDocument;
-import MiniDictionary;
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.Callable;
