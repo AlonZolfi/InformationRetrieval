@@ -50,7 +50,7 @@ public class WriteFile {
     }
 
     public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
-        StringBuilder toWrite = new StringBuilder();
+        StringBuilder toWrite = new StringBuilder("city_name\tcountry_name\tpopulation_amount\tcurrency_sign\tposting_link\n");
         for (CityInfoNode cur : cityDictionary.values()) {
             toWrite.append(cur.toString());
         }

@@ -29,11 +29,7 @@ public class InvertedIndexNode {
     }
 
     public String getPostingLink() {
-        return m_postingLink;
-    }
-
-    public int getPostingLine() {
-        return m_postingLine;
+        return m_postingLink+"\t"+m_postingLine;
     }
 
     public int getNumOfAppearances() {
