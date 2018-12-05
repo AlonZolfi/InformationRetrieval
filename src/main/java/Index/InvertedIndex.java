@@ -76,4 +76,12 @@ public class InvertedIndex {
         }
         return toWrite.toString();
     }
+
+    public void print(){
+        for (InvertedIndexNode i : invertedIndexDic.values()) {
+            if(i.getNumOfAppearances()==-1)
+                System.out.println(i.getWord());
+
+        }
+    }
 }

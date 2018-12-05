@@ -8,29 +8,24 @@ import javafx.util.Pair;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.*;
 
 public class WriteFile {
-
     public static void writeTmpPosting(String path, int i , HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting) {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
-        TreeMap<String, Pair<Integer, StringBuilder>> sorted = new TreeMap<>(String::compareToIgnoreCase);
-        sorted.putAll(temporaryPosting);
-        String [] words = sorted.keySet().toArray(new String[0]);
-        System.out.println(words.length+"yuyuyyu");
-        for (int j = 0; j <sorted.size() ; j++) {
-            int shows = sorted.get(words[j]).getKey();
-            StringBuilder stringBuilder = sorted.get(words[j]).getValue();
-            toWrite.append(words[j]).append("~").append(shows).append("~").append(stringBuilder+"\n");
+        LinkedList<String> sorted = new LinkedList<>(temporaryPosting.keySet());
+        sorted.sort(String.CASE_INSENSITIVE_ORDER);
+        for (String s : sorted) {
+            int shows = temporaryPosting.get(s).getKey();
+            StringBuilder stringBuilder = temporaryPosting.get(s).getValue();
+            toWrite.append(s).append("~").append(shows).append("~").append(stringBuilder).append("\n");
         }
         File dir = new File(path);
-        File actualFile = new File(dir,"posting_"+i+".txt");
-        write(actualFile,toWrite);
-    }
+        File actualFile = new File(dir, "posting_" + i + ".txt");
+        write(actualFile, toWrite);
 
+    }
     public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary, boolean stem) {
         StringBuilder toWrite = new StringBuilder();
         for (DocDictionaryNode cur :documentDictionary) {
@@ -51,7 +46,7 @@ public class WriteFile {
         if (!stem)
             fileName= "InvertedFile.txt";
         File actualFile = new File(dir,fileName);
-        write(actualFile,new StringBuilder(toWrite));
+        write(actualFile,new StringBuilder("word\ttermFreq\tnum Of Appearances\tposting Link\tposting Line\n"+toWrite));
     }
 
     public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
@@ -71,6 +66,7 @@ public class WriteFile {
             fileWriter = new FileWriter(actualFile);
             fileWriter.write(toWrite.toString());
             fileWriter.close();
+            toWrite.delete(0,toWrite.length());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,10 +75,22 @@ public class WriteFile {
 
     public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
         StringBuilder ans = new StringBuilder();
-        for (StringBuilder s : finalPostingLine)
-            ans.append(s+"\n");
+        StringBuilder[] sbArray = finalPostingLine.toArray(new StringBuilder[0]);
         File file = new File(fileName);
-        write(file,ans);
+        try {
+            FileWriter fileWriter = new FileWriter(file, true);
+            for (int i = 0; i <= sbArray.length / 1000; i++) {
+                for (int j = 0; j < 1000 && (j + i * 1000) < sbArray.length; j++) {
+                    ans.append(sbArray[j + i * 1000] + "\n");
+                }
+                fileWriter.write(ans.toString());
+                ans.delete(0, ans.length());
+            }
+            fileWriter.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

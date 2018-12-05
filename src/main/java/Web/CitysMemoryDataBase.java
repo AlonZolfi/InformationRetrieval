@@ -1,6 +1,7 @@
 package Web;
 
 import Index.CityInfoNode;
+import Parse.Parse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -23,6 +24,8 @@ public class CitysMemoryDataBase {
             String countryName = data.get("name").toString();
             String capitalName = data.get("capital").toString();
             String population = data.get("population").toString();
+            Parse parse = new Parse();
+            population = parse.handleNumber(Integer.parseInt(population));
             CityInfoNode cur = new CityInfoNode(capitalName.toUpperCase(),countryName,population,currency);
             this.CountryDB.put(cur.getCity_name(),cur);
         }

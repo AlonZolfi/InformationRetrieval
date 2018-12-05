@@ -22,8 +22,10 @@ public class Parse implements Callable<MiniDictionary> {
         this.ps = new PortersStemmer();
     }
 
+    public Parse(){}
+
     public MiniDictionary call() {
-        wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " \n\r\t"));
+        wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " (){}\n\r\t"));
         LinkedList<String> nextWord = new LinkedList<>();
         MiniDictionary miniDic = new MiniDictionary(corpus_doc.getM_fileName()+"_"+corpus_doc.getM_docNum(),corpus_doc.getM_docCity());
         int index = 0;
@@ -179,17 +181,6 @@ public class Parse implements Callable<MiniDictionary> {
 
     }
 
-    private String handleWeight(String term, String unit) {
-        switch (unit){
-            case "Ton":
-                term = numberValue(Double.parseDouble(term.replace(",","")) *1000);
-                break;
-            case "Gram":
-                term = numberValue(Double.parseDouble(term.replace(",","")) /1000);
-        }
-        return term + " Kilograms";
-    }
-
     private LinkedList<String> StringToList(String[] split) {
         LinkedList<String> wordsList = new LinkedList<>();
         for (String word: split) {
@@ -217,6 +208,17 @@ public class Parse implements Callable<MiniDictionary> {
             }
         }
         return term;
+    }
+
+    private String handleWeight(String term, String unit) {
+        switch (unit){
+            case "Ton":
+                term = numberValue(Double.parseDouble(term.replace(",","")) *1000);
+                break;
+            case "Gram":
+                term = numberValue(Double.parseDouble(term.replace(",","")) /1000);
+        }
+        return term + " Kilograms";
     }
 
     private String handleTime(String term, String unit){
@@ -289,7 +291,7 @@ public class Parse implements Callable<MiniDictionary> {
      * @param number - number to be changed
      * @return the number after changed
      */
-    private String handleNumber(double number){
+    public String handleNumber(double number){
         String ans = "";
         int multi = 1000;
         if(number > multi){//smaller than 1000
@@ -313,7 +315,6 @@ public class Parse implements Callable<MiniDictionary> {
             }
         }
         return numberValue(number)+ans;
-
     }
 
     /**
