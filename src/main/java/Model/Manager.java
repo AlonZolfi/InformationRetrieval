@@ -124,7 +124,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 900;
+        int iter = 3;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -176,10 +176,10 @@ public class Manager {
                         DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),cityTry.toString());
                         documentDictionary.add(cur);
                     }
-
                     for (String word : mini.listOfWords()) {
                         invertedIndex.addTerm(word);
                     }
+                    System.out.println(invertedIndex.getNumOfUniqueTerms() +"hjhjhj" );
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -198,12 +198,12 @@ public class Manager {
             e.printStackTrace();
         }
 
-        mergePostings(invertedIndex,destinationPath,stem);
+        //mergePostings(invertedIndex,destinationPath,stem);
         WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
-    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
+    /*private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
 
         LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
@@ -308,7 +308,7 @@ public class Manager {
             }
         }
         return bufferedReaderList;
-    }
+    }*/
 
     /*private void fillTheCityDictionary(LinkedList<DocDictionaryNode> documentDictionary ,HashMap<String,CityInfoNode> cityDictionary) {
         CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;

@@ -16,7 +16,7 @@ public class InvertedIndexNode {
         this.m_postingLine = postingLine;
     }
 
-    public void increaseAppearances(){
+    public void increaseTermFreq(){
         m_termFreq++;
     }
 

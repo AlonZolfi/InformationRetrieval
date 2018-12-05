@@ -37,18 +37,15 @@ public class InvertedIndex {
         }
     }
 
-    public void addTerm (String term){
-        if (!invertedIndexDic.containsKey(term) && term.charAt(0)<123){
-            InvertedIndexNode first = new InvertedIndexNode(term,1,0,null,-1);
-            invertedIndexDic.put(term,first);
-        }
-        else{
-            //if the word already exist we shold fo to the posting and add the new postin to him
-            /*InvertedIndexNode notFirst = invertedIndexDic.remove(term);
-            notFirst.increaseAppearances();
-            invertedIndexDic.put(term,notFirst);
-        */
-            invertedIndexDic.get(term).increaseAppearances();
+    public void addTerm (String term) {
+        if (term.charAt(0) < 123) {
+            if (!invertedIndexDic.containsKey(term)) {
+                InvertedIndexNode first = new InvertedIndexNode(term, 1, -1, null, -1);
+                invertedIndexDic.put(term, first);
+            }
+            else {
+                invertedIndexDic.get(term).increaseTermFreq();
+            }
         }
     }
 

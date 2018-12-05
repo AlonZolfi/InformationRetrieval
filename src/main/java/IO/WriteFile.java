@@ -20,6 +20,7 @@ public class WriteFile {
         TreeMap<String, Pair<Integer, StringBuilder>> sorted = new TreeMap<>(String::compareToIgnoreCase);
         sorted.putAll(temporaryPosting);
         String [] words = sorted.keySet().toArray(new String[0]);
+        System.out.println(words.length+"yuyuyyu");
         for (int j = 0; j <sorted.size() ; j++) {
             int shows = sorted.get(words[j]).getKey();
             StringBuilder stringBuilder = sorted.get(words[j]).getValue();
@@ -77,17 +78,11 @@ public class WriteFile {
     }
 
     public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
-        try {
-            StringBuilder ans = new StringBuilder();
-            for (StringBuilder s : finalPostingLine)
-                ans.append(s+"\n");
-            File file = new File(fileName);
-            FileWriter fileWriter = new FileWriter(file,true);
-            fileWriter.write(ans.toString());
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        StringBuilder ans = new StringBuilder();
+        for (StringBuilder s : finalPostingLine)
+            ans.append(s+"\n");
+        File file = new File(fileName);
+        write(file,ans);
     }
 
 }
