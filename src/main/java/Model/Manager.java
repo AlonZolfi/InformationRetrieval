@@ -109,7 +109,7 @@ public class Manager {
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
-    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
+    /*private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
         LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
         char postingNum = '`';
@@ -158,13 +158,71 @@ public class Manager {
             if(minTerm.toLowerCase().charAt(0)>postingNum) {
                 WriteFile.writeToEndOfFile(fileName + "_"+ postingNum + ".txt", writeToPosting);
                 postingNum++;
-
                 writeToPosting = new LinkedList<>();
             }
             writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
         } while(containsNull(firstSentenceOfFile) && postingNum<'z'+1);
         WriteFile.writeToEndOfFile(fileName + "_z" + ".txt", writeToPosting);
+    }*/
+
+
+    private void mergePostings(InvertedIndex invertedIndex, String tempPostingPath,boolean stem){
+        LinkedList<BufferedReader> bufferedReaderList = initiateBufferedReaderList(tempPostingPath);
+        String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
+        char postingNum = '`';
+        HashMap<String, StringBuilder> writeToPosting = new HashMap<>();
+        String fileName = "Stem"+tempPostingPath+"/finalPosting";
+        if (!stem)
+            fileName= tempPostingPath+"/finalPosting";
+        do {
+            int numOfAppearances = 0;
+            StringBuilder finalPostingLine = new StringBuilder();
+            String minTerm = ""+(char)127;
+            String[] saveSentences = new String[firstSentenceOfFile.length];
+            for (int i = 0; i < firstSentenceOfFile.length; i++) {
+                if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
+                    String[] termAndData = firstSentenceOfFile[i].split("~");
+                    int result = termAndData[0].compareToIgnoreCase(minTerm);
+                    if (result == 0) {
+                        finalPostingLine.append(termAndData[2]);
+                        firstSentenceOfFile[i] = null;
+                        saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                        numOfAppearances += Integer.parseInt(termAndData[1]);
+                    } else if (result < 0) {
+                        minTerm = termAndData[0];
+                        finalPostingLine.delete(0, finalPostingLine.length());
+                        finalPostingLine.append(termAndData[0]).append("~").append(termAndData[2]);
+                        firstSentenceOfFile[i] = null;
+                        saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                        numOfAppearances = Integer.parseInt(termAndData[1]);
+                    }
+                }
+            }
+            for (int i = 0; i < saveSentences.length; i++) {
+                if (saveSentences[i] != null) {
+                    String[] termAndData = saveSentences[i].split("~");
+                    if (!termAndData[0].equals(minTerm)) {
+                        firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                    }
+                    else
+                        firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));;
+                }
+            }
+            
+            if(!finalPostingLine.toString().equals("")) {
+                invertedIndex.setPointer(minTerm, fileName+"_"+postingNum+".txt", writeToPosting.size());
+                invertedIndex.setNumOfAppearance(minTerm,numOfAppearances);
+            }
+            if(minTerm.toLowerCase().charAt(0)>postingNum) {
+                WriteFile.writeToEndOfFile(fileName + "_"+ postingNum + ".txt", writeToPosting);
+                postingNum++;
+                writeToPosting = new HashMap<>();
+            }
+            writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
+        } while(containsNull(firstSentenceOfFile) && postingNum<'z'+1);
+        WriteFile.writeToEndOfFile(fileName + "_z" + ".txt", writeToPosting);
     }
+
 
     private boolean containsNull(String[] firstSentenceOfFile) {
         for (String sentence: firstSentenceOfFile) {
