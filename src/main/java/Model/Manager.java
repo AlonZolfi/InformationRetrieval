@@ -89,6 +89,13 @@ public class Manager {
             pool.shutdown();
         }
 
+        mergePostings(invertedIndex,destinationPath,stem);
+        WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
+
+        for (String word:cityDictionary.keySet()) {
+            cityDictionary.get(word).setPosting(invertedIndex.getPostingLink(word));
+        }
+
         Thread tCity = new Thread(()->WriteFile.writeDocDictionary(destinationPath,documentDictionary,stem));
         tCity.start();
         Thread tDocs = new Thread(()->WriteFile.writeCityDictionary(destinationPath,cityDictionary));
@@ -100,8 +107,8 @@ public class Manager {
             e.printStackTrace();
         }
 
-        mergePostings(invertedIndex,destinationPath,stem);
-        WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
+
+
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
 
@@ -280,6 +287,7 @@ public class Manager {
         }
     }
 
+
     private boolean containsNull(String[] firstSentenceOfFile) {
         for (String sentence: firstSentenceOfFile) {
             if(sentence!=null)
@@ -331,5 +339,3 @@ public class Manager {
         return bufferedReaderList;
     }
 }
-
-

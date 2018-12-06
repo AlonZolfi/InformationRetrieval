@@ -77,6 +77,12 @@ public class InvertedIndex {
         return toWrite.toString();
     }
 
+    public String getPostingLink(String word){
+        if (invertedIndexDic.get(word)==null)
+            return "posting dose not found";
+        return invertedIndexDic.get(word).getPostingLink();
+    }
+
     public void print(){
         for (InvertedIndexNode i : invertedIndexDic.values()) {
             if(i.getNumOfAppearances()==-1)
