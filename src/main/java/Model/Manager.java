@@ -148,10 +148,8 @@ public class Manager {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
                     int result = comparator.compare(termAndData[0],minTerm);
                     if (result == 0) {
-                        if (Character.isLowerCase(termAndData[0].charAt(0))) {
-                            termAndData[0]=termAndData[0].toLowerCase();
-                            finalPostingLine.replace(0, termAndData[0].length()-1, termAndData[0]);
-                        }
+                        if (Character.isLowerCase(termAndData[0].charAt(0)))
+                            finalPostingLine.replace(0, termAndData[0].length(), termAndData[0].toLowerCase());
                         finalPostingLine.append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
                         saveSentences[i] = termAndData[0] + "~" + termAndData[1] + "~" + termAndData[2];
@@ -204,6 +202,43 @@ public class Manager {
         }
     }
 
+    private void lookForSameTerm(String minTerm, StringBuilder finalPostingLine, HashMap<String, StringBuilder> writeToPosting) {
+        boolean option1 = writeToPosting.containsKey(minTerm.toUpperCase());
+        boolean option2 = writeToPosting.containsKey(minTerm.toLowerCase());
+        String replace;
+        if (option1) {
+            if (Character.isLowerCase(minTerm.charAt(0))) {
+                replace = writeToPosting.remove(minTerm.toUpperCase()).toString();
+                minTerm = minTerm.toLowerCase();
+            } else {
+                replace = writeToPosting.get(minTerm.toUpperCase()).toString();
+            }
+            String[] separatePostingAndNumOld = replace.split("\t");
+            String[] separatePostingAndNumNew = finalPostingLine.toString().split("\t");
+            int numOfAppearance = Integer.parseInt(separatePostingAndNumOld[1]) + Integer.parseInt(separatePostingAndNumNew[1]);
+            String oldPosting = separatePostingAndNumOld[0].substring(separatePostingAndNumOld[0].indexOf("~") + 1);
+            String newPosting = separatePostingAndNumNew[0].substring(separatePostingAndNumNew[0].indexOf("~") + 1);
+            StringBuilder allTogether = new StringBuilder(minTerm + "~" + oldPosting + newPosting + "\t" + numOfAppearance);
+            writeToPosting.replace(minTerm, allTogether);
+        }
+        else if (option2) {
+            minTerm = minTerm.toLowerCase();
+            replace = writeToPosting.get(minTerm).toString();
+            String[] separatePostingAndNumOld = replace.split("\t");
+            String[] separatePostingAndNumNew = finalPostingLine.toString().split("\t");
+            int numOfAppearance = Integer.parseInt(separatePostingAndNumOld[1]) + Integer.parseInt(separatePostingAndNumNew[1]);
+            String oldPosting = separatePostingAndNumOld[0].substring(separatePostingAndNumOld[0].indexOf("~") + 1);
+            String newPosting = separatePostingAndNumNew[0].substring(separatePostingAndNumNew[0].indexOf("~") + 1);
+            StringBuilder allTogether = new StringBuilder(minTerm + "~" + oldPosting + newPosting + "\t" + numOfAppearance);
+            writeToPosting.replace(minTerm, allTogether);
+        }
+        else {
+            System.out.println("ferjgfuegfuregfrehgau\t"+minTerm);
+            writeToPosting.put(minTerm, finalPostingLine);
+        }
+    }
+
+/*
     private void lookForSameTerm(String minTerm, StringBuilder finalPostingLine, HashMap<String, StringBuilder> writeToPosting){
         boolean option1 = writeToPosting.containsKey(Character.toUpperCase(minTerm.charAt(0))+minTerm.substring(1));
         boolean option2 = writeToPosting.containsKey(minTerm.toUpperCase());
@@ -231,7 +266,7 @@ public class Manager {
         else
             writeToPosting.put(minTerm,finalPostingLine);
     }
-
+    */
     private void restoreSentence(LinkedList<BufferedReader> bufferedReaderList,String minTerm,String[] firstSentenceOfFile, String[] saveSentences){
         for (int i = 0; i < saveSentences.length; i++) {
             if (saveSentences[i] != null) {

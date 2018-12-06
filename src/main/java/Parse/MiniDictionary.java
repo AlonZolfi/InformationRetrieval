@@ -26,6 +26,7 @@ public class MiniDictionary {
         if (containsKey(word)==0){
             if (Character.isUpperCase(word.charAt(0)))
                 word=word.toUpperCase();
+            else word=word.toLowerCase();
             currentPositions = new LinkedList<Integer>();
             currentPositions.add(placeInText);
             m_dictionary.put(word, currentPositions);
