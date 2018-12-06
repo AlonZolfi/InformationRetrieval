@@ -21,6 +21,7 @@ public class Manager {
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
         int iter = 1800;
+        LinkedList<Thread> tmpPostingThread = new LinkedList<>();
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -43,7 +44,9 @@ public class Manager {
             try {
                 HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = futureTemporaryPosting.get();
                 //first Write the posting to the disk, then get the "link" of each word in list from the "WriteFile"
-                new Thread(()->WriteFile.writeTmpPosting(destinationPath, numOfPostings.getAndIncrement(), temporaryPosting)).start();
+                Thread t1= new Thread(()->WriteFile.writeTmpPosting(destinationPath, numOfPostings.getAndIncrement(), temporaryPosting));
+                t1.start();
+                tmpPostingThread.add(t1);
                 //second fill the InvertedIndex with words and linkes
                 fillCityData(miniDicList,cityDictionary,citysMemoryDataBaseRESTAPI,invertedIndex,documentDictionary);
             } catch (InterruptedException | ExecutionException e) {
@@ -52,6 +55,13 @@ public class Manager {
             pool.shutdown();
         }
 
+        for(Thread t: tmpPostingThread) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         mergePostings(invertedIndex,destinationPath,stem);
         WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
         for (String word:cityDictionary.keySet()) {
