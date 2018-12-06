@@ -3,17 +3,13 @@ package Model;
 import IO.CorpusDocument;
 import IO.ReadFile;
 import IO.WriteFile;
-import Index.CityInfoNode;
-import Index.DocDictionaryNode;
-import Index.Indexer;
-import Index.InvertedIndex;
+import Index.*;
 import Parse.*;
 import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class Manager {
@@ -29,7 +25,7 @@ public class Manager {
 
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 900;
+        int iter = 1800;
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
@@ -171,9 +167,10 @@ public class Manager {
         String[] firstSentenceOfFile = initiateMergingArray(bufferedReaderList);
         char postingNum = '`';
         HashMap<String, StringBuilder> writeToPosting = new HashMap<>();
-        String fileName = "Stem"+tempPostingPath+"/finalPosting";
+        Comparator<String> comparator = new StringNaturalOrderComparator();
+        String fileName = "Stem"+tempPostingPath+"\\finalPosting";
         if (!stem)
-            fileName= tempPostingPath+"/finalPosting";
+            fileName= tempPostingPath+"\\finalPosting";
         do {
             int numOfAppearances = 0;
             StringBuilder finalPostingLine = new StringBuilder();
@@ -182,8 +179,10 @@ public class Manager {
             for (int i = 0; i < firstSentenceOfFile.length; i++) {
                 if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
-                    int result = termAndData[0].compareToIgnoreCase(minTerm);
+                    int result = comparator.compare(termAndData[0],minTerm);
                     if (result == 0) {
+                        if(Character.isLowerCase(termAndData[0].charAt(0)))
+                            finalPostingLine.replace(0, 1, "" + termAndData[0].charAt(0));
                         finalPostingLine.append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
                         saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
@@ -198,31 +197,88 @@ public class Manager {
                     }
                 }
             }
-            for (int i = 0; i < saveSentences.length; i++) {
-                if (saveSentences[i] != null) {
-                    String[] termAndData = saveSentences[i].split("~");
-                    if (!termAndData[0].equals(minTerm)) {
-                        firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
-                    }
-                    else
-                        firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));;
-                }
-            }
-            
-            if(!finalPostingLine.toString().equals("")) {
-                invertedIndex.setPointer(minTerm, fileName+"_"+postingNum+".txt", writeToPosting.size());
-                invertedIndex.setNumOfAppearance(minTerm,numOfAppearances);
-            }
+            restoreSentence(bufferedReaderList,minTerm,firstSentenceOfFile,saveSentences);
+            finalPostingLine.append("\t").append(numOfAppearances);
             if(minTerm.toLowerCase().charAt(0)>postingNum) {
-                WriteFile.writeToEndOfFile(fileName + "_"+ postingNum + ".txt", writeToPosting);
-                postingNum++;
+                List<String> keys = new LinkedList<String>(writeToPosting.keySet());
+                int k = 0;
+                for (String word0: keys){
+                    String toNum=writeToPosting.get(word0).toString().split("\t")[1];
+                    int num = Integer.parseInt(toNum);
+                    invertedIndex.setPointer(word0, fileName+"_"+postingNum+".txt", k++);
+                    invertedIndex.setNumOfAppearance(word0,num);
+                }
+                final HashMap<String, StringBuilder> sendToThread = new HashMap<>(writeToPosting);
+                String file = fileName + "_"+ postingNum + ".txt";
+                new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
                 writeToPosting = new HashMap<>();
+                postingNum++;
             }
-            writeToPosting.add(finalPostingLine.append("\t").append(numOfAppearances));
+            lookForSameTerm(finalPostingLine.toString().split("~")[0],finalPostingLine,writeToPosting);
         } while(containsNull(firstSentenceOfFile) && postingNum<'z'+1);
-        WriteFile.writeToEndOfFile(fileName + "_z" + ".txt", writeToPosting);
+        List<String> keys = new LinkedList<String>(writeToPosting.keySet());
+        keys.sort(new StringNaturalOrderComparator());
+        for (String word: keys){
+            invertedIndex.setPointer(word, fileName+"_"+postingNum+".txt", keys.indexOf(word));
+            invertedIndex.setNumOfAppearance(word,Integer.parseInt(writeToPosting.get(word).toString().split("\t")[1]));
+        }
+        final HashMap sendToThread = new HashMap(writeToPosting);
+        String file = fileName + "_"+ postingNum + ".txt";
+        new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
+        invertedIndex.deleteEntriesOfIrrelevant();
+        closeAllFiles(bufferedReaderList);
     }
 
+    private void closeAllFiles(LinkedList<BufferedReader> bufferedReaderList) {
+        for (BufferedReader bf: bufferedReaderList) {
+            try {
+                bf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void lookForSameTerm(String minTerm, StringBuilder finalPostingLine, HashMap<String, StringBuilder> writeToPosting){
+        boolean option1 = writeToPosting.containsKey(Character.toUpperCase(minTerm.charAt(0))+minTerm.substring(1));
+        boolean option2 = writeToPosting.containsKey(minTerm.toUpperCase());
+        boolean option3 = Character.isLowerCase(minTerm.charAt(0));
+        boolean option4 = writeToPosting.containsKey(minTerm);
+        if(option1 || (option2 && option3) || option4) {
+            String replace;
+            if (option1)
+                replace = writeToPosting.remove(Character.toUpperCase(minTerm.charAt(0))+minTerm.substring(1)).toString();
+            else if(option2)
+                replace = writeToPosting.remove(minTerm.toUpperCase()).toString();
+            else
+                replace = writeToPosting.remove(minTerm).toString();
+            String[] separatePostingAndNumOld = replace.split("\t");
+            String[] separatePostingAndNumNew = finalPostingLine.toString().split("\t");
+            int numOfAppearance = Integer.parseInt(separatePostingAndNumOld[1]) + Integer.parseInt(separatePostingAndNumNew[1]);
+            writeToPosting.put(minTerm, new StringBuilder(minTerm + "~" + separatePostingAndNumOld[0].substring(separatePostingAndNumOld[0].indexOf("~") + 1) + separatePostingAndNumNew[0].substring(separatePostingAndNumNew[0].indexOf("~") + 1) + "\t" + numOfAppearance));
+        } else if(option2){
+            String replace = writeToPosting.remove(minTerm.toUpperCase()).toString();
+            String[] separatePostingAndNumOld = replace.split("\t");
+            String[] separatePostingAndNumNew = finalPostingLine.toString().split("\t");
+            int numOfAppearance = Integer.parseInt(separatePostingAndNumOld[1]) + Integer.parseInt(separatePostingAndNumNew[1]);
+            writeToPosting.put(minTerm.toUpperCase(), new StringBuilder(minTerm + "~" + separatePostingAndNumOld[0].substring(separatePostingAndNumOld[0].indexOf("~") + 1) + separatePostingAndNumNew[0].substring(separatePostingAndNumNew[0].indexOf("~") + 1) + "\t" + numOfAppearance));
+        }
+        else
+            writeToPosting.put(minTerm,finalPostingLine);
+    }
+
+    private void restoreSentence(LinkedList<BufferedReader> bufferedReaderList,String minTerm,String[] firstSentenceOfFile, String[] saveSentences){
+        for (int i = 0; i < saveSentences.length; i++) {
+            if (saveSentences[i] != null) {
+                String[] termAndData = saveSentences[i].split("~");
+                if (!termAndData[0].equals(minTerm)) {
+                    firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                }
+                else
+                    firstSentenceOfFile[i] = getNextSentence(bufferedReaderList.get(i));;
+            }
+        }
+    }
 
     private boolean containsNull(String[] firstSentenceOfFile) {
         for (String sentence: firstSentenceOfFile) {

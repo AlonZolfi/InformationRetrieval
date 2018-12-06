@@ -81,7 +81,13 @@ public class InvertedIndex {
         for (InvertedIndexNode i : invertedIndexDic.values()) {
             if(i.getNumOfAppearances()==-1)
                 System.out.println(i.getWord());
+        }
+    }
 
+    public void deleteEntriesOfIrrelevant() {
+        for (String s: invertedIndexDic.keySet()){
+            if(invertedIndexDic.get(s).getNumOfAppearances()==-1)
+                invertedIndexDic.remove(s);
         }
     }
 }

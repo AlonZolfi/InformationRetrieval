@@ -84,6 +84,7 @@ public class Model extends Observable implements IModel {
                 FileUtils.cleanDirectory(dir);
                 update = new String[]{"Successful","The folder is clean now"};
             } catch (IOException e) {
+                e.printStackTrace();
                 update = new String[]{"Fail","Cleaning the folder was unsuccessful"};
             }
         }

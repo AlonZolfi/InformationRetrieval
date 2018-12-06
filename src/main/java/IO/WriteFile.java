@@ -3,6 +3,7 @@ package IO;
 import Index.InvertedIndex;
 import Index.CityInfoNode;
 import Index.DocDictionaryNode;
+import Index.StringNaturalOrderComparator;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public class WriteFile {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
         LinkedList<String> sorted = new LinkedList<>(temporaryPosting.keySet());
-        sorted.sort(String.CASE_INSENSITIVE_ORDER);
+        sorted.sort(new StringNaturalOrderComparator());
         for (String s : sorted) {
             int shows = temporaryPosting.get(s).getKey();
             StringBuilder stringBuilder = temporaryPosting.get(s).getValue();
@@ -73,7 +74,7 @@ public class WriteFile {
 
     }
 
-    public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
+    /*public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
         StringBuilder ans = new StringBuilder();
         StringBuilder[] sbArray = finalPostingLine.toArray(new StringBuilder[0]);
         File file = new File(fileName);
@@ -82,6 +83,26 @@ public class WriteFile {
             for (int i = 0; i <= sbArray.length / 1000; i++) {
                 for (int j = 0; j < 1000 && (j + i * 1000) < sbArray.length; j++) {
                     ans.append(sbArray[j + i * 1000] + "\n");
+                }
+                fileWriter.write(ans.toString());
+                ans.delete(0, ans.length());
+            }
+            fileWriter.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public static void writeToEndOfFile(String fileName, HashMap<String, StringBuilder> finalPostingLine) {
+        StringBuilder ans = new StringBuilder();
+        StringBuilder[] sbArray = finalPostingLine.values().toArray(new StringBuilder[0]);
+        File file = new File(fileName);
+        try {
+            FileWriter fileWriter = new FileWriter(file, true);
+            for (int i = 0; i <= sbArray.length / 1000; i++) {
+                for (int j = 0; j < 1000 && (j + i * 1000) < sbArray.length; j++) {
+                    ans.append(sbArray[j + i * 1000]).append("\n");
                 }
                 fileWriter.write(ans.toString());
                 ans.delete(0, ans.length());
