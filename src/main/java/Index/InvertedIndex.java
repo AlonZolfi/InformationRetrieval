@@ -47,6 +47,8 @@ public class InvertedIndex {
                 invertedIndexDic.get(term).increaseTermFreq(1);
             }
         }
+        if(term.equals("pampa"))
+            System.out.println("pampa small is in the invertedIndex");
     }
 
     public int getNumOfUniqueTerms(){
@@ -90,7 +92,8 @@ public class InvertedIndex {
                 int termFreqCur = cur.getTermFreq();
                 if(invertedIndexDic.get(s.toLowerCase())!=null)
                     invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
-                else System.out.println(s);
+                else
+                    System.out.println(s);
                 invertedIndexDic.remove(s);
             }
         }

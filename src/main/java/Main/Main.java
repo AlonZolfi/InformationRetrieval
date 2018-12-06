@@ -2,6 +2,7 @@ package Main;
 
 import IO.WriteFile;
 import Index.InvertedIndex;
+import Index.StringNaturalOrderComparator;
 import Model.*;
 import View.View;
 import ViewModel.ViewModel;
@@ -18,9 +19,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        StringBuilder a = new StringBuilder("DISASTE~FT942_38_FT942-13071,1,[361]|\t1");
-        a.replace(0,"DISASTE".length()-1,"DISASTE".toLowerCase());
-
 
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);

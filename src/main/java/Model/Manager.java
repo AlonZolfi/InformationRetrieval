@@ -20,7 +20,7 @@ public class Manager {
         CitysMemoryDataBase citysMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
-        int iter = 1800;
+        int iter = 3;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
         for (int i = 0; i < iter; i++) {
             LinkedList<CorpusDocument> l = ReadFile.readFiles(corpusPath, i, iter);
@@ -156,7 +156,9 @@ public class Manager {
             for (int i = 0; i < firstSentenceOfFile.length; i++) {
                 if(firstSentenceOfFile[i]!=null && !firstSentenceOfFile[i].equals("")) {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
-                    int result = comparator.compare(termAndData[0],minTerm);
+                    int result = termAndData[0].compareToIgnoreCase(minTerm);
+                    if(termAndData[0].equalsIgnoreCase("pampa"))
+                        System.out.println("fdsfsd");
                     if (result == 0) {
                         if (Character.isLowerCase(termAndData[0].charAt(0)))
                             finalPostingLine.replace(0, termAndData[0].length(), termAndData[0].toLowerCase());
@@ -221,7 +223,7 @@ public class Manager {
                 replace = writeToPosting.remove(minTerm.toUpperCase()).toString();
                 minTerm = minTerm.toLowerCase();
             } else {
-                replace = writeToPosting.get(minTerm.toUpperCase()).toString();
+                replace = writeToPosting.remove(minTerm.toUpperCase()).toString();
             }
             String[] separatePostingAndNumOld = replace.split("\t");
             String[] separatePostingAndNumNew = finalPostingLine.toString().split("\t");
@@ -229,7 +231,7 @@ public class Manager {
             String oldPosting = separatePostingAndNumOld[0].substring(separatePostingAndNumOld[0].indexOf("~") + 1);
             String newPosting = separatePostingAndNumNew[0].substring(separatePostingAndNumNew[0].indexOf("~") + 1);
             StringBuilder allTogether = new StringBuilder(minTerm + "~" + oldPosting + newPosting + "\t" + numOfAppearance);
-            writeToPosting.replace(minTerm, allTogether);
+            writeToPosting.put(minTerm, allTogether);
         }
         else if (option2) {
             minTerm = minTerm.toLowerCase();
@@ -243,7 +245,6 @@ public class Manager {
             writeToPosting.replace(minTerm, allTogether);
         }
         else {
-            System.out.println("ferjgfuegfuregfrehgau\t"+minTerm);
             writeToPosting.put(minTerm, finalPostingLine);
         }
     }
@@ -281,7 +282,7 @@ public class Manager {
         for (int i = 0; i < saveSentences.length; i++) {
             if (saveSentences[i] != null) {
                 String[] termAndData = saveSentences[i].split("~");
-                if (!termAndData[0].equals(minTerm)) {
+                if (termAndData[0].compareToIgnoreCase(minTerm)!=0) {
                     firstSentenceOfFile[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
                 }
                 else
