@@ -87,7 +87,6 @@ public class InvertedIndex {
         for (InvertedIndexNode i : invertedIndexDic.values()) {
             if(i.getNumOfAppearances()==-1)
                 System.out.println(i.getWord());
-
         }
     }
 }

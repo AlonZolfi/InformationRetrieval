@@ -16,7 +16,6 @@ public class CityInfoNode {
         this.m_posting="Dose not Found";
     }
 
-
     public String getCity_name() {
         return city_name;
     }

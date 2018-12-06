@@ -223,5 +223,3 @@ public class Manager {
         return bufferedReaderList;
     }
 }
-
-
