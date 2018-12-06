@@ -11,18 +11,13 @@ import javafx.util.Pair;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Manager {
-    private int numOfPostings = 0;
+    private AtomicInteger numOfPostings = new AtomicInteger(0);
 
     public double[] Manage(HashMap<String, CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) {
-        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
-        try {
-            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
         double start = System.currentTimeMillis();
         int iter = 1800;
@@ -48,41 +43,9 @@ public class Manager {
             try {
                 HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting = futureTemporaryPosting.get();
                 //first Write the posting to the disk, then get the "link" of each word in list from the "WriteFile"
-                WriteFile.writeTmpPosting(destinationPath, numOfPostings++, temporaryPosting);
+                new Thread(()->WriteFile.writeTmpPosting(destinationPath, numOfPostings.getAndIncrement(), temporaryPosting)).start();
                 //second fill the InvertedIndex with words and linkes
-                for (MiniDictionary mini : miniDicList) {
-                    String curCity = mini.getCity();
-                    StringBuilder cityTry = new StringBuilder();
-                    if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
-                        String[] cityWords = curCity.split(" ");
-                        int j = 0;
-                        boolean found = false;
-                        while (j < cityWords.length  && !found) {
-                            if (!cityDictionary.containsKey(cityTry.toString())) {
-                                cityTry.append(cityWords[j]);
-                                CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
-                                if (toPut != null) {
-                                    if (!cityDictionary.containsKey(cityTry.toString())) {
-                                        cityDictionary.put(cityTry.toString(), toPut);
-                                        found = true;
-                                    }
-                                } else cityTry.append(" ");
-                                j++;
-                            }
-                            else
-                                found=true;
-                        }
-                        if(!found)
-                            cityTry = new StringBuilder();
-                        DocDictionaryNode cur = new DocDictionaryNode(mini.getName(),mini.getMaxFrequency(),mini.size(),cityTry.toString());
-                        documentDictionary.add(cur);
-                    }
-                    cityTry.delete(0,cityTry.length());
-
-                    for (String word : mini.listOfWords()) {
-                        invertedIndex.addTerm(word);
-                    }
-                }
+                fillCityData(miniDicList,cityDictionary,citysMemoryDataBaseRESTAPI,invertedIndex,documentDictionary);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -91,7 +54,6 @@ public class Manager {
 
         mergePostings(invertedIndex,destinationPath,stem);
         WriteFile.writeInvertedFile(destinationPath,invertedIndex,stem);
-
         for (String word:cityDictionary.keySet()) {
             cityDictionary.get(word).setPosting(invertedIndex.getPostingLink(word));
         }
@@ -106,8 +68,6 @@ public class Manager {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
 
         return new double[]{numOfDocs,invertedIndex.getNumOfUniqueTerms(),(System.currentTimeMillis()-start)/60000};
     }
@@ -207,33 +167,29 @@ public class Manager {
             restoreSentence(bufferedReaderList,minTerm,firstSentenceOfFile,saveSentences);
             finalPostingLine.append("\t").append(numOfAppearances);
             if(minTerm.toLowerCase().charAt(0)>postingNum) {
-                List<String> keys = new LinkedList<String>(writeToPosting.keySet());
-                int k = 0;
-                for (String word0: keys){
-                    String toNum=writeToPosting.get(word0).toString().split("\t")[1];
-                    int num = Integer.parseInt(toNum);
-                    invertedIndex.setPointer(word0, fileName+"_"+postingNum+".txt", k++);
-                    invertedIndex.setNumOfAppearance(word0,num);
-                }
-                final HashMap<String, StringBuilder> sendToThread = new HashMap<>(writeToPosting);
-                String file = fileName + "_"+ postingNum + ".txt";
-                new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
+                writeFinalPosting(writeToPosting,invertedIndex,fileName,postingNum);
                 writeToPosting = new HashMap<>();
                 postingNum++;
             }
             lookForSameTerm(finalPostingLine.toString().split("~")[0],finalPostingLine,writeToPosting);
         } while(containsNull(firstSentenceOfFile) && postingNum<'z'+1);
-        List<String> keys = new LinkedList<String>(writeToPosting.keySet());
-        keys.sort(new StringNaturalOrderComparator());
-        for (String word: keys){
-            invertedIndex.setPointer(word, fileName+"_"+postingNum+".txt", keys.indexOf(word));
-            invertedIndex.setNumOfAppearance(word,Integer.parseInt(writeToPosting.get(word).toString().split("\t")[1]));
-        }
-        final HashMap sendToThread = new HashMap(writeToPosting);
-        String file = fileName + "_"+ postingNum + ".txt";
-        new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
+        writeFinalPosting(writeToPosting,invertedIndex,fileName,'z');
         invertedIndex.deleteEntriesOfIrrelevant();
         closeAllFiles(bufferedReaderList);
+    }
+
+    private void writeFinalPosting(HashMap<String, StringBuilder> writeToPosting, InvertedIndex invertedIndex, String fileName, char postingNum) {
+        List<String> keys = new LinkedList<String>(writeToPosting.keySet());
+        int k = 0;
+        for (String word0: keys){
+            String toNum=writeToPosting.get(word0).toString().split("\t")[1];
+            int num = Integer.parseInt(toNum);
+            invertedIndex.setPointer(word0, fileName+"_"+postingNum+".txt", k++);
+            invertedIndex.setNumOfAppearance(word0,num);
+        }
+        final HashMap<String, StringBuilder> sendToThread = new HashMap<>(writeToPosting);
+        String file = fileName + "_"+ postingNum + ".txt";
+        new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
     }
 
     private void closeAllFiles(LinkedList<BufferedReader> bufferedReaderList) {
@@ -287,7 +243,6 @@ public class Manager {
         }
     }
 
-
     private boolean containsNull(String[] firstSentenceOfFile) {
         for (String sentence: firstSentenceOfFile) {
             if(sentence!=null)
@@ -338,4 +293,48 @@ public class Manager {
         }
         return bufferedReaderList;
     }
+
+    private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, LinkedList<DocDictionaryNode> documentDictionary) {
+        for (MiniDictionary mini : miniDicList) {
+            String curCity = mini.getCity();
+            StringBuilder cityTry = new StringBuilder();
+            if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
+                String[] cityWords = curCity.split(" ");
+                int j = 0;
+                boolean found = false;
+                while (j < cityWords.length && !found) {
+                    if (!cityDictionary.containsKey(cityTry.toString())) {
+                        cityTry.append(cityWords[j]);
+                        CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
+                        if (toPut != null) {
+                            if (!cityDictionary.containsKey(cityTry.toString())) {
+                                cityDictionary.put(cityTry.toString(), toPut);
+                                found = true;
+                            }
+                        } else cityTry.append(" ");
+                        j++;
+                    } else found = true;
+                }
+                if (!found) cityTry = new StringBuilder();
+                DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString());
+                documentDictionary.add(cur);
+            }
+            cityTry.delete(0, cityTry.length());
+            for (String word : mini.listOfWords()) {
+                invertedIndex.addTerm(word);
+            }
+        }
+    }
+
+    private CitysMemoryDataBase fillCityDataBase(){
+        CitysMemoryDataBase citysMemoryDataBaseRESTAPI = null;
+        try {
+            citysMemoryDataBaseRESTAPI = new CitysMemoryDataBase("https://restcountries.eu/rest/v2/all?fields=name;capital;population;currencies");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return citysMemoryDataBaseRESTAPI;
+    }
+
+
 }
