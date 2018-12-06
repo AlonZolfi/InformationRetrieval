@@ -44,7 +44,7 @@ public class InvertedIndex {
                 invertedIndexDic.put(term, first);
             }
             else {
-                invertedIndexDic.get(term).increaseTermFreq();
+                invertedIndexDic.get(term).increaseTermFreq(1);
             }
         }
     }
@@ -85,8 +85,14 @@ public class InvertedIndex {
 
     public void deleteEntriesOfIrrelevant() {
         for (String s: invertedIndexDic.keySet()){
-            if(invertedIndexDic.get(s).getNumOfAppearances()==-1)
+            InvertedIndexNode cur = invertedIndexDic.get(s);
+            if(cur.getNumOfAppearances()==-1) {
+                int termFreqCur = cur.getTermFreq();
+                if(invertedIndexDic.get(s.toLowerCase())!=null)
+                    invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
+                else System.out.println(s);
                 invertedIndexDic.remove(s);
+            }
         }
     }
 }

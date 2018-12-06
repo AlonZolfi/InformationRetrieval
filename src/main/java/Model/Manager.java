@@ -148,11 +148,13 @@ public class Manager {
                     String[] termAndData = firstSentenceOfFile[i].split("~");
                     int result = comparator.compare(termAndData[0],minTerm);
                     if (result == 0) {
-                        if(Character.isLowerCase(termAndData[0].charAt(0)))
-                            finalPostingLine.replace(0, 1, "" + termAndData[0].charAt(0));
+                        if (Character.isLowerCase(termAndData[0].charAt(0))) {
+                            termAndData[0]=termAndData[0].toLowerCase();
+                            finalPostingLine.replace(0, termAndData[0].length()-1, termAndData[0]);
+                        }
                         finalPostingLine.append(termAndData[2]);
                         firstSentenceOfFile[i] = null;
-                        saveSentences[i] = termAndData[0]+"~"+termAndData[1]+"~"+termAndData[2];
+                        saveSentences[i] = termAndData[0] + "~" + termAndData[1] + "~" + termAndData[2];
                         numOfAppearances += Integer.parseInt(termAndData[1]);
                     } else if (result < 0) {
                         minTerm = termAndData[0];

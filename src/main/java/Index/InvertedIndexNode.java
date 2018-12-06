@@ -16,8 +16,8 @@ public class InvertedIndexNode {
         this.m_postingLine = postingLine;
     }
 
-    public void increaseTermFreq(){
-        m_termFreq++;
+    public void increaseTermFreq(int termFreqCur){
+        m_termFreq+=termFreqCur;
     }
 
     public int getTermFreq() {

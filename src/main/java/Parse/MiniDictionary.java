@@ -1,5 +1,7 @@
 package Parse;
 
+import Index.StringNaturalOrderComparator;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -7,33 +9,54 @@ import java.util.Set;
 
 public class MiniDictionary {
     private String m_name; //name of the doc that past pars
-    private Map<String,LinkedList> m_dictionary; //string - the term ; int - TF in the doc
+    private Map<String,LinkedList<Integer>> m_dictionary; //string - the term ; int - TF in the doc
     private int m_maxFreq;
     private String m_city;
 
     public MiniDictionary (String name, String city){
         m_name=name;
         m_city = city;
-        m_dictionary = new HashMap<String, LinkedList>();
+        m_dictionary = new HashMap<String, LinkedList<Integer>>();
         m_maxFreq = 1;
     }
 
+
     public void addWord(String word,int placeInText){
-        if (!containsKey(word)) {
-            LinkedList root = new LinkedList();
-            root.add(placeInText);
-            m_dictionary.put(word, root);
+        LinkedList<Integer> currentPositions;
+        if (containsKey(word)==0){
+            if (Character.isUpperCase(word.charAt(0)))
+                word=word.toUpperCase();
+            currentPositions = new LinkedList<Integer>();
+            currentPositions.add(placeInText);
+            m_dictionary.put(word, currentPositions);
+        }
+        else if (containsKey(word)==1){
+            if (Character.isUpperCase(word.charAt(0))){
+                currentPositions = m_dictionary.get(word.toUpperCase());
+                currentPositions.add(placeInText);
+            }else {
+                currentPositions = m_dictionary.remove(word.toUpperCase());
+                currentPositions.add(placeInText);
+                m_dictionary.put(word.toLowerCase(),currentPositions);
+            }
         }
         else {
-            LinkedList linkl = m_dictionary.get(word);
-            linkl.add(placeInText);
-            if (m_maxFreq < linkl.size())
-                m_maxFreq = linkl.size();
+            word=word.toLowerCase();
+            currentPositions = m_dictionary.get(word);
+            currentPositions.add(placeInText);
         }
+        if (m_maxFreq < currentPositions.size())
+            m_maxFreq = currentPositions.size();
     }
 
-    public boolean containsKey(String word){
-        return m_dictionary.containsKey(word);
+    public int containsKey(String word){
+        String upper = word.toUpperCase();
+        String lower = word.toLowerCase();
+        if(m_dictionary.containsKey(upper))
+            return 1;
+        if(m_dictionary.containsKey(lower))
+            return 2;
+        return 0;
     }
 
     public int size(){
@@ -45,7 +68,7 @@ public class MiniDictionary {
     }
 
     public int getFrequency(String word){
-        if (size()>0 && containsKey(word))
+        if (size()>0 && containsKey(word)!=0)
             return m_dictionary.get(word).size();
         return 0;
     }
@@ -59,7 +82,7 @@ public class MiniDictionary {
     }
 
     public LinkedList<Integer> listOfIndexes(String word){
-        if (containsKey(word))
+        if (containsKey(word)!=0)
             return m_dictionary.get(word);
         return null;
     }
