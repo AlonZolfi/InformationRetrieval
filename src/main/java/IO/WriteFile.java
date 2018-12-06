@@ -74,26 +74,6 @@ public class WriteFile {
 
     }
 
-    /*public static void writeToEndOfFile(String fileName, LinkedList<StringBuilder> finalPostingLine) {
-        StringBuilder ans = new StringBuilder();
-        StringBuilder[] sbArray = finalPostingLine.toArray(new StringBuilder[0]);
-        File file = new File(fileName);
-        try {
-            FileWriter fileWriter = new FileWriter(file, true);
-            for (int i = 0; i <= sbArray.length / 1000; i++) {
-                for (int j = 0; j < 1000 && (j + i * 1000) < sbArray.length; j++) {
-                    ans.append(sbArray[j + i * 1000] + "\n");
-                }
-                fileWriter.write(ans.toString());
-                ans.delete(0, ans.length());
-            }
-            fileWriter.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public static void writeToEndOfFile(String fileName, HashMap<String, StringBuilder> finalPostingLine) {
         StringBuilder ans = new StringBuilder();
         StringBuilder[] sbArray = finalPostingLine.values().toArray(new StringBuilder[0]);

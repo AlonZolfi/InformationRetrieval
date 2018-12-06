@@ -47,8 +47,8 @@ public class InvertedIndex {
                 invertedIndexDic.get(term).increaseTermFreq(1);
             }
         }
-        if(term.equals("pampa"))
-            System.out.println("pampa small is in the invertedIndex");
+        if(term.equalsIgnoreCase("\t0"))
+            System.out.println("REALLYY??");
     }
 
     public int getNumOfUniqueTerms(){
@@ -64,11 +64,15 @@ public class InvertedIndex {
     }
 
     public void setPointer(String minTerm, String fileName, int lineNumber){
-        invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+        if (invertedIndexDic.containsKey(minTerm))
+            invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+        else System.out.println(minTerm+" "+fileName+" "+lineNumber);
     }
 
     public void setNumOfAppearance(String term, int numOfAppearance){
-        invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
+        if (invertedIndexDic.containsKey(term))
+            invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
+        else System.out.println(term+" "+numOfAppearance);
     }
     @Override
     public String toString() {

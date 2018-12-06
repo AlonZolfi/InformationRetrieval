@@ -42,5 +42,4 @@ public class Indexer implements Callable<HashMap<String, Pair<Integer,StringBuil
         return toReturn;
     }
 
-
 }

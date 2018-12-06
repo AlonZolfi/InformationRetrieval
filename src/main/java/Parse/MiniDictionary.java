@@ -12,12 +12,14 @@ public class MiniDictionary {
     private Map<String,LinkedList<Integer>> m_dictionary; //string - the term ; int - TF in the doc
     private int m_maxFreq;
     private String m_city;
+    private String m_maxFreqWord;
 
     public MiniDictionary (String name, String city){
         m_name=name;
         m_city = city;
         m_dictionary = new HashMap<String, LinkedList<Integer>>();
-        m_maxFreq = 1;
+        m_maxFreq = 0;
+        m_maxFreqWord = "";
     }
 
 
@@ -47,8 +49,10 @@ public class MiniDictionary {
             currentPositions = m_dictionary.get(word);
             currentPositions.add(placeInText);
         }
-        if (m_maxFreq < currentPositions.size())
+        if (m_maxFreq < currentPositions.size()) {
             m_maxFreq = currentPositions.size();
+            m_maxFreqWord = word;
+        }
     }
 
     public int containsKey(String word){
@@ -102,5 +106,9 @@ public class MiniDictionary {
 
     public void setCity(String city) {
         m_city=city;
+    }
+
+    public String getMaxFreqWord() {
+        return m_maxFreqWord;
     }
 }

@@ -16,16 +16,16 @@ public class Parse implements Callable<MiniDictionary> {
     private static String[] shortMonth = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
     private static String[] longMonth = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
 
+    public Parse(){}
+
     public Parse(CorpusDocument corpus_doc, boolean stm){
         this.corpus_doc = corpus_doc;
         this.stm = stm;
         this.ps = new PortersStemmer();
     }
 
-    public Parse(){}
-
     public MiniDictionary call() {
-        wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " (){}\n\r\t"));
+        wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " |:\"(){}[]\n\r\t"));
         LinkedList<String> nextWord = new LinkedList<>();
         MiniDictionary miniDic = new MiniDictionary(corpus_doc.getM_fileName()+"_"+corpus_doc.getM_docNum(),corpus_doc.getM_docCity());
         int index = 0;
@@ -155,23 +155,21 @@ public class Parse implements Callable<MiniDictionary> {
                     if (isFraction(nextWord.peekFirst()))
                         term += " " + nextWord.pollFirst();
                 }
-            }else if (term.contains("-")){
-                term=term;
-            } else if(stm)
-                term = ps.stemTerm(term);
+            }else if (term.contains("-")) {
+                term = term;
+            }
 
 
             while (!nextWord.isEmpty()) {
                 String s = nextWord.pollFirst();
-                try {
-                    if (s!= null && !s.equals(""))
-                        wordList.addFirst(s);
-                }catch (Exception e){
-                    System.out.println(corpus_doc.getM_fileName()+" "+corpus_doc.getM_docNum());
-                }
+                if (s!= null && !s.equals(""))
+                    wordList.addFirst(s);
+
             }
 
             if(!ReadFile.stopWords.contains(term.toLowerCase())) {
+                if(stm)
+                    term = ps.stemTerm(term);
                 miniDic.addWord(term, index);
                 index++;
             }
