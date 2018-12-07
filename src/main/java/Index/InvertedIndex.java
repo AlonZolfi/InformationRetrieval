@@ -94,10 +94,10 @@ public class InvertedIndex {
             InvertedIndexNode cur = invertedIndexDic.get(s);
             if(cur.getNumOfAppearances()==-1) {
                 int termFreqCur = cur.getTermFreq();
-                if(invertedIndexDic.get(s.toLowerCase())!=null)
+                //if(invertedIndexDic.get(s.toLowerCase())!=null)
                     invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
-                else
-                    System.out.println(s);
+                //
+                    //System.out.println(s);
                 invertedIndexDic.remove(s);
             }
         }

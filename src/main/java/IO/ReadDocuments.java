@@ -29,9 +29,6 @@ public class ReadDocuments implements Callable<LinkedList<CorpusDocument>> {
             }
             return fileList;
         }
-        else{
-            System.out.println("Not a directory");
-        }
         return fileList;
     }
 

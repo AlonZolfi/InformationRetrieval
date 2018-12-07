@@ -13,7 +13,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 
-
 public class View implements Observer, IView {
 
     private ViewModel viewModel;
@@ -39,31 +38,31 @@ public class View implements Observer, IView {
     public Label lbl_totalTimeNum;
 
     /**
-     * constractor of view, connect the view to the viewModel
-     * @param viewModel
+     * constructor of view, connect the view to the viewModel
+     * @param viewModel the view model of the MVVM
      */
     public void setViewModel(ViewModel viewModel) {
         this.viewModel = viewModel;
     }
 
     /**
-     * This function start the procces of pars and index the dictionary
+     * This function starts the process of parse and index the dictionary
      */
     public void onStartClick() {
-        if (source.getText().equals("") || destination.getText().equals(""))
+        if (source.getText().equals("") || destination.getText().equals(""))// check if the paths are not empty
             MyAlert.showAlert(javafx.scene.control.Alert.AlertType.ERROR,"paths cannot be empty");
         else
-            viewModel.onStartClick(source.getText(),destination.getText(), doStemming());
+            viewModel.onStartClick(source.getText(),destination.getText(), doStemming());//transfer to the view Model
     }
 
     /**
-     * This function delete all of the work and let the option of clear start
+     * This function deletes all the contents of the destination path
      */
     public void onStartOverClick() {
-        if(!destination.getText().equals("")) {
+        if(!destination.getText().equals("")) { // check if the user is sure he wants to delete the whole folder he chose
             ButtonType stay = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
             ButtonType leave = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,"Are you sure?",leave,stay);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"Are you sure?",leave,stay);
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == stay)
                 viewModel.onStartOverClick(destination.getText());
@@ -75,27 +74,32 @@ public class View implements Observer, IView {
     }
 
     /**
-     * This function determen if we shuld stem or not
+     * This function determines if we should stem or not
      * @return if we should stem or not
      */
     private boolean doStemming(){
          return cb_stm.isSelected();
     }
 
+    /**
+     * a function that gets called when an observer has raised a flag for something that changed
+     * @param o - who changed
+     * @param arg - the change
+     */
     public void update(Observable o, Object arg) {
         if(o==viewModel){
             if(arg instanceof String[]){
                 String[] toUpdate = (String[])arg;
-                if(toUpdate[0].equals("Fail"))
+                if(toUpdate[0].equals("Fail")) // if we received a fail message from the model
                     MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
-                else if(toUpdate[0].equals("Successful")) {
+                else if(toUpdate[0].equals("Successful")) {// if we received a successful message from the model
                     MyAlert.showAlert(Alert.AlertType.INFORMATION, toUpdate[1]);
                     if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary"))
                         btn_showDic.setDisable(false);
                 }
-            } else if( arg instanceof ObservableList){
+            } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
                 showDictionary((ObservableList<ShowDictionaryRecord>)arg);
-            } else if( arg instanceof double[]){
+            } else if( arg instanceof double[]){ // show the results of the indexing
                 showIndexResults((double[])arg);
                 btn_showDic.setDisable(false);
             }
@@ -103,9 +107,10 @@ public class View implements Observer, IView {
     }
 
     /***
-     * This function let the user select his corpus and stopReadAndParse word list
+     * This function lets the user select his corpus and stop words path
      */
     public void browseSourceClick(){
+        //open a choose folder dialog
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Source Path");
         File defaultDirectory = new File("C:");
@@ -113,15 +118,13 @@ public class View implements Observer, IView {
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
             source.setText(chosen.getAbsolutePath());
-        /*else
-            source.setText(defaultDirectory.getName());*/
     }
 
     /***
-     * This function let the user select his favorite location to save the documents
+     * This function lets the user select his  location to save the postings and other data
      */
-
     public void browseDestClick(){
+        //open a choose folder dialog
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Load Destination Path");
         File defaultDirectory = new File("C:");
@@ -129,15 +132,21 @@ public class View implements Observer, IView {
         File chosen = fileChooser.showDialog(new Stage());
         if (chosen!=null)
             destination.setText(chosen.getAbsolutePath());
-        /*else
-            destination.setText(defaultDirectory.getName());*/
     }
 
+    /**
+     * transfers a request to show the dictionary of the current indexing
+     */
     public void showDictionaryClick() {
         viewModel.showDictionary();
     }
 
+    /**
+     * shows the data of the current indexing process such as: Number of docs, Number of terms, Total time to index
+     * @param results the results of the current indexing
+     */
     private void showIndexResults(double[] results) {
+        //makes all the fields visible to the user and sets the results into them
         lbl_totalDocsNum.setText(""+(int)results[0]);
         lbl_totalTermsNum.setText(""+(int)results[1]);
         lbl_totalTimeNum.setText(""+results[2]+" Minutes");
@@ -150,6 +159,10 @@ public class View implements Observer, IView {
         lbl_totalTimeNum.setVisible(true);
     }
 
+    /**
+     * shows an observable list that contains all the data about the current indexing: Term and TF
+     * @param records all the data about the current indexing
+     */
     private void showDictionary(ObservableList<ShowDictionaryRecord> records){
         if(records != null){
             tableCol_term.setCellValueFactory(cellData -> cellData.getValue().getTermProperty());
@@ -159,6 +172,9 @@ public class View implements Observer, IView {
         btn_showDic.setDisable(false);
     }
 
+    /**
+     * transfers to the view model a load dictionary request
+     */
     public void loadDictionary() {
         if(!destination.getText().equals(""))
             viewModel.loadDictionary(destination.getText(),doStemming());

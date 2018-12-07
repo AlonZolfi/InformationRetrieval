@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 
 public class Parse implements Callable<MiniDictionary> {
-
     private LinkedList<String> wordList;
     private CorpusDocument corpus_doc;
     private PortersStemmer ps;
@@ -16,20 +15,45 @@ public class Parse implements Callable<MiniDictionary> {
     private static String[] shortMonth = new String[]{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
     private static String[] longMonth = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
 
+    /**
+     * a default constructor
+     */
     public Parse(){}
 
+    /**
+     * a constructor that receives a document from the corpus and if the terms should be stemmed
+     * @param corpus_doc a document from the corpus
+     * @param stm if the terms should be stemmed
+     */
     public Parse(CorpusDocument corpus_doc, boolean stm){
         this.corpus_doc = corpus_doc;
         this.stm = stm;
         this.ps = new PortersStemmer();
     }
 
+    /**
+     * returns a Mini dictionary that was retrieved from the parse
+     * @return a Mini dictionary that was retrieved from the parse
+     */
     public MiniDictionary call() {
-        wordList = StringToList(StringUtils.split(corpus_doc.getM_docText(), " |:\"(){}[]\n\r\t"));
+        return parse();
+    }
+
+    /**
+     * goes over all the terms of label <TEXT>  and parses them according to the rules of the work
+     * @return a Mini Dictionary that contains all the data about the terms and the doc
+     */
+    private MiniDictionary parse(){
+        //split the <Text> label to list of terms
+        wordList = stringToList(StringUtils.split(corpus_doc.getM_docText(), " |:\"(){}[]\n\r\t"));
+        //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
+        //the mini dictionary that will be filled according to the terms
         MiniDictionary miniDic = new MiniDictionary(corpus_doc.getM_fileName()+"_"+corpus_doc.getM_docNum(),corpus_doc.getM_docCity());
+        //the index of the
         int index = 0;
         while (!wordList.isEmpty()) {
+            boolean doStemIfTermWasNotManipulated = false;
             String term = wordList.remove();
             if (isNumber(term)) { //if current term is a number
                 nextWord.add(nextWord());
@@ -43,7 +67,7 @@ public class Parse implements Callable<MiniDictionary> {
                     term = handleMonthDay(nextWord.pollFirst(), term);
                 } else if (nextWord.peekFirst().equalsIgnoreCase("Dollars")) {  //if it is rule Dalet - it is a Dollar term
                     nextWord.pollFirst();
-                    term = handleDollars(Double.parseDouble(term.replace(",", "")), term.contains(","));
+                    term = handleDollar(Double.parseDouble(term.replace(",", "")), term.contains(","));
                 } else if (nextWord.peekFirst().equals("%")) { // if it is rule Gimel - it is a percent term
                     term = handlePercent(term, nextWord.pollFirst());
                 } else if(nextWord.peekFirst().equalsIgnoreCase("Min") || nextWord.peekFirst().equalsIgnoreCase("Sec")){
@@ -61,44 +85,41 @@ public class Parse implements Callable<MiniDictionary> {
                         if (nextWord.peekFirst().length() == 1)
                             term += nextWord.pollFirst();
 
-                        //nextWord.clear();
+                        if (!nextWord.isEmpty() && nextWord.peekFirst().equals(""))
+                            nextWord.clear();
+
                         if (!wordList.isEmpty()) {
-                            nextWord.addFirst(wordList.poll());
+                            nextWord.addLast(wordList.poll());
                             if (isFraction(nextWord.peekFirst())) { //rule Alef 2 - fraction rule
                                 term += " " + nextWord.pollFirst();
                                 nextWord.addFirst(nextWord());
                                 if (nextWord.peekFirst().equals("Dollars"))
                                     term += " " + nextWord.pollFirst();
-
                             } else if (!wordList.isEmpty() && nextWord.peekFirst().equals("U.S")) {
                                 nextWord.addFirst(wordList.poll());
-                                try {
-                                    if (nextWord.peekFirst().equalsIgnoreCase("dollars")) {
-                                        nextWord.clear();
-                                        double d;
-                                        if (Character.isLetter(term.charAt(term.length() - 1)))
-                                            d = Double.parseDouble(term.substring(0, term.length() - 1));
-                                        else
-                                            d = Double.parseDouble(term);
-                                        if (term.charAt(term.length() - 1) == 'M')
-                                            d *= 1000000;
-                                        else if (term.charAt(term.length() - 1) == 'B') {
-                                            d *= 1000000000;
-                                        }
-                                        term = handleDollars(d, term.contains(","));
+                                if (nextWord.peekFirst().equalsIgnoreCase("dollars")) {
+                                    nextWord.clear();
+                                    double d;
+                                    if (Character.isLetter(term.charAt(term.length() - 1)))
+                                        d = Double.parseDouble(term.substring(0, term.length() - 1));
+                                    else
+                                        d = Double.parseDouble(term);
+                                    if (term.charAt(term.length() - 1) == 'M')
+                                        d *= 1000000;
+                                    else if (term.charAt(term.length() - 1) == 'B') {
+                                        d *= 1000000000;
                                     }
-                                } catch (Exception e) {
-                                    System.out.println(corpus_doc.getM_fileName()+" "+corpus_doc.getM_docNum());
+                                    term = handleDollar(d, term.contains(","));
                                 }
                             }
                         }
                     }
                 }
             }
-             else if (term.length()>=1 && isNumber(term.substring(1))) {
+            else if (term.length()>=1 && isNumber(term.substring(1))) {
                 if (term.charAt(0) == '$') { //rule Dalet - dollar sign at the beginning of a number
                     try {
-                        term = handleDollars(Double.parseDouble(term.substring(1).replace(",", "")), term.contains(","));
+                        term = handleDollar(Double.parseDouble(term.substring(1).replace(",", "")), term.contains(","));
                     } catch (NumberFormatException e) {
                         e.getCause();
                     }
@@ -149,37 +170,43 @@ public class Parse implements Callable<MiniDictionary> {
 
                     }
                 }
-            } else if (isRangeNumbers(term)) {
+            } else if (term.contains("-") && isRangeNumbers(term)) {
                 if (!wordList.isEmpty()) {
                     nextWord.addFirst(wordList.pollFirst());
                     if (isFraction(nextWord.peekFirst()))
                         term += " " + nextWord.pollFirst();
                 }
             }else if (term.contains("-")) {
-                term = term;
+                term = handleRangesSign(term);
+            } else if(stm){
+                doStemIfTermWasNotManipulated = true;
             }
 
 
             while (!nextWord.isEmpty()) {
-                String s = nextWord.pollFirst();
+                String s = nextWord.pollLast();
                 if (s!= null && !s.equals(""))
                     wordList.addFirst(s);
 
             }
 
             if(!ReadFile.stopWords.contains(term.toLowerCase())) {
-                if(stm)
+                if(doStemIfTermWasNotManipulated)
                     term = ps.stemTerm(term);
                 miniDic.addWord(term, index);
                 index++;
             }
         }
-
         return miniDic;
-
     }
 
-    private LinkedList<String> StringToList(String[] split) {
+    /**
+     * gets an array of String and returns it has a List
+     * each term is cleaned from the unwanted signs
+     * @param split the array to separate
+     * @return a list of the terms
+     */
+    private LinkedList<String> stringToList(String[] split) {
         LinkedList<String> wordsList = new LinkedList<>();
         for (String word: split) {
             word = cleanTerm(word);
@@ -190,6 +217,11 @@ public class Parse implements Callable<MiniDictionary> {
         return wordsList;
     }
 
+    /**
+     * this function deletes all irrelevant signs from a term
+     * @param term the term to clean
+     * @return a cleaned term
+     */
     private String cleanTerm(String term){
         if (!term.equals("")) {
             if (!(term.charAt(term.length() - 1) == '%')) {
@@ -208,6 +240,26 @@ public class Parse implements Callable<MiniDictionary> {
         return term;
     }
 
+    /**
+     * deletes a double -- if exists
+     * @param term the term to be handled
+     * @return the term without --
+     */
+    private String handleRangesSign(String term) {
+        int idx = term.indexOf('-');
+        if (idx != -1){
+            if (term.lastIndexOf('-')==idx+1)
+                term = term.replaceFirst("-","");
+        }
+        return term;
+    }
+
+    /**
+     * transforms terms that contain Tons or Grams to Kilograms
+     * @param term the term to be changed
+     * @param unit the unit of the number
+     * @return the term after change as kilogram
+     */
     private String handleWeight(String term, String unit) {
         switch (unit){
             case "Ton":
@@ -219,6 +271,12 @@ public class Parse implements Callable<MiniDictionary> {
         return term + " Kilograms";
     }
 
+    /**
+     * transforms terms that contain Seconds or Minutes to Hours
+     * @param term the term to be changed
+     * @param unit the unit of the number
+     * @return the term after change as hours
+     */
     private String handleTime(String term, String unit){
         switch (unit) {
             case "Sec":
@@ -230,10 +288,22 @@ public class Parse implements Callable<MiniDictionary> {
         return term + " Hours";
     }
 
+    /**
+     * adds to term the % sign
+     * @param term the term
+     * @param percentSign % sign
+     * @return the term with percent sign
+     */
     private String handlePercent(String term, String percentSign) {
         return term+percentSign;
     }
 
+    /**
+     * transforms a term that is written as DAY MONTH / MONTH DAY to mm-dd
+     * @param month the month
+     * @param day the day
+     * @return mm-dd
+     */
     private String handleMonthDay(String month, String day){
         int monthNum = isMonth(month);
         int dayNum=0;
@@ -247,7 +317,13 @@ public class Parse implements Callable<MiniDictionary> {
         return newTerm;
     }
 
-    private String handleMonthYear (String month, String year){
+    /**
+     * transforms a MONTH YEAR to yyyy-mm
+     * @param month the month
+     * @param year the year
+     * @return yyyy-mm
+     */
+    private String handleMonthYear(String month, String year){
         int monthNum = isMonth(month);
         String newTerm = year + "-";
         if (monthNum < 9)
@@ -258,10 +334,10 @@ public class Parse implements Callable<MiniDictionary> {
     /**
      * Rule DALET - changed number according to the rule
      * @param number the number to be changed
-     * @param containsComma ghfg
+     * @param containsComma if the number contains comma
      * @return the number after rule
      */
-    private String handleDollars(double number, boolean containsComma) {
+    private String handleDollar(double number, boolean containsComma) {
         String ans = "";
         int multi = 1000000;
         if(number >= multi) {
@@ -372,7 +448,7 @@ public class Parse implements Callable<MiniDictionary> {
             } else if (queuePeek.equalsIgnoreCase("Tons")) {
                 wordList.remove();
                 nextWord = "Ton";
-            } else if (queuePeek.equalsIgnoreCase("grams")) {
+            } else if (queuePeek.equalsIgnoreCase("Grams")) {
                 wordList.remove();
                 nextWord = "Gram";
             } else if (queuePeek.equalsIgnoreCase("percent") || queuePeek.equalsIgnoreCase("percentage")) {
@@ -413,6 +489,11 @@ public class Parse implements Callable<MiniDictionary> {
         return word == Math.floor(word) && !Double.isInfinite(word);
     }
 
+    /**
+     * checks if a number is an integer or not
+     * @param word the number to be checked
+     * @return true if it is integer
+     */
     private boolean isInteger(String word){
         try{
             Integer.parseInt(word);
@@ -448,22 +529,17 @@ public class Parse implements Callable<MiniDictionary> {
         catch (NumberFormatException e){
             return false;
         }
-        /*if(word.equals("") || (word.length()==1 && !Character.isDigit(word.charAt(0))))
-            return false;
-        for(int i = 0; i < word.length(); i++)
-            if(word.charAt(i) < '0' || word.charAt(i) > '9') {
-                if(word.charAt(0)=='-'&& i==0)
-                    continue;
-                if (!(word.charAt(i) == '.') && !(word.charAt(i) == ','))
-                    return false;
-            }
-        return true;*/
     }
 
+    /**
+     * checks if a range term is a range of numbers
+     * @param range the range to be checked
+     * @return tr
+     */
     private boolean isRangeNumbers(String range){
         int idx =range.indexOf('-');
         if (idx!=-1)
-            if(isNumber(range.substring(0,idx)) || isFraction(range.substring(0,idx)))
+            if(isFraction(range.substring(0,idx)))
                 return isNumber(range.substring(idx+1)) || isFraction(range.substring(idx+1));
         return false;
     }

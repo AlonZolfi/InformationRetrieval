@@ -1,9 +1,11 @@
 package Main;
 
+import IO.CorpusDocument;
 import IO.WriteFile;
 import Index.InvertedIndex;
 import Index.StringNaturalOrderComparator;
 import Model.*;
+import Parse.Parse;
 import View.View;
 import ViewModel.ViewModel;
 import javafx.application.Application;
@@ -19,7 +21,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+        if (Character.isLowerCase('1'))
+            System.out.println("fdsdfsdf");
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
@@ -39,17 +42,9 @@ public class Main extends Application {
         int i = s.compareToIgnoreCase("ALON");*/
 
         /*CorpusDocument cd = new CorpusDocument("","","","",
-                "First " +
-                "first " +
-                "1001 " +
-                "Grams " +
-                "54.546456 " +
-                "Tons " +
-                "1000 " +
-                "Seconds " +
-                "3.2 " +
-                "Minutes " +
-                "4/9-11 " +
+                "alon--hila " +
+                "54 " +
+                "20-11 " +
                 "1/5 " +
                 "4/9-11 " +
                 "1/5 " +
