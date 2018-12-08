@@ -7,13 +7,15 @@ public class CityInfoNode {
     private String population_amount;
     private String currency_sign;
     private String m_posting;
+    private boolean isCapital;
 
-    public CityInfoNode(String city_name, String country_name, String population_amount, String currency_sign) {
+    public CityInfoNode(String city_name, String country_name, String population_amount, String currency_sign,boolean is_Capital) {
         this.city_name = city_name;
         this.country_name = country_name;
         this.population_amount = population_amount;
         this.currency_sign = currency_sign;
         this.m_posting="Dose not Found";
+        this.isCapital = is_Capital;
     }
 
     public String getCity_name() {
@@ -36,6 +38,6 @@ public class CityInfoNode {
 
     @Override
     public String toString() {
-        return city_name+"\t"+country_name+"\t"+population_amount+"\t"+currency_sign+"\t"+m_posting+"\n";
+        return city_name+"\t"+country_name+"\t"+population_amount+"\t"+currency_sign+"\t"+m_posting+"\t"+isCapital+"\n";
     }
 }

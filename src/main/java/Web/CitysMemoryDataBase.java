@@ -31,7 +31,7 @@ public class CitysMemoryDataBase {
             String population = data.get("population").toString();
             Parse parse = new Parse();
             population = parse.handleNumber(Integer.parseInt(population));
-            CityInfoNode cur = new CityInfoNode(cityName.toUpperCase(),countryName,population,currency);
+            CityInfoNode cur = new CityInfoNode(cityName.toUpperCase(),countryName,population,currency,true);
             this.CountryDB.put(cur.getCity_name(),cur);
         }
     }

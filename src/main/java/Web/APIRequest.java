@@ -6,7 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-class APIRequest {
+public class APIRequest {
 
     /**
      * this function addresses the url given and gets the data from the web
@@ -14,7 +14,7 @@ class APIRequest {
      * @return JSONObject containing all data
      * @throws IOException .
      */
-    JSONObject post(String url) throws IOException {
+    public JSONObject post(String url) throws IOException {
         URL address = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) address.openConnection();
         conn.setRequestMethod("GET");
