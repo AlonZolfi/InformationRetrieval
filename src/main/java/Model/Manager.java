@@ -5,10 +5,14 @@ import IO.ReadFile;
 import IO.WriteFile;
 import Index.*;
 import Parse.*;
+import Web.APIRequest;
 import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -117,6 +121,8 @@ class Manager {
     private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, LinkedList<DocDictionaryNode> documentDictionary) {
         for (MiniDictionary mini : miniDicList) {
             String curCity = mini.getCity();
+            if(curCity.equals(""))
+                continue;
             StringBuilder cityTry = new StringBuilder();
             if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
                 String[] cityWords = curCity.split(" ");
@@ -136,10 +142,31 @@ class Manager {
                     } else found = true;
                 }
                 if (!found) {
-                    cityTry = new StringBuilder();
-                    cityDictionary.put(curCity,new CityInfoNode(curCity,"","",""));
+                    int space = curCity.indexOf(" ");
+                    curCity = curCity.substring(0, space);
+                    String out = "";
+                    String realCity = "";
+                    String realCuntry = "";
+                    String realCurancy = "";
+                    String realPopulation = "";
+                    try {
+                        APIRequest request = new APIRequest();
+                        JSONObject data = request.post("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=" + curCity);
+                        JSONObject result = data.getJSONObject("result");
+                        realCity = result.get("geobytescity").toString();
+                        realCuntry = result.get("geobytescountry").toString();
+                        realCurancy = result.get("geobytescurrency").toString();
+                        realPopulation = result.get("geobytespopulation").toString();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if(!realPopulation.equals("")) {
+                        Parse parse = new Parse();
+                        realPopulation = parse.handleNumber(Integer.parseInt(realPopulation));
+                    }
+                    cityDictionary.put(realCity, new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy,false));
                 }
-                DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(),mini.getMaxFreqWord());
+                DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
                 documentDictionary.add(cur);
             }
             cityTry.delete(0, cityTry.length());
