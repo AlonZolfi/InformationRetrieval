@@ -4,15 +4,13 @@ public class InvertedIndexNode {
     private String m_word;//the term
     private int m_termFreq;//number of documents the words appears in
     private int m_numOfAppearances;//number of times the word has appeared
-    private String m_postingLink;//the pointer to the posting
     private int m_postingLine;//line number in the posting
 
 
-    InvertedIndexNode(String word, int termFreq, int numOfAppearances, String postingLink, int postingLine) {
+    InvertedIndexNode(String word, int termFreq, int numOfAppearances, int postingLine) {
         this.m_word = word;
         this.m_termFreq = termFreq;
         this.m_numOfAppearances = numOfAppearances;
-        this.m_postingLink = postingLink;
         this.m_postingLine = postingLine;
     }
 
@@ -33,15 +31,14 @@ public class InvertedIndexNode {
     }
 
     String getPostingLink() {
-        return m_postingLink+"\t"+m_postingLine;
+        return ""+m_postingLine;
     }
 
     int getNumOfAppearances() {
         return m_numOfAppearances;
     }
 
-    void setPointer(String postingFile, int postingLine){
-        this.m_postingLink = postingFile;
+    void setPointer(int postingLine){
         this.m_postingLine =postingLine;
     }
 
@@ -51,6 +48,6 @@ public class InvertedIndexNode {
 
     @Override
     public String toString() {
-        return m_word+"\t"+m_termFreq+"\t"+m_numOfAppearances+"\t"+m_postingLink+"\t"+m_postingLine+"\n";
+        return m_word+"\t"+m_termFreq+"\t"+m_numOfAppearances+"\t"+m_postingLine+"\n";
     }
 }

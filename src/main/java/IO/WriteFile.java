@@ -65,7 +65,7 @@ public class WriteFile {
         if (!stem)
             fileName= "InvertedFile.txt";
         File actualFile = new File(dir,fileName);
-        write(actualFile,new StringBuilder("word\ttermFreq\tnum Of Appearances\tposting Link\tposting Line\n"+toWrite));
+        write(actualFile,new StringBuilder(toWrite));
     }
 
     /**

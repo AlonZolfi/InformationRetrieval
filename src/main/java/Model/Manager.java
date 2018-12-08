@@ -135,7 +135,10 @@ class Manager {
                         j++;
                     } else found = true;
                 }
-                if (!found) cityTry = new StringBuilder();
+                if (!found) {
+                    cityTry = new StringBuilder();
+                    cityDictionary.put(curCity,new CityInfoNode(curCity,"","",""));
+                }
                 DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(),mini.getMaxFreqWord());
                 documentDictionary.add(cur);
             }
@@ -222,7 +225,7 @@ class Manager {
         for (String word0: keys){
             String toNum=writeToPosting.get(word0).toString().split("\t")[1];
             int num = Integer.parseInt(toNum);
-            invertedIndex.setPointer(word0, fileName+"_"+postingNum+".txt", k++);
+            invertedIndex.setPointer(word0, k++);
             invertedIndex.setNumOfAppearance(word0,num);
         }
         final HashMap<String, StringBuilder> sendToThread = new HashMap<>(writeToPosting);

@@ -34,7 +34,7 @@ public class InvertedIndex {
             line = bufferedReader.readLine();
             while(line != null) {
                 String [] curLine = line.split("\t");
-                InvertedIndexNode cur = new InvertedIndexNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],Integer.parseInt(curLine[4]));
+                InvertedIndexNode cur = new InvertedIndexNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),Integer.parseInt(curLine[3]));
                 invertedIndexDic.put(curLine[0],cur);
                 line = bufferedReader.readLine();
             }
@@ -51,7 +51,7 @@ public class InvertedIndex {
     public void addTerm (String term) {
         if (term.charAt(0) < 123) {
             if (!invertedIndexDic.containsKey(term)) {//if the term doesn't exist in the inverted index
-                InvertedIndexNode first = new InvertedIndexNode(term, 1, -1, null, -1);
+                InvertedIndexNode first = new InvertedIndexNode(term, 1, -1, -1);
                 invertedIndexDic.put(term, first);
             }
             else {
@@ -88,12 +88,11 @@ public class InvertedIndex {
     /**
      * updates the pointer to the final posting
      * @param minTerm the term to sent the pointer
-     * @param fileName the file where the posting of the term exists
      * @param lineNumber the line in the posting file
      */
-    public void setPointer(String minTerm, String fileName, int lineNumber){
+    public void setPointer(String minTerm, int lineNumber){
         if (invertedIndexDic.containsKey(minTerm))
-            invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+            invertedIndexDic.get(minTerm).setPointer(lineNumber);
     }
 
     /**
