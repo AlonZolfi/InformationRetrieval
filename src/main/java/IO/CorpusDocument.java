@@ -11,7 +11,7 @@ public class CorpusDocument {
     private String m_docText;
     private String m_docCity;
 
-    public CorpusDocument(String m_fileName, String m_docNum, String m_docDate, String m_docTitle, String m_docText, String m_docCity) {
+    CorpusDocument(String m_fileName, String m_docNum, String m_docDate, String m_docTitle, String m_docText, String m_docCity) {
         this.m_fileName = m_fileName;
         this.m_docNum = m_docNum;
         this.m_docDate = m_docDate;

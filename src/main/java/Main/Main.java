@@ -1,11 +1,6 @@
 package Main;
 
-import IO.CorpusDocument;
-import IO.WriteFile;
-import Index.InvertedIndex;
-import Index.StringNaturalOrderComparator;
 import Model.*;
-import Parse.Parse;
 import View.View;
 import ViewModel.ViewModel;
 import javafx.application.Application;
@@ -13,9 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.*;
-import java.util.LinkedList;
 
 public class Main extends Application {
 

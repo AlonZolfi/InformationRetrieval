@@ -27,11 +27,11 @@ public class CitysMemoryDataBase {
             JSONObject data = (JSONObject)obj;
             String currency = data.getJSONArray("currencies").getJSONObject(0).get("name").toString();
             String countryName = data.get("name").toString();
-            String capitalName = data.get("capital").toString();
+            String cityName = data.get("capital").toString();
             String population = data.get("population").toString();
             Parse parse = new Parse();
             population = parse.handleNumber(Integer.parseInt(population));
-            CityInfoNode cur = new CityInfoNode(capitalName.toUpperCase(),countryName,population,currency);
+            CityInfoNode cur = new CityInfoNode(cityName.toUpperCase(),countryName,population,currency);
             this.CountryDB.put(cur.getCity_name(),cur);
         }
     }
