@@ -57,14 +57,21 @@ public class Parse implements Callable<MiniDictionary> {
             String term = wordList.remove();
             if (isNumber(term)) { //if current term is a number
                 nextWord.add(nextWord());
-                if (isRangeNumbers(nextWord.peekFirst()) && !wordList.isEmpty()) {
+                if (nextWord.peekFirst().contains("-") && isRangeNumbers(nextWord.peekFirst()) && isFraction(nextWord.peekFirst().substring(0,nextWord.peekFirst().indexOf("-")))&&!wordList.isEmpty()) {
                     nextWord.addFirst(wordList.pollFirst());
                     term += " " + nextWord.pollLast();
                     if (isFraction(nextWord.peekFirst())) {
                         term += " " + nextWord.pollLast();
                     }
-                } else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)) { //if it is rule Hei - it is a Month term
-                    term = handleMonthDay(nextWord.pollFirst(), term);
+                } else if (isMonth(nextWord.peekFirst()) != -1 && isInteger(term)){  //if it is rule Hei - it is a Month term
+                    String save = nextWord.pollFirst();
+                    term = handleMonthDay(save, term);
+                    if(!wordList.isEmpty()){
+                        nextWord.add(wordList.pollFirst());
+                        if(nextWord.peekFirst()!=null && isNumber(nextWord.peekFirst()) && nextWord.peekFirst().length()==4) {
+                            nextWord.addFirst(save);
+                        }
+                    }
                 } else if (nextWord.peekFirst().equalsIgnoreCase("Dollars")) {  //if it is rule Dalet - it is a Dollar term
                     nextWord.pollFirst();
                     term = handleDollar(Double.parseDouble(term.replace(",", "")), term.contains(","));
@@ -538,9 +545,13 @@ public class Parse implements Callable<MiniDictionary> {
      */
     private boolean isRangeNumbers(String range){
         int idx =range.indexOf('-');
-        if (idx!=-1)
-            if(isFraction(range.substring(0,idx)))
-                return isNumber(range.substring(idx+1)) || isFraction(range.substring(idx+1));
+        if (idx!=-1) {
+            if (isFraction(range.substring(0, idx)))
+                return isNumber(range.substring(idx + 1)) || isFraction(range.substring(idx + 1));
+            else if(isNumber(range.substring(0,idx)))
+                return isNumber(range.substring(idx + 1));
+
+        }
         return false;
     }
 }

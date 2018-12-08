@@ -40,13 +40,16 @@ public class Main extends Application {
         int i = s.compareToIgnoreCase("ALON");*/
 
         /*CorpusDocument cd = new CorpusDocument("","","","",
-                "alon--hila " +
+                "14 " +
+                "May " +
+                "1998 " +
                 "54 " +
                 "20-11 " +
                 "1/5 " +
                 "4/9-11 " +
-                "1/5 " +
-                "187 " +
+                        "1/5 " +
+                        "4/9-8/9 " +
+                        "187 " +
                 "4/9-1/8 " +
                 "999 " +
                 "between " +
@@ -129,9 +132,9 @@ public class Main extends Application {
                 "trillion "+
                 "U.S. "+
                 "dollars "+
-                "14 "+
+                "28 "+
                 "DEC "+
-                "14 "+
+                "23 "+
                 "Feb "+
                 "Nov "+
                 "1994 "+
