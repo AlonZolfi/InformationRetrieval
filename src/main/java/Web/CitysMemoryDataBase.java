@@ -11,12 +11,17 @@ public class CitysMemoryDataBase {
 
     private HashMap<String, CityInfoNode> CountryDB;
 
-    public CitysMemoryDataBase(String WebServiceURL) throws IOException {
+    /**
+     * this function creates the city data base containing all data about it
+     * @param webURL the url to address to
+     * @throws IOException .
+     */
+    public CitysMemoryDataBase(String webURL) throws IOException {
 
         this.CountryDB = new HashMap<>();
         APIRequest request = new APIRequest();
-        JSONObject jsonDetails = request.post(WebServiceURL);
-        JSONArray result = jsonDetails.getJSONArray("result");
+        JSONObject details = request.post(webURL);
+        JSONArray result = details.getJSONArray("result");
 
         for (Object obj: result){
             JSONObject data = (JSONObject)obj;
@@ -31,8 +36,14 @@ public class CitysMemoryDataBase {
         }
     }
 
-
+    /**
+     * returns the capital name of the country given
+     * @param capitalName the country given
+     * @return the capital name of the country given
+     */
     public CityInfoNode getCountryByCapital(String capitalName) {
-        return this.CountryDB.get(capitalName);
+        if(CountryDB.containsKey(capitalName))
+            return this.CountryDB.get(capitalName);
+        return null;
     }
 }

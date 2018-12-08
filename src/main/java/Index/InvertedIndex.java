@@ -14,10 +14,17 @@ public class InvertedIndex {
     // term  | num Of appearance | pointer(path of posting file, line number in the posting)
     private ConcurrentHashMap<String, InvertedIndexNode> invertedIndexDic;
 
+    /**
+     * create a new inverted index
+     */
     public InvertedIndex() {
         invertedIndexDic = new ConcurrentHashMap<>();
     }
 
+    /**
+     * construct a inverted index from a file
+     * @param file the file that has the data about he inverted file
+     */
     public InvertedIndex(File file) {
         String line = null;
         invertedIndexDic = new ConcurrentHashMap<String, InvertedIndexNode>();
@@ -37,22 +44,72 @@ public class InvertedIndex {
         }
     }
 
+    /**
+     * adds a term to the inverted index
+     * @param term the term to be added
+     */
     public void addTerm (String term) {
         if (term.charAt(0) < 123) {
-            if (!invertedIndexDic.containsKey(term)) {
+            if (!invertedIndexDic.containsKey(term)) {//if the term doesn't exist in the inverted index
                 InvertedIndexNode first = new InvertedIndexNode(term, 1, -1, null, -1);
                 invertedIndexDic.put(term, first);
             }
             else {
-                invertedIndexDic.get(term).increaseTermFreq(1);
+                invertedIndexDic.get(term).increaseTermFreq(1); // if the term exist in the inverted index increase number of freqenecy
             }
         }
         if(term.equalsIgnoreCase("\t0"))
             System.out.println("REALLYY??");
     }
 
+    /**
+     * deletes all the terms that appeared in different ways in the corpus (their appearance number was never updated)
+     */
+    public void deleteEntriesOfIrrelevant() {
+        for (String s: invertedIndexDic.keySet()){
+            InvertedIndexNode cur = invertedIndexDic.get(s);
+            if(cur.getNumOfAppearances()==-1) {
+                int termFreqCur = cur.getTermFreq();
+                if(invertedIndexDic.get(s.toLowerCase())!=null)
+                    invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
+                invertedIndexDic.remove(s);
+            }
+        }
+    }
+
+    /**
+     * returns number of unique terms that exist in the inverted index
+     * @return number of unique terms that exist in the inverted index
+     */
     public int getNumOfUniqueTerms(){
         return invertedIndexDic.size();
+    }
+
+    /**
+     * updates the pointer to the final posting
+     * @param minTerm the term to sent the pointer
+     * @param fileName the file where the posting of the term exists
+     * @param lineNumber the line in the posting file
+     */
+    public void setPointer(String minTerm, String fileName, int lineNumber){
+        if (invertedIndexDic.containsKey(minTerm))
+            invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
+    }
+
+    /**
+     * sets the number of appearances of the term
+     * @param term the term to be updated
+     * @param numOfAppearance num of appearances
+     */
+    public void setNumOfAppearance(String term, int numOfAppearance){
+        if (invertedIndexDic.containsKey(term))
+            invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
+    }
+
+    public String getPostingLink(String word){
+        if (invertedIndexDic.get(word)==null)
+            return "";
+        return invertedIndexDic.get(word).getPostingLink();
     }
 
     public ObservableList<ShowDictionaryRecord> getRecords() {
@@ -63,17 +120,6 @@ public class InvertedIndex {
         return showDictionaryRecords;
     }
 
-    public void setPointer(String minTerm, String fileName, int lineNumber){
-        if (invertedIndexDic.containsKey(minTerm))
-            invertedIndexDic.get(minTerm).setPointer(fileName,lineNumber);
-        else System.out.println(minTerm+" "+fileName+" "+lineNumber);
-    }
-
-    public void setNumOfAppearance(String term, int numOfAppearance){
-        if (invertedIndexDic.containsKey(term))
-            invertedIndexDic.get(term).setNumOfAppearance(numOfAppearance);
-        else System.out.println(term+" "+numOfAppearance);
-    }
     @Override
     public String toString() {
         StringBuilder toWrite=new StringBuilder();
@@ -81,25 +127,5 @@ public class InvertedIndex {
             toWrite.append(cur.toString());
         }
         return toWrite.toString();
-    }
-
-    public String getPostingLink(String word){
-        if (invertedIndexDic.get(word)==null)
-            return "posting dose not found";
-        return invertedIndexDic.get(word).getPostingLink();
-    }
-
-    public void deleteEntriesOfIrrelevant() {
-        for (String s: invertedIndexDic.keySet()){
-            InvertedIndexNode cur = invertedIndexDic.get(s);
-            if(cur.getNumOfAppearances()==-1) {
-                int termFreqCur = cur.getTermFreq();
-                //if(invertedIndexDic.get(s.toLowerCase())!=null)
-                    invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
-                //
-                    //System.out.println(s);
-                invertedIndexDic.remove(s);
-            }
-        }
     }
 }

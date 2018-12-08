@@ -20,15 +20,15 @@ public class CityInfoNode {
         return city_name;
     }
 
-    public String getCountry_name() {
+    public String getCountryName() {
         return country_name;
     }
 
-    public String getPopulation_amount() {
+    public String getPopulationAmount() {
         return population_amount;
     }
 
-    public String getCurrency_sign() {
+    public String getCurrencySign() {
         return  currency_sign;
     }
 

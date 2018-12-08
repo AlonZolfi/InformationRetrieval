@@ -12,7 +12,13 @@ import java.io.IOException;
 import java.util.*;
 
 public class WriteFile {
-    public static void writeTmpPosting(String path, int i , HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting) {
+    /**
+     * writes a tmp posting to the disk
+     * @param path the path where it should be written
+     * @param postingNum the number of the temp posting
+     * @param temporaryPosting an hash map that contains all the contents of the temp posting
+     */
+    public static void writeTempPosting(String path, int postingNum , HashMap<String, Pair<Integer,StringBuilder>> temporaryPosting) {
         //get all the info needed and write it to dest
         StringBuilder toWrite = new StringBuilder();
         LinkedList<String> sorted = new LinkedList<>(temporaryPosting.keySet());
@@ -23,10 +29,16 @@ public class WriteFile {
             toWrite.append(s).append("~").append(shows).append("~").append(stringBuilder).append("\n");
         }
         File dir = new File(path);
-        File actualFile = new File(dir, "posting_" + i + ".txt");
+        File actualFile = new File(dir, "posting_" + postingNum + ".txt");
         write(actualFile, toWrite);
-
     }
+
+    /**
+     * writes the doc dictionary to the disk
+     * @param path the path where it should be written
+     * @param documentDictionary the document dictionary
+     * @param stem if terms were stemmed
+     */
     public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary, boolean stem) {
         StringBuilder toWrite = new StringBuilder();
         for (DocDictionaryNode cur :documentDictionary) {
@@ -40,6 +52,12 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
+    /**
+     * writes the inverted index to the disk
+     * @param path the path where it should be written
+     * @param invertedIndex the inverted index
+     * @param stem if terms were stemmed
+     */
     public static void writeInvertedFile(String path, InvertedIndex invertedIndex, boolean stem) {
         String toWrite = invertedIndex.toString();
         File dir = new File(path);
@@ -50,6 +68,11 @@ public class WriteFile {
         write(actualFile,new StringBuilder("word\ttermFreq\tnum Of Appearances\tposting Link\tposting Line\n"+toWrite));
     }
 
+    /**
+     * writes the city dictionary to the disk
+     * @param path the path where it should be written
+     * @param cityDictionary the city dictionary
+     */
     public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
         StringBuilder toWrite = new StringBuilder("city_name\tcountry_name\tpopulation_amount\tcurrency_sign\tposting_link\n");
         for (CityInfoNode cur : cityDictionary.values()) {
@@ -61,22 +84,14 @@ public class WriteFile {
         write(actualFile,toWrite);
     }
 
-    private static void write(File actualFile, StringBuilder toWrite){
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(actualFile);
-            fileWriter.write(toWrite.toString());
-            fileWriter.close();
-            toWrite.delete(0,toWrite.length());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static void writeToEndOfFile(String fileName, HashMap<String, StringBuilder> finalPostingLine) {
+    /**
+     * writes a final posting to the disk
+     * @param fileName the file name
+     * @param finalPosting the entire final posting
+     */
+    public static void writeFinalPosting(String fileName, HashMap<String, StringBuilder> finalPosting) {
         StringBuilder ans = new StringBuilder();
-        StringBuilder[] sbArray = finalPostingLine.values().toArray(new StringBuilder[0]);
+        StringBuilder[] sbArray = finalPosting.values().toArray(new StringBuilder[0]);
         File file = new File(fileName);
         try {
             FileWriter fileWriter = new FileWriter(file, true);
@@ -92,6 +107,24 @@ public class WriteFile {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * write a certain string to the file
+     * @param actualFile the file to be written to
+     * @param toWrite what should be written
+     */
+    private static void write(File actualFile, StringBuilder toWrite){
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(actualFile);
+            fileWriter.write(toWrite.toString());
+            fileWriter.close();
+            toWrite.delete(0,toWrite.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

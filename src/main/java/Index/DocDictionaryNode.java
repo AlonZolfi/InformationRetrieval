@@ -1,11 +1,11 @@
 package Index;
 
 public class DocDictionaryNode {
-    private String m_docName;
-    private int m_maxFreq;
-    private String m_maxFreqWord;
-    private int m_numOfUniWords;
-    private String m_city;
+    private String m_docName; //doc name
+    private int m_maxFreq; //the max freqenecy of a word existing in the doc
+    private String m_maxFreqWord; // the word that exists most of the times
+    private int m_numOfUniWords; //number of unique words in the document
+    private String m_city; //city that represents the country the doc came from
 
     public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, String m_city, String maxFreqWord) {
         this.m_docName = m_docName;

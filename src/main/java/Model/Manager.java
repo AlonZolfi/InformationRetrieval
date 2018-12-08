@@ -31,7 +31,7 @@ class Manager {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
-        int numOfTempPostings = 3;
+        int numOfTempPostings = 900;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
 
         for (int i = 0; i < numOfTempPostings; i++) {
@@ -58,7 +58,7 @@ class Manager {
             HashMap<String, Pair<Integer, StringBuilder>> temporaryPosting = futureTemporaryPosting.get();
 
             // Write the posting to the disk, then get the "link" of each word in list from the "WriteFile"
-            Thread t1 = new Thread(() -> WriteFile.writeTmpPosting(destinationPath, numOfPostings.getAndIncrement(), temporaryPosting));
+            Thread t1 = new Thread(() -> WriteFile.writeTempPosting(destinationPath, numOfPostings.getAndIncrement(), temporaryPosting));
             t1.start();
             tmpPostingThread.add(t1);
 
@@ -75,8 +75,18 @@ class Manager {
         mergePostings(invertedIndex, destinationPath, stem);
 
         //for each city in the city dictionary set pointer to the city name in the posting
-        for (String word : cityDictionary.keySet())
-            cityDictionary.get(word).setPosting(invertedIndex.getPostingLink(word));
+        for (String word : cityDictionary.keySet()) {
+            String pointer = invertedIndex.getPostingLink(word);
+            if(pointer.equals("")) {
+                pointer = invertedIndex.getPostingLink(word.toLowerCase());
+                if(pointer.equals("") &&  word.indexOf(' ')!=-1) {
+                    pointer = invertedIndex.getPostingLink(word.substring(0, word.indexOf(' ')));
+                    if(pointer.equals(""))
+                        pointer = invertedIndex.getPostingLink(word.toLowerCase().substring(0, word.indexOf(' ')));
+                }
+            }
+            cityDictionary.get(word).setPosting(pointer);
+        }
 
         return new double[]{numOfDocs, invertedIndex.getNumOfUniqueTerms()};
     }
@@ -217,7 +227,7 @@ class Manager {
         }
         final HashMap<String, StringBuilder> sendToThread = new HashMap<>(writeToPosting);
         String file = fileName + "_"+ postingNum + ".txt";
-        new Thread(()->WriteFile.writeToEndOfFile(file, sendToThread)).start();
+        new Thread(()->WriteFile.writeFinalPosting(file, sendToThread)).start();
     }
 
     /**

@@ -1,14 +1,14 @@
 package Index;
 
 public class InvertedIndexNode {
-    private String m_word;
-    private int m_termFreq;
-    private int m_numOfAppearances;
-    private String m_postingLink;
-    private int m_postingLine;
+    private String m_word;//the term
+    private int m_termFreq;//number of documents the words appears in
+    private int m_numOfAppearances;//number of times the word has appeared
+    private String m_postingLink;//the pointer to the posting
+    private int m_postingLine;//line number in the posting
 
 
-    public InvertedIndexNode(String word, int termFreq, int numOfAppearances, String postingLink, int postingLine) {
+    InvertedIndexNode(String word, int termFreq, int numOfAppearances, String postingLink, int postingLine) {
         this.m_word = word;
         this.m_termFreq = termFreq;
         this.m_numOfAppearances = numOfAppearances;
@@ -16,32 +16,36 @@ public class InvertedIndexNode {
         this.m_postingLine = postingLine;
     }
 
-    public void increaseTermFreq(int termFreqCur){
+    /**
+     * increase the number of times word has appeared in docs
+     * @param termFreqCur number of appearances to be added
+     */
+    void increaseTermFreq(int termFreqCur){
         m_termFreq+=termFreqCur;
     }
 
-    public int getTermFreq() {
+    int getTermFreq() {
         return m_termFreq;
     }
 
-    public String getWord() {
+    String getWord() {
         return m_word;
     }
 
-    public String getPostingLink() {
+    String getPostingLink() {
         return m_postingLink+"\t"+m_postingLine;
     }
 
-    public int getNumOfAppearances() {
+    int getNumOfAppearances() {
         return m_numOfAppearances;
     }
 
-    public void setPointer(String postingFile, int postingLine){
+    void setPointer(String postingFile, int postingLine){
         this.m_postingLink = postingFile;
         this.m_postingLine =postingLine;
     }
 
-    public void setNumOfAppearance(int numOfAppearance){
+    void setNumOfAppearance(int numOfAppearance){
         this.m_numOfAppearances = numOfAppearance;
     }
 

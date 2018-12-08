@@ -8,6 +8,10 @@ public class ReadFile {
 
     public static Set<String> stopWords;
 
+    /**
+     * initiate the stop words set containing all the stop words
+     * @param fileName the path of the file
+     */
     public static void initStopWords(String fileName) {
         stopWords = new HashSet<>();
         String line = null;
@@ -25,6 +29,13 @@ public class ReadFile {
 
     }
 
+    /**
+     * this function reads a bunch of files
+     * @param pathOfDocs the path of the corpus
+     * @param mone iteration number
+     * @param mechane number of temp postings
+     * @return a list of Corpus Document
+     */
     public static LinkedList<CorpusDocument> readFiles(String pathOfDocs, int mone, int mechane) {
         File dir = new File(pathOfDocs);
         File[] directoryListing = dir.listFiles();
@@ -34,10 +45,12 @@ public class ReadFile {
             int end = ((mone + 1) * directoryListing.length / mechane) - 1;
             ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
             LinkedList<Future<LinkedList<CorpusDocument>>> futureDocsInFile = new LinkedList<>();
+            //go throw end-start FILES
             for (int i = start; i <= end; i++) {
                 futureDocsInFile.add(pool.submit(new ReadDocuments(directoryListing[i])));
             }
 
+            //add together all the lists of the corpus docs to one list
             for (Future<LinkedList<CorpusDocument>> f : futureDocsInFile) {
                 try {
                     allDocsInCorpus.addAll(f.get());

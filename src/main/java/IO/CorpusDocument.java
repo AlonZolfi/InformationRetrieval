@@ -1,4 +1,7 @@
 package IO;
+/*
+this class represents a single document in the corpus containing all the data about the document
+ */
 
 public class CorpusDocument {
     private String m_fileName;
@@ -8,8 +11,7 @@ public class CorpusDocument {
     private String m_docText;
     private String m_docCity;
 
-
-    public CorpusDocument(String m_fileName, String m_docNum, String m_docDate, String m_docTitle, String m_docText, String m_docCity) {
+    CorpusDocument(String m_fileName, String m_docNum, String m_docDate, String m_docTitle, String m_docText, String m_docCity) {
         this.m_fileName = m_fileName;
         this.m_docNum = m_docNum;
         this.m_docDate = m_docDate;
@@ -18,27 +20,27 @@ public class CorpusDocument {
         this.m_docCity = m_docCity;
     }
 
-    public String getM_fileName() {
+    public String getFileName() {
         return m_fileName;
     }
 
-    public String getM_docNum() {
+    public String getDocNum() {
         return m_docNum;
     }
 
-    public String getM_docDate() {
+    public String getDocDate() {
         return m_docDate;
     }
 
-    public String getM_docTitle() {
+    public String getDocTitle() {
         return m_docTitle;
     }
 
-    public String getM_docText() {
+    public String getDocText() {
         return m_docText;
     }
 
-    public String getM_docCity() {
+    public String getDocCity() {
         return m_docCity;
     }
 }
