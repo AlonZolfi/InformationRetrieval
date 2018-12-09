@@ -74,7 +74,7 @@ public class WriteFile {
      * @param cityDictionary the city dictionary
      */
     public static void writeCityDictionary(String path, HashMap<String, CityInfoNode> cityDictionary){
-        StringBuilder toWrite = new StringBuilder("city_name\tcountry_name\tpopulation_amount\tcurrency_sign\tposting_link\n");
+        StringBuilder toWrite = new StringBuilder();
         for (CityInfoNode cur : cityDictionary.values()) {
             toWrite.append(cur.toString());
         }

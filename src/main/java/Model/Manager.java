@@ -121,55 +121,75 @@ class Manager {
     private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, LinkedList<DocDictionaryNode> documentDictionary) {
         for (MiniDictionary mini : miniDicList) {
             String curCity = mini.getCity();
-            if(curCity.equals(""))
-                continue;
             StringBuilder cityTry = new StringBuilder();
+            DocDictionaryNode cur=null;
             if (!curCity.equals("") && !cityDictionary.containsKey(curCity)) {
                 String[] cityWords = curCity.split(" ");
                 int j = 0;
                 boolean found = false;
                 while (j < cityWords.length && !found) {
+                    cityTry.append(cityWords[j].toUpperCase());
                     if (!cityDictionary.containsKey(cityTry.toString())) {
-                        cityTry.append(cityWords[j]);
                         CityInfoNode toPut = citysMemoryDataBaseRESTAPI.getCountryByCapital(cityTry.toString());
                         if (toPut != null) {
                             if (!cityDictionary.containsKey(cityTry.toString())) {
-                                cityDictionary.put(cityTry.toString(), toPut);
+                                int idx = cityTry.toString().indexOf(" ");
+                                if (idx!=-1)
+                                    cityDictionary.put(cityTry.toString().substring(0,idx),toPut);
+                                else
+                                    cityDictionary.put(cityTry.toString(), toPut);
                                 found = true;
+                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
                             }
-                        } else cityTry.append(" ");
+                        } else {
+                            cityTry.append(" ");
+                        }
                         j++;
-                    } else found = true;
+                    } else {
+                        found = true;
+                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
+                    }
                 }
                 if (!found) {
                     int space = curCity.indexOf(" ");
-                    curCity = curCity.substring(0, space);
-                    String out = "";
-                    String realCity = "";
-                    String realCuntry = "";
-                    String realCurancy = "";
-                    String realPopulation = "";
-                    try {
-                        APIRequest request = new APIRequest();
-                        JSONObject data = request.post("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=" + curCity);
-                        JSONObject result = data.getJSONObject("result");
-                        realCity = result.get("geobytescity").toString();
-                        realCuntry = result.get("geobytescountry").toString();
-                        realCurancy = result.get("geobytescurrency").toString();
-                        realPopulation = result.get("geobytespopulation").toString();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (space != -1) {
+                        curCity = curCity.substring(0, space);
                     }
-                    if(!realPopulation.equals("")) {
-                        Parse parse = new Parse();
-                        realPopulation = parse.handleNumber(Integer.parseInt(realPopulation));
+                    if(!cityDictionary.containsKey(curCity)) {
+                        String realCity = "";
+                        String realCuntry = "";
+                        String realCurancy = "";
+                        String realPopulation = "";
+                        try {
+                            APIRequest request = new APIRequest();
+                            JSONObject data = request.post("http://getcitydetails.geobytes.com/GetCityDetails?fqcn=" + curCity);
+                            JSONObject result = data.getJSONObject("result");
+                            realCity = result.get("geobytescity").toString();
+                            realCuntry = result.get("geobytescountry").toString();
+                            realCurancy = result.get("geobytescurrency").toString();
+                            realPopulation = result.get("geobytespopulation").toString();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        if (!realPopulation.equals("")) {
+                            Parse parse = new Parse();
+                            realPopulation = parse.handleNumber(Integer.parseInt(realPopulation));
+                        }
+                        if (realCity.equals("")) {
+                            realCity = curCity;
+                        }
+                        int idx = realCity.indexOf(" ");
+                        String oneWordCity=realCity;
+                        if(idx!=-1)
+                            oneWordCity=realCity.substring(0,idx);
+                        cityDictionary.put(oneWordCity.toUpperCase(), new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy, false));
                     }
-                    cityDictionary.put(realCity, new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy,false));
+                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord());
                 }
-                DocDictionaryNode cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
-                documentDictionary.add(cur);
             }
             cityTry.delete(0, cityTry.length());
+            if(cur!=null)
+                documentDictionary.add(cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);
             }
@@ -251,6 +271,8 @@ class Manager {
         //set the pointers in the inverted index for each term
         for (String word0: keys){
             String toNum=writeToPosting.get(word0).toString().split("\t")[1];
+            if(toNum.equals("0"))
+                System.out.println("fdssadfsa");
             int num = Integer.parseInt(toNum);
             invertedIndex.setPointer(word0, k++);
             invertedIndex.setNumOfAppearance(word0,num);

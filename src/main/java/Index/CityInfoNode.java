@@ -14,7 +14,7 @@ public class CityInfoNode {
         this.country_name = country_name;
         this.population_amount = population_amount;
         this.currency_sign = currency_sign;
-        this.m_posting="Dose not Found";
+        this.m_posting="not Found";
         this.isCapital = is_Capital;
     }
 

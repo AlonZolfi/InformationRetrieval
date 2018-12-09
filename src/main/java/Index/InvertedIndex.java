@@ -58,8 +58,6 @@ public class InvertedIndex {
                 invertedIndexDic.get(term).increaseTermFreq(1); // if the term exist in the inverted index increase number of freqenecy
             }
         }
-        if(term.equalsIgnoreCase("\t0"))
-            System.out.println("REALLYY??");
     }
 
     /**
@@ -70,8 +68,9 @@ public class InvertedIndex {
             InvertedIndexNode cur = invertedIndexDic.get(s);
             if(cur.getNumOfAppearances()==-1) {
                 int termFreqCur = cur.getTermFreq();
-                if(invertedIndexDic.get(s.toLowerCase())!=null)
+                if(invertedIndexDic.get(s.toLowerCase())!=null) {
                     invertedIndexDic.get(s.toLowerCase()).increaseTermFreq(termFreqCur);
+                }
                 invertedIndexDic.remove(s);
             }
         }
