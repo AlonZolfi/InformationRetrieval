@@ -271,8 +271,6 @@ class Manager {
         //set the pointers in the inverted index for each term
         for (String word0: keys){
             String toNum=writeToPosting.get(word0).toString().split("\t")[1];
-            if(toNum.equals("0"))
-                System.out.println("fdssadfsa");
             int num = Integer.parseInt(toNum);
             invertedIndex.setPointer(word0, k++);
             invertedIndex.setNumOfAppearance(word0,num);

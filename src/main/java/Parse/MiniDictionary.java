@@ -83,7 +83,7 @@ public class MiniDictionary {
             return 1;
         if(m_dictionary.containsKey(lower))
             return 2;
-        if(Character.isDigit(word.charAt(0)) && m_dictionary.containsKey(word))
+        if(!Character.isLetter(word.charAt(0)) && m_dictionary.containsKey(word))
             return 3;
         return 0;
     }
