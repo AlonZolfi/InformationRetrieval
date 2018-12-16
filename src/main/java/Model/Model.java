@@ -15,9 +15,9 @@ import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
 
 public class Model extends Observable implements IModel {
-    private InvertedIndex invertedIndex;
-    private LinkedList<DocDictionaryNode> documentDictionary;
-    private HashMap<String, CityInfoNode> cityDictionary;
+    public static InvertedIndex invertedIndex;
+    public static LinkedList<DocDictionaryNode> documentDictionary;
+    public static HashMap<String, CityInfoNode> cityDictionary;
 
     /**
      * starts the index process
@@ -182,4 +182,6 @@ public class Model extends Observable implements IModel {
             e.printStackTrace();
         }
     }
+
+
 }

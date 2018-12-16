@@ -166,4 +166,12 @@ public class MiniDictionary {
     public String getCity() {
         return m_city;
     }
+
+    public int getDocLength(){
+        int count = 0;
+        for (LinkedList l: m_dictionary.values()) {
+            count += l.size();
+        }
+        return count;
+    }
 }

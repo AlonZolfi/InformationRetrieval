@@ -8,17 +8,23 @@ import Parse.*;
 import Web.APIRequest;
 import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
+
+    void calulateQueries(File file){
+
+    }
+
+    void calulateQuery(String query){
+
+    }
 
     /**
      * This function manages the index process by separating it to a few bunches
@@ -139,7 +145,7 @@ class Manager {
                                 else
                                     cityDictionary.put(cityTry.toString(), toPut);
                                 found = true;
-                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
+                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength());
                             }
                         } else {
                             cityTry.append(" ");
@@ -147,7 +153,7 @@ class Manager {
                         j++;
                     } else {
                         found = true;
-                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord());
+                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength());
                     }
                 }
                 if (!found) {
@@ -184,7 +190,7 @@ class Manager {
                             oneWordCity=realCity.substring(0,idx);
                         cityDictionary.put(oneWordCity.toUpperCase(), new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy, false));
                     }
-                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord());
+                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength());
                 }
             }
             cityTry.delete(0, cityTry.length());

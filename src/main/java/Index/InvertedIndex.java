@@ -126,4 +126,6 @@ public class InvertedIndex {
         }
         return toWrite.toString();
     }
+
+
 }
