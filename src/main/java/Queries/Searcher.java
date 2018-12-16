@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public class Searcher {
-    
+
     public void getQueryResults(String query){
         HashMap<String, Integer> wordsQuery = putWordsInMap(query);
         double averageDocmentLength= getDocumentAverageLength();
