@@ -4,26 +4,24 @@ import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.controlsfx.control.CheckComboBox;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Optional;
+import java.util.*;
 
 public class View implements Observer, IView {
 
-    public Tab tab_search;
-    public ComboBox cb_citiesList;
     private ViewModel viewModel;
-    public MenuButton mb_cities;
+    public Tab tab_search;
+    public CheckComboBox ccb_cities;
     public TextField source;
     public TextField destination;
     public Button btn_start;
@@ -200,23 +198,32 @@ public class View implements Observer, IView {
     /**
      * fill the cities list with the content of the cityDictionary
      */
-    private void fillCities() {
-        ArrayList<CheckMenuItem> cities = new ArrayList<>();
-        cities.add(new CheckMenuItem("All"));
+    public ArrayList<String> listOfCities() {
+        ArrayList<String> cities = new ArrayList<>();
         if (!btn_showDic.isDisable()) {
             try {
                 FileReader fileReader = new FileReader(destination.getText() + "/CityDictionary.txt");
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
-                    int i = line.indexOf('\t');
-                    mb_cities.getItems().add(new CheckMenuItem(line.substring(0, i)));
+                    String[] words = line.split("\t");
+                    if (!words[4].equals("")) {
+                        cities.add(words[0]);
+                    }
                 }
                 bufferedReader.close();
+                return cities;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        return null;
+    }
+    public ObservableList cities=null;
+    public void fillCities(){
+        if (cities==null)
+            cities = FXCollections.observableArrayList(listOfCities());
+        ccb_cities.getItems().addAll(cities);
     }
 
 }
