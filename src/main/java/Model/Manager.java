@@ -22,15 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
 
-    void calulateQueries(File queries){
+    void calulateQueries(String postingPath, File queries, boolean stem){
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
-        Searcher searcher = new Searcher();
+        Searcher searcher = new Searcher(postingPath,stem);
         for (Query q:queriesList) {
             searcher.getQueryResults(q);
         }
     }
 
-    void calulateQuery(String query){
+    void calulateQuery(String postingPath, String query, boolean stem){
 
     }
 
@@ -49,7 +49,7 @@ class Manager {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
-        int numOfTempPostings = 900;
+        int numOfTempPostings = 20;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
 
         for (int i = 0; i < numOfTempPostings; i++) {

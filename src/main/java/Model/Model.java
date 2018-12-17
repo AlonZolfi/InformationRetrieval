@@ -190,13 +190,14 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(File queries){
+    public void getResults(String postingPath, File queries, boolean stem){
         Manager m = new Manager();
-        m.calulateQueries(queries);
+        m.calulateQueries(postingPath, queries,stem);
     }
 
-    public void getResults(String query){
-
+    public void getResults(String postingPath, String query ,boolean stem){
+        Manager m = new Manager();
+        m.calulateQuery(postingPath,query,stem);
     }
 
 }

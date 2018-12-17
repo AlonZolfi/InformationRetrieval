@@ -1,5 +1,7 @@
 package IO;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -61,5 +63,19 @@ public class ReadFile {
             pool.shutdown();
         }
         return allDocsInCorpus;
+    }
+
+    public static String readPostingLineAtIndex(String path, char c, int index, boolean stem){
+        String fileName = path+"\\finalPosting";
+        if(stem)
+            fileName += "Stem";
+        fileName+="_"+c+".txt";
+        File postingFile = new File(fileName);
+        try {
+            return FileUtils.readLines(postingFile).get(index).toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
