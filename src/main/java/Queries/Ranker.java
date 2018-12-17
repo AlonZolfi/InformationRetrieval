@@ -1,19 +1,14 @@
 package Queries;
 
+import Index.DocDictionaryNode;
+import Model.Model;
+
 import java.util.*;
 
 public class Ranker {
-    private double k;
-    private double b;
-    private double averageDocumentLength;
 
-    public Ranker(double k, double b, double averageDocumentLength) {
-        this.k = k;
-        this.b = b;
-        this.averageDocumentLength = averageDocumentLength;
-    }
-
-    public double BM25(Map<String,Integer> queryWords, String documentName){
+    public double BM25(Map<String,Integer> queryWords, String documentName, int k, int b){
+        double averageDocumentLength = getDocumentAverageLength();
         double rank = 0;
         HashMap<String,Double> wordsIDF = calculateLog(queryWords.keySet());
         for (String word: queryWords.keySet()) {
@@ -31,7 +26,9 @@ public class Ranker {
     }
 
     private boolean documentContainsWord(String word) {
-        return false;
+        boolean lower = !Model.invertedIndex.getPostingLink(word.toLowerCase()).equals("");
+        boolean upper = !Model.invertedIndex.getPostingLink(word.toUpperCase()).equals("");
+        return upper || lower;
     }
 
     private int getDocLength(String documentName) {
@@ -46,4 +43,12 @@ public class Ranker {
         return new HashMap<>();
     }
 
+    private double getDocumentAverageLength() {
+        double sum = 0, count = 0;
+        for(DocDictionaryNode node: Model.documentDictionary){
+            sum += node.getDocLength();
+            count++;
+        }
+        return sum/count;
+    }
 }
