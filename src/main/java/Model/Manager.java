@@ -49,7 +49,7 @@ class Manager {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
-        int numOfTempPostings = 900;
+        int numOfTempPostings = 2;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
 
         for (int i = 0; i < numOfTempPostings; i++) {

@@ -18,7 +18,7 @@ public class Main extends Application {
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
-        model.getResults(new File("C:\\Users\\alonz\\Desktop\\queries.txt"));
+       // model.getResults(new File("C:\\Users\\alonz\\Desktop\\queries.txt"));
         //--------------
         primaryStage.setTitle("Information Retrieval Project");
         FXMLLoader fxmlLoader = new FXMLLoader();
