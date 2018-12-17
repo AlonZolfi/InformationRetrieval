@@ -1,5 +1,6 @@
 package Main;
 
+import Index.InvertedIndex;
 import Model.*;
 import View.View;
 import ViewModel.ViewModel;
@@ -18,6 +19,8 @@ public class Main extends Application {
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
+
+        model.loadDictionary("C:\\Users\\alonz\\Desktop\\stam",false);
         //--------------
         primaryStage.setTitle("Information Retrieval Project");
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -29,6 +32,7 @@ public class Main extends Application {
         viewModel.addObserver(view);
         //--------------
         primaryStage.show();
+        model.getResults("C:\\Users\\alonz\\Desktop\\stam",new File("C:\\Users\\alonz\\Desktop\\queries.txt"),false);
 
         /*String s = "Alon";
         int i = s.compareToIgnoreCase("ALON");*/

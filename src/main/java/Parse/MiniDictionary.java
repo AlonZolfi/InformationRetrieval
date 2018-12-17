@@ -102,7 +102,16 @@ public class MiniDictionary {
      * @return the data about a certain term
      */
     public String listOfData(String word){
-        return ""+m_name+","+getFrequency(word)+","+ getIndexesOfWord(word);
+        return ""+m_name+","+getFrequency(word)+","+ printIndexes(getIndexesOfWord(word));
+    }
+
+    private String printIndexes(LinkedList<Integer> indexesOfWord) {
+        StringBuilder s = new StringBuilder("[");
+        for (Integer i: indexesOfWord) {
+            s.append(i).append("-");
+        }
+        s.replace(s.length()-1,s.length(),"]");
+        return s.toString();
     }
 
     /**
