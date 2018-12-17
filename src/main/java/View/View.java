@@ -3,20 +3,27 @@ package View;
 import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 
 public class View implements Observer, IView {
 
+    public Tab tab_search;
+    public ComboBox cb_citiesList;
     private ViewModel viewModel;
-
+    public MenuButton mb_cities;
     public TextField source;
     public TextField destination;
     public Button btn_start;
@@ -36,6 +43,7 @@ public class View implements Observer, IView {
     public Label lbl_totalDocsNum;
     public Label lbl_totalTermsNum;
     public Label lbl_totalTimeNum;
+
 
     /**
      * constructor of view, connect the view to the viewModel
@@ -94,14 +102,19 @@ public class View implements Observer, IView {
                     MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
                 else if(toUpdate[0].equals("Successful")) {// if we received a successful message from the model
                     MyAlert.showAlert(Alert.AlertType.INFORMATION, toUpdate[1]);
-                    if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary"))
+                    if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary")) {
                         btn_showDic.setDisable(false);
+                        tab_search.setDisable(false);
+                        fillCities();
+                    }
                 }
             } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
                 showDictionary((ObservableList<ShowDictionaryRecord>)arg);
             } else if( arg instanceof double[]){ // show the results of the indexing
                 showIndexResults((double[])arg);
                 btn_showDic.setDisable(false);
+                tab_search.setDisable(false);
+                fillCities();
             }
         }
     }
@@ -170,6 +183,8 @@ public class View implements Observer, IView {
             table_showDic.setItems(records);
         }
         btn_showDic.setDisable(false);
+        tab_search.setDisable(false);
+        fillCities();
     }
 
     /**
@@ -181,4 +196,27 @@ public class View implements Observer, IView {
         else
             MyAlert.showAlert(Alert.AlertType.ERROR,"Destination path cannot be empty");
     }
+
+    /**
+     * fill the cities list with the content of the cityDictionary
+     */
+    private void fillCities() {
+        ArrayList<CheckMenuItem> cities = new ArrayList<>();
+        cities.add(new CheckMenuItem("All"));
+        if (!btn_showDic.isDisable()) {
+            try {
+                FileReader fileReader = new FileReader(destination.getText() + "/CityDictionary.txt");
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    int i = line.indexOf('\t');
+                    mb_cities.getItems().add(new CheckMenuItem(line.substring(0, i)));
+                }
+                bufferedReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
