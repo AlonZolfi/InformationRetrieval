@@ -9,6 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class Main extends Application {
 
     @Override
@@ -16,6 +18,7 @@ public class Main extends Application {
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
+        model.getResults(new File("C:\\Users\\alonz\\Desktop\\queries.txt"));
         //--------------
         primaryStage.setTitle("Information Retrieval Project");
         FXMLLoader fxmlLoader = new FXMLLoader();

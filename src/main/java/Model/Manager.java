@@ -2,9 +2,13 @@ package Model;
 
 import IO.CorpusDocument;
 import IO.ReadFile;
+import IO.ReadQuery;
 import IO.WriteFile;
 import Index.*;
 import Parse.*;
+import Queries.Query;
+import Queries.Ranker;
+import Queries.Searcher;
 import Web.APIRequest;
 import Web.CitysMemoryDataBase;
 import javafx.util.Pair;
@@ -18,8 +22,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
 
-    void calulateQueries(File file){
-
+    void calulateQueries(File queries){
+        LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
+        Searcher searcher = new Searcher();
+        for (Query q:queriesList) {
+            searcher.getQueryResults(q);
+        }
     }
 
     void calulateQuery(String query){

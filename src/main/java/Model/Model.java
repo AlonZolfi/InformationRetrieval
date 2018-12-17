@@ -1,6 +1,8 @@
 package Model;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,6 +15,11 @@ import Index.DocDictionaryNode;
 import Index.InvertedIndex;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.select.Elements;
 
 public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
@@ -183,5 +190,13 @@ public class Model extends Observable implements IModel {
         }
     }
 
+    public void getResults(File queries){
+        Manager m = new Manager();
+        m.calulateQueries(queries);
+    }
+
+    public void getResults(String query){
+
+    }
 
 }

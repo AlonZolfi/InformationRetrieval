@@ -4,15 +4,14 @@ import Index.DocDictionaryNode;
 import Model.*;
 
 import java.util.HashMap;
-import java.util.List;
-
 
 public class Searcher {
 
-    public void getQueryResults(String query){
+    public void getQueryResults(Query q){
+        String query = q.getTitle();
         HashMap<String, Integer> wordsQuery = putWordsInMap(query);
-        double averageDocmentLength= getDocumentAverageLength();
-        Ranker r = new Ranker(2,0.5,averageDocmentLength);
+        double averageDocumentLength= getDocumentAverageLength();
+        Ranker r = new Ranker(2,0.5,averageDocumentLength);
         //GO TO BM25 AND OTHER STUFF
     }
 
