@@ -13,9 +13,9 @@ public interface IModel {
 
     void loadDictionary(String path, boolean stem);
 
-    void getResults(String postingPath, File queries, boolean stem);
+    void getResults(String postingPath, String stopWordsPath, File queries, boolean stem);
 
-    void getResults(String postingPath, String query ,boolean stem);
+    void getResults(String postingPath, String stopWordsPath, String query ,boolean stem);
 
     void filterCities(List<String> toFilter);
 }

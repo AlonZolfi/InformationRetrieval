@@ -9,10 +9,10 @@ import java.util.*;
 public class Ranker {
     private double m_averageDocumentLength;
     private HashMap<String, Integer> m_wordsCount;
-    private HashMap<String, String> m_wordsPosting;
+    private CaseInsensitiveMap m_wordsPosting;
 
 
-    Ranker(HashMap<String, Integer> wordsCount, HashMap<String, String> wordsPosting){
+    Ranker(HashMap<String, Integer> wordsCount, CaseInsensitiveMap wordsPosting){
         this.m_averageDocumentLength = getDocumentAverageLength();
         this.m_wordsCount = wordsCount;
         this.m_wordsPosting = wordsPosting;
@@ -34,6 +34,25 @@ public class Ranker {
         }
         return rank;
     }
+
+    double TfIdf (String documentName){
+        double tfidf = 0;
+        double docInCorpusCount = Model.documentDictionary.keySet().size();
+        for (String word: m_wordsCount.keySet()) {
+            String postingLine = m_wordsPosting.get(word);
+            if(!postingLine.equals("")) {
+                double tf = (double)(getDocLength(documentName) / getWordInDocumentCount(postingLine,documentName,word));
+                double idf = Math.log10(docInCorpusCount/(StringUtils.countMatches(m_wordsPosting.get(word),"|")+1));
+                tfidf += tf*idf;
+            }
+        }
+        return  tfidf;
+    }
+
+    double cosSim(String documentName){
+        return 0;
+    }
+
 
     private int getDocLength(String documentName) {
         return Model.documentDictionary.get(documentName).getDocLength();

@@ -65,17 +65,20 @@ public class ReadFile {
         return allDocsInCorpus;
     }
 
-    public static String readPostingLineAtIndex(String path, char c, int index, boolean stem){
+    public static LinkedList<String> readPostingLineAtIndex(String path, char c, LinkedList<Integer> indices, boolean stem){
         String fileName = path+"\\finalPosting";
         if(stem)
             fileName += "Stem";
         fileName+="_"+c+".txt";
         File postingFile = new File(fileName);
+        LinkedList<String> postings = new LinkedList<>();
         try {
-            return FileUtils.readLines(postingFile).get(index).toString();
+            List l = FileUtils.readLines(postingFile);
+            for (Integer index : indices)
+                postings.add(l.get(index).toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return postings;
     }
 }

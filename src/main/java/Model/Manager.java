@@ -30,10 +30,6 @@ class Manager {
         }
     }
 
-    void calulateQuery(String postingPath, String query, boolean stem){
-
-    }
-
     /**
      * This function manages the index process by separating it to a few bunches
      * @param cityDictionary - the city dictionary

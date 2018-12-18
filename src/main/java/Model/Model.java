@@ -21,6 +21,8 @@ public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
+    public static HashMap<String, CityInfoNode> usedCities;
+
     /**
      * starts the index process
      * @param pathOfDocs - path of the corpus and stop words
@@ -210,17 +212,37 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(String postingPath, File queries, boolean stem){
+    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
+        ReadFile.initStopWords(stopWordsPath+"\\stop_words.txt");
         Manager m = new Manager();
-        m.calulateQueries(postingPath, queries,stem);
+        m.calulateQueries(postingPath,queries,stem);
     }
 
-    public void getResults(String postingPath, String query ,boolean stem){
-        Manager m = new Manager();
-        m.calulateQuery(postingPath,query,stem);
+    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
+        try {
+            Random r = new Random();
+            int queryNumber = r.nextInt();
+            File f = new File("tempquery.txt");
+            FileWriter fw = new FileWriter(f);
+            StringBuilder sb = new StringBuilder("<top>\n" +
+                    "\n" +
+                    "<num> Number: "+queryNumber+" \n" +
+                    "<title> "+query+"  \n" +
+                    "\n" +
+                    "<desc> Description: \n" +
+                    "\n" +
+                    "\n" +
+                    "<narr> Narrative: \n" +
+                    "\n" +
+                    "</top>");
+            fw.write(sb.toString());
+            getResults(postingPath,stopWordsPath,f,stem);
+            fw.close();
+            f.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    public static HashMap<String, CityInfoNode> usedCities;
 
     public void loadCityDictionary(String destination){
         cityDictionary=new HashMap<>();
