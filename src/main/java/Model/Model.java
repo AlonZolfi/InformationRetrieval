@@ -1,6 +1,8 @@
 package Model;
 
 import java.io.*;
+import java.util.*;
+import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Observable;
@@ -14,19 +16,11 @@ import Index.InvertedIndex;
 import Index.InvertedIndexNode;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.Elements;
-
-import javax.print.Doc;
 
 public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
-
     /**
      * starts the index process
      * @param pathOfDocs - path of the corpus and stop words
@@ -111,6 +105,7 @@ public class Model extends Observable implements IModel {
         File[] directoryListing = dirSource.listFiles();
         String[] update=new String[0];
         if (directoryListing != null && dirSource.isDirectory()) {
+            loadCityDictionary(path);
             for (File file : directoryListing) { // search for the relevant file
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
                     invertedIndex = new InvertedIndex(file);
@@ -225,4 +220,41 @@ public class Model extends Observable implements IModel {
         m.calulateQuery(postingPath,query,stem);
     }
 
+    public static HashMap<String, CityInfoNode> usedCities;
+
+    public void loadCityDictionary(String destination){
+        cityDictionary=new HashMap<>();
+        try {
+            FileReader fileReader = new FileReader(destination + "/CityDictionary.txt");
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] words = line.split("\t");
+                if (!words[4].equals("")) {
+                    boolean isCapital = words[5].equals("true");
+                    CityInfoNode i = new CityInfoNode(words[0],words[1],words[2],words[3],isCapital);
+                    i.setPosting(words[4]);
+                    cityDictionary.put(words[0],i);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * this function filler the resukte by the list of cities marked by the user
+     * @param toFilter all the cities that are checked
+     */
+    public void filterCities(List<String> toFilter) {
+        usedCities = new HashMap<>();
+        if (toFilter.size() > 0) {
+            for(String nameOfCity:cityDictionary.keySet()) {
+                if(toFilter.contains(nameOfCity))
+                    usedCities.put(nameOfCity,cityDictionary.get(nameOfCity));
+            }
+        }
+    }
 }

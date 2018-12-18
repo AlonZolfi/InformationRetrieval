@@ -6,6 +6,7 @@ import Index.ShowDictionaryRecord;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -30,7 +31,6 @@ public class View implements Observer, IView {
     public Button btn_loadDic;
     public CheckBox cb_stm;
     public Button btn_browse_corpus;
-    public Button btn_browse_saveDic;
     public TableColumn<ShowDictionaryRecord,String> tableCol_term;
     public TableColumn<ShowDictionaryRecord,String> tableCol_count;
     public TableView<ShowDictionaryRecord> table_showDic;
@@ -41,7 +41,6 @@ public class View implements Observer, IView {
     public Label lbl_totalDocsNum;
     public Label lbl_totalTermsNum;
     public Label lbl_totalTimeNum;
-
 
     /**
      * constructor of view, connect the view to the viewModel
@@ -185,6 +184,8 @@ public class View implements Observer, IView {
         fillCities();
     }
 
+    public Button btn_browse_saveDic;
+
     /**
      * transfers to the view model a load dictionary request
      */
@@ -219,11 +220,22 @@ public class View implements Observer, IView {
         }
         return null;
     }
-    public ObservableList cities=null;
+    public ObservableList cities;
     public void fillCities(){
-        if (cities==null)
-            cities = FXCollections.observableArrayList(listOfCities());
+        cities = FXCollections.observableArrayList(listOfCities());
         ccb_cities.getItems().addAll(cities);
     }
 
+    public void onSearchClick(ActionEvent actionEvent) {
+        boolean found = false;
+        List<String> relevantCities = new ArrayList<>();
+        for (int i=0;i<ccb_cities.getItems().size();i++){
+            if (ccb_cities.getCheckModel().isChecked(i)) {
+                relevantCities.add(ccb_cities.getCheckModel().getItem(i).toString());
+                found = true;
+            }
+        }
+        if (found)
+            viewModel.filterCities(relevantCities);
+    }
 }
