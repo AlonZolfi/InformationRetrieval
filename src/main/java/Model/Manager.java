@@ -45,11 +45,11 @@ class Manager {
      * @return returns data about the current run [num of documents, number of unique terms]
      * @throws Exception .
      */
-    double[] manage(HashMap<String, CityInfoNode> cityDictionary, LinkedList<DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) throws Exception {
+    double[] manage(HashMap<String, CityInfoNode> cityDictionary, HashMap<String, DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) throws Exception {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
-        int numOfTempPostings = 900;
+        int numOfTempPostings = 100;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
 
         for (int i = 0; i < numOfTempPostings; i++) {
@@ -132,7 +132,7 @@ class Manager {
      * @param invertedIndex - the inverted index
      * @param documentDictionary - the document dictionary
      */
-    private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, LinkedList<DocDictionaryNode> documentDictionary) {
+    private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary) {
         for (MiniDictionary mini : miniDicList) {
             String curCity = mini.getCity();
             StringBuilder cityTry = new StringBuilder();
@@ -203,7 +203,7 @@ class Manager {
             }
             cityTry.delete(0, cityTry.length());
             if(cur!=null)
-                documentDictionary.add(cur);
+                documentDictionary.put(cur.getDocName(),cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);
             }

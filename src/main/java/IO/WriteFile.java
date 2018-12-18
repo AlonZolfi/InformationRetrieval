@@ -39,9 +39,9 @@ public class WriteFile {
      * @param documentDictionary the document dictionary
      * @param stem if terms were stemmed
      */
-    public static void writeDocDictionary(String path, LinkedList<DocDictionaryNode> documentDictionary, boolean stem) {
+    public static void writeDocDictionary(String path, HashMap<String, DocDictionaryNode> documentDictionary, boolean stem) {
         StringBuilder toWrite = new StringBuilder();
-        for (DocDictionaryNode cur :documentDictionary) {
+        for (DocDictionaryNode cur :documentDictionary.values()) {
             toWrite.append(cur.toString());
         }
         File dir = new File(path);

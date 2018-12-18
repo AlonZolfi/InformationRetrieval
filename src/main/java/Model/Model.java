@@ -13,7 +13,7 @@ import org.apache.commons.io.FileUtils;
 
 public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
-    public static LinkedList<DocDictionaryNode> documentDictionary;
+    public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
     /**
      * starts the index process
@@ -29,7 +29,7 @@ public class Model extends Observable implements IModel {
             Manager man = new Manager();
             ReadFile.initStopWords(paths[2]);
             invertedIndex = new InvertedIndex();
-            documentDictionary = new LinkedList<>();
+            documentDictionary = new HashMap<>();
             cityDictionary = new HashMap<>();
             double[] results = new double[0];
             try {
