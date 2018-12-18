@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="View.View">
+<TabPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
       <Tab text="Load Inverted Index">
          <content>
@@ -65,7 +65,7 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Button layoutX="576.0" layoutY="37.0" mnemonicParsing="false" prefHeight="142.0" prefWidth="88.0" text="Button" />
+                  <Button fx:id="btn_search" layoutX="576.0" layoutY="37.0" mnemonicParsing="false" onAction="#onSearchClick" prefHeight="142.0" prefWidth="88.0" text="Search" />
                   <Label layoutX="24.0" layoutY="40.0" text="Pleasa enter a query" />
                   <Label layoutX="287.0" layoutY="102.0" text="OR" />
                   <Label layoutX="24.0" layoutY="114.0" text="Please enter a queries file" />

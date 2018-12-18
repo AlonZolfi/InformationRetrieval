@@ -1,6 +1,7 @@
 package Model;
 
 import java.io.File;
+import java.util.List;
 
 public interface IModel {
 
@@ -15,4 +16,6 @@ public interface IModel {
     void getResults(String postingPath, File queries, boolean stem);
 
     void getResults(String postingPath, String query ,boolean stem);
+
+    void filterCities(List<String> toFilter);
 }

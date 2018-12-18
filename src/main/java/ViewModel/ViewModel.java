@@ -2,7 +2,10 @@ package ViewModel;
 
 import Model.IModel;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TextField;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -61,5 +64,9 @@ public class ViewModel extends Observable implements Observer {
      */
     public void loadDictionary(String path, boolean stem) {
         Platform.runLater(()->model.loadDictionary(path,stem));
+    }
+
+    public void filterCities(List<String> toFilter) {
+        model.filterCities(toFilter);
     }
 }
