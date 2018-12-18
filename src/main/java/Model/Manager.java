@@ -130,6 +130,8 @@ class Manager {
      */
     private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary) {
         for (MiniDictionary mini : miniDicList) {
+            if(mini.getName().equals("FBIS3-13114"))
+                System.out.println("dsaassadasdasd");
             String curCity = mini.getCity();
             StringBuilder cityTry = new StringBuilder();
             DocDictionaryNode cur=null;
@@ -198,8 +200,9 @@ class Manager {
                 }
             }
             cityTry.delete(0, cityTry.length());
-            if(cur!=null)
-                documentDictionary.put(cur.getDocName(),cur);
+            if(cur==null)
+                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength());
+            documentDictionary.put(cur.getDocName(),cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);
             }

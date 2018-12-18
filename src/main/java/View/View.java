@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
 
@@ -19,8 +20,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class View implements Observer, IView {
-
     private ViewModel viewModel;
+    private File queryFile;
+
+    public TextField tf_queriesFile;
+    public TextField tf_simpleQuery;
     public Tab tab_search;
     public CheckComboBox ccb_cities;
     public TextField source;
@@ -226,7 +230,11 @@ public class View implements Observer, IView {
         ccb_cities.getItems().addAll(cities);
     }
 
-    public void onSearchClick(ActionEvent actionEvent) {
+    public void onSearchClick() {
+        if(destination.getText().equals(""))
+            MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify postings path");
+        if(tf_queriesFile.getText().equals("") && tf_simpleQuery.getText().equals(""))
+            MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify a query!");
         boolean found = false;
         List<String> relevantCities = new ArrayList<>();
         for (int i=0;i<ccb_cities.getItems().size();i++){
@@ -237,5 +245,23 @@ public class View implements Observer, IView {
         }
         if (found)
             viewModel.filterCities(relevantCities);
+        String simpleQuery = tf_simpleQuery.getText();
+        if (!simpleQuery.equals(""))
+            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming());
+        viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming());
+        queryFile = null;
+
+    }
+
+    public void btn_browseQueries(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Load Destination Path");
+        File defaultDirectory = new File("C:");
+        fileChooser.setInitialDirectory(defaultDirectory);
+        File chosen = fileChooser.showOpenDialog(new Stage());
+        if (chosen!=null) {
+            tf_queriesFile.setText(chosen.getAbsolutePath());
+            queryFile = chosen;
+        }
     }
 }

@@ -221,23 +221,23 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
         try {
             Random r = new Random();
-            int queryNumber = r.nextInt();
+            int queryNumber = Math.abs(r.nextInt(1000));
             File f = new File("tempquery.txt");
             FileWriter fw = new FileWriter(f);
-            StringBuilder sb = new StringBuilder("<top>\n" +
+            String sb = "<top>\n" +
                     "\n" +
-                    "<num> Number: "+queryNumber+" \n" +
-                    "<title> "+query+"  \n" +
+                    "<num> Number: " + queryNumber + " \n" +
+                    "<title> " + query + "  \n" +
                     "\n" +
                     "<desc> Description: \n" +
                     "\n" +
                     "\n" +
                     "<narr> Narrative: \n" +
                     "\n" +
-                    "</top>");
-            fw.write(sb.toString());
-            getResults(postingPath,stopWordsPath,f,stem);
+                    ".</top>";
+            fw.write(sb);
             fw.close();
+            getResults(postingPath,stopWordsPath,f,stem);
             f.delete();
         } catch (IOException e) {
             e.printStackTrace();

@@ -49,7 +49,7 @@ public class Parse implements Callable<MiniDictionary> {
         //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
         //the mini dictionary that will be filled according to the terms
-        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getFileName()+"_"+corpus_doc.getDocNum(),corpus_doc.getDocCity());
+        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity());
         //the index of the
         int index = 0;
         while (!wordList.isEmpty()) {

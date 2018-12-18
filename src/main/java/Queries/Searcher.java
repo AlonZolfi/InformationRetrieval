@@ -34,9 +34,9 @@ public class Searcher {
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (!docCloseList.contains(docName)) {
-                        ranker.BM25(docName, 2, 0.75);
-                        ranker.TfIdf(docName);
+                    if (splitLine.length>1 && !docCloseList.contains(docName)) {
+                        ranker.BM25AndPLN(docName, 2, 0.75);
+                        ranker.tfIdf(docName);
                     }
                     docCloseList.add(docName);
                 }
