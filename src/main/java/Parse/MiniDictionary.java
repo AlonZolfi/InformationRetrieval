@@ -108,7 +108,7 @@ public class MiniDictionary {
     private String printIndexes(LinkedList<Integer> indexesOfWord) {
         StringBuilder s = new StringBuilder("[");
         for (Integer i: indexesOfWord) {
-            s.append(i).append("-");
+            s.append(i).append("&");
         }
         s.replace(s.length()-1,s.length(),"]");
         return s.toString();

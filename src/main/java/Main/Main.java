@@ -32,9 +32,11 @@ public class Main extends Application {
         viewModel.addObserver(view);
         //--------------
         primaryStage.show();
-        model.getResults("C:\\Users\\alonz\\Desktop\\stam",new File("C:\\Users\\alonz\\Desktop\\queries.txt"),false);
+        //model.loadDocumentDictionary(new File("C:\\Users\\alonz\\Desktop\\stam\\DocumentDictionary.txt"));
+        //model.getResults("C:\\Users\\alonz\\Desktop\\stam",new File("C:\\Users\\alonz\\Desktop\\queries.txt"),false);
 
         /*String s = "Alon";
+
         int i = s.compareToIgnoreCase("ALON");*/
 
         /*CorpusDocument cd = new CorpusDocument("","","","",

@@ -28,7 +28,7 @@ public class Ranker {
                 int wordInDocumentCount = getWordInDocumentCount(postingLine,documentName,word);
                 double numerator = wordInQueryCount * (k + 1) * wordInDocumentCount * wordsIDF.get(word);
                 int documentLength = getDocLength(documentName);
-                double denominator = wordInDocumentCount + k * (1 - b + b * (documentLength / m_averageDocumentLength));
+                double denominator = wordInDocumentCount + k * (1 - b + (b * (documentLength / m_averageDocumentLength)));
                 rank += numerator / denominator;
             }
         }
@@ -52,14 +52,14 @@ public class Ranker {
     }
 
     private int countSeparators(String s) {
-        return StringUtils.countMatches(s,"-")+1;
+        return StringUtils.countMatches(s,"&")+1;
     }
 
     private HashMap<String,Double> calculateLog() {
         HashMap<String, Double> wordsIDF =  new HashMap<>();
         double docInCorpusCount = Model.documentDictionary.keySet().size();
         for (String word: m_wordsCount.keySet()) {
-            double d = Math.log10((StringUtils.countMatches(m_wordsPosting.get(word),"|")+1)/docInCorpusCount);
+            double d = Math.log10(docInCorpusCount/(StringUtils.countMatches(m_wordsPosting.get(word),"|")+1));
             wordsIDF.put(word,d);
         }
         return wordsIDF;
