@@ -1,9 +1,10 @@
 package Parse;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import javafx.util.Pair;
+
+import java.util.*;
+
+import static java.util.stream.Collectors.toMap;
 
 public class MiniDictionary {
     private String m_name; //name of the doc that past pars
@@ -11,6 +12,7 @@ public class MiniDictionary {
     private int m_maxFreq;
     private String m_city;
     private String m_maxFreqWord;
+    private Pair<String,Integer>[] places = new Pair[5];
 
     /**
      * create new MiniDictionary
@@ -182,5 +184,36 @@ public class MiniDictionary {
             count += l.size();
         }
         return count;
+    }
+
+    public void setPrimaryWords() {
+        Map<String,LinkedList<Integer>> inPlace = sorted(m_dictionary);
+        int i =0;
+        for (Map.Entry<String,LinkedList<Integer>> first:inPlace.entrySet()){
+            if (Character.isUpperCase(first.getKey().charAt(0))) {
+                LinkedList<Integer> cur = first.getValue();
+                if (cur!=null)
+                   places[i] = new Pair<>(first.getKey(),cur.size());
+            }
+            if (places[i]==null)
+                i--;
+            i++;
+            if (places[4]!=null) break;
+        }
+    }
+
+    public Pair<String,Integer>[] getPrimaryWords(){
+            return places;
+    }
+
+    private Map<String,LinkedList<Integer>> sorted(Map<String,LinkedList<Integer>> toSort){
+        TreeMap<String,LinkedList<Integer>> sorted = new TreeMap<>((o1, o2) -> {
+            if (o1.equals(o2))return 0;
+            if (m_dictionary.get(o1).size()>m_dictionary.get(o2).size())
+                return -1;
+            else return 1;
+        });
+        sorted.putAll(toSort);
+        return sorted;
     }
 }

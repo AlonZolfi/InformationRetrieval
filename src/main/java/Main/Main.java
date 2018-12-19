@@ -30,8 +30,7 @@ public class Main extends Application {
         viewModel.addObserver(view);
         //--------------
         primaryStage.show();
-        //model.loadDictionary("C:\\Users\\alonz\\Desktop\\stam",false);
-        //model.getResults("C:\\Users\\alonz\\Desktop\\stam","C:\\Users\\alonz\\Desktop\\littlecorpus",new File("C:\\Users\\alonz\\Desktop\\queries.txt"),false);
+
     }
 
 

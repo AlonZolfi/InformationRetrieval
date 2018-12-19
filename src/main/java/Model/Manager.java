@@ -85,6 +85,7 @@ class Manager {
             t1.start();
             tmpPostingThread.add(t1);
 
+            setPraimeryWords(miniDicList);
             //with all the information about the documents, fill the inverted index, doc dictionary and city dictionary
             fillCityData(miniDicList, cityDictionary, cityMemoryDataBaseRESTAPI, invertedIndex, documentDictionary);
             pool.shutdown();
@@ -104,14 +105,24 @@ class Manager {
                 pointer = invertedIndex.getPostingLink(word.toLowerCase());
                 if(pointer.equals("") &&  word.indexOf(' ')!=-1) {
                     pointer = invertedIndex.getPostingLink(word.substring(0, word.indexOf(' ')));
-                    if(pointer.equals(""))
+                    if(pointer.equals("")) {
                         pointer = invertedIndex.getPostingLink(word.toLowerCase().substring(0, word.indexOf(' ')));
+                    }
                 }
             }
             cityDictionary.get(word).setPosting(pointer);
         }
-
         return new double[]{numOfDocs, invertedIndex.getNumOfUniqueTerms()};
+    }
+
+    /**
+     * set the 5 most recent words in a doc
+     * @param miniDicList
+     */
+    private void setPraimeryWords(ConcurrentLinkedDeque<MiniDictionary> miniDicList) {
+        for (MiniDictionary mini:miniDicList){
+            mini.setPrimaryWords();
+        }
     }
 
     /**
@@ -158,7 +169,7 @@ class Manager {
                                 else
                                     cityDictionary.put(cityTry.toString(), toPut);
                                 found = true;
-                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength());
+                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
                             }
                         } else {
                             cityTry.append(" ");
@@ -166,7 +177,7 @@ class Manager {
                         j++;
                     } else {
                         found = true;
-                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength());
+                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
                     }
                 }
                 if (!found) {
@@ -203,7 +214,7 @@ class Manager {
                             oneWordCity=realCity.substring(0,idx);
                         cityDictionary.put(oneWordCity.toUpperCase(), new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy, false));
                     }
-                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength());
+                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
                 }
             }
             cityTry.delete(0, cityTry.length());
