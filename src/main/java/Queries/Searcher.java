@@ -5,10 +5,9 @@ import IO.ReadFile;
 import Model.*;
 import Parse.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Collections.reverseOrder;
 
 public class Searcher {
     private String postingPath;
@@ -19,29 +18,60 @@ public class Searcher {
         this.stem = stem;
     }
 
-    public void getQueryResults(Query q) {
+    public LinkedList<String> getQueryResults(Query q) {
+        //parse query
         Parse p = new Parse(new CorpusDocument("","","","",q.getTitle(),""),stem);
         MiniDictionary md = p.parse();
         Set<String> hs =  md.listOfWords();
-        HashMap<String, Integer> wordsCount = putWordsInMap(hs);
+        //prepare for calculation
+        HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
         CaseInsensitiveMap wordsPosting = getWordsPosting(hs);
-        HashSet<String> docCloseList = new HashSet<>();
-        Ranker ranker = new Ranker(wordsCount, wordsPosting);
-        for (String word : wordsCount.keySet()) {
+        //objects for the iteration
+        Ranker ranker = new Ranker(wordsCountInQuery, wordsPosting);
+        HashMap<String, Double> score = new HashMap<>();
+
+
+        for (String word : wordsCountInQuery.keySet())
+        {
             if (!wordsPosting.get(word).equals("")) {
                 String postingLine = wordsPosting.get(word);
                 String[] split = postingLine.split("\\|");
+                double idf = getIDF(split.length);
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (splitLine.length>1 && !docCloseList.contains(docName)) {
-                        ranker.BM25AndPLN(docName, 2, 0.75);
-                        ranker.tfIdf(docName);
+                    if (splitLine.length>1) {
+                        int tf = Integer.parseInt(splitLine[1]);
+                        addToScore(score,docName,ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75));
+                        //double tfidf = ranker.tfIdf(docName);
                     }
-                    docCloseList.add(docName);
                 }
             }
         }
+        return sortByScore(score);
+    }
+
+    private LinkedList<String> sortByScore(HashMap<String, Double> score) {
+        List<Map.Entry<String,Double>> list = new ArrayList<>(score.entrySet());
+        list.sort(reverseOrder(Map.Entry.comparingByValue()));
+
+        LinkedList<String> result= new LinkedList<>();
+        for(Map.Entry<String,Double> entry: list){
+            result.add(entry.getKey());
+        }
+        return result;
+    }
+
+    private void addToScore(HashMap<String, Double> score, String docName, double bm25AndPLN) {
+        Double d = score.get(docName);
+        if(d!=null)
+            bm25AndPLN+=d;
+        score.put(docName,bm25AndPLN);
+    }
+
+    private Double getIDF(int length) {
+        double docInCorpusCount = Model.documentDictionary.keySet().size();
+        return Math.log10((docInCorpusCount+1)/length);
     }
 
     private CaseInsensitiveMap getWordsPosting(Set<String> query) {

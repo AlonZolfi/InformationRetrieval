@@ -2,18 +2,14 @@ package Model;
 
 import java.io.*;
 import java.util.*;
-import java.io.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Observable;
-import java.util.concurrent.ConcurrentHashMap;
 
 import IO.ReadFile;
 import IO.WriteFile;
 import Index.CityInfoNode;
 import Index.DocDictionaryNode;
 import Index.InvertedIndex;
-import Index.InvertedIndexNode;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
 
@@ -215,7 +211,7 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
         ReadFile.initStopWords(stopWordsPath+"\\stop_words.txt");
         Manager m = new Manager();
-        m.calulateQueries(postingPath,queries,stem);
+        m.calculateQueries(postingPath,queries,stem);
     }
 
     public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){

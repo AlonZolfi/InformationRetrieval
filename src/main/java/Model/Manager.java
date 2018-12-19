@@ -7,7 +7,6 @@ import IO.WriteFile;
 import Index.*;
 import Parse.*;
 import Queries.Query;
-import Queries.Ranker;
 import Queries.Searcher;
 import Web.APIRequest;
 import Web.CitysMemoryDataBase;
@@ -22,13 +21,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
 
-    void calulateQueries(String postingPath, File queries, boolean stem){
+    void calculateQueries(String postingPath, File queries, boolean stem){
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
         Searcher searcher = new Searcher(postingPath,stem);
+        HashMap<String, LinkedList<String>> queryResults = new HashMap<>();
         for (Query q:queriesList) {
-            searcher.getQueryResults(q);
+            queryResults.put(q.getNum(),getLimited(searcher.getQueryResults(q)));
         }
     }
+
+    private LinkedList<String> getLimited(LinkedList<String> queryResults) {
+        LinkedList<String> limited = new LinkedList<>();
+        for (int i = 0; i < 50 && !queryResults.isEmpty(); i++) {
+            limited.add(queryResults.pollFirst());
+        }
+        return limited;
+    }
+
 
     /**
      * This function manages the index process by separating it to a few bunches
@@ -130,8 +139,6 @@ class Manager {
      */
     private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary) {
         for (MiniDictionary mini : miniDicList) {
-            if(mini.getName().equals("FBIS3-13114"))
-                System.out.println("dsaassadasdasd");
             String curCity = mini.getCity();
             StringBuilder cityTry = new StringBuilder();
             DocDictionaryNode cur=null;
