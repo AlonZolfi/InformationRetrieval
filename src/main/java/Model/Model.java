@@ -2,12 +2,18 @@ package Model;
 
 import java.io.*;
 import java.util.*;
+import java.io.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import IO.ReadFile;
 import IO.WriteFile;
 import Index.CityInfoNode;
 import Index.DocDictionaryNode;
 import Index.InvertedIndex;
+import Index.InvertedIndexNode;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
 
@@ -15,6 +21,8 @@ public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
+    public static HashMap<String, CityInfoNode> usedCities;
+
     /**
      * starts the index process
      * @param pathOfDocs - path of the corpus and stop words
@@ -94,7 +102,7 @@ public class Model extends Observable implements IModel {
      */
     @Override
     public void loadDictionary(String path, boolean stem) {
-        boolean found = false;
+        boolean foundInvertedIndex = false, foundDocumentDictionary = false;
         File dirSource = new File(path);
         File[] directoryListing = dirSource.listFiles();
         String[] update=new String[0];
@@ -104,10 +112,15 @@ public class Model extends Observable implements IModel {
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
                     invertedIndex = new InvertedIndex(file);
                     update = new String[]{"Successful","Dictionary was loaded successfully"};
-                    found = true;
+                    foundInvertedIndex = true;
+                }
+                if ((file.getName().equals("StemDocumentDictionary.txt") && stem)||(file.getName().equals("DocumentDictionary.txt"))&&!stem) {
+                    loadDocumentDictionary(file);
+                    update = new String[]{"Successful","Dictionary was loaded successfully"};
+                    foundDocumentDictionary = true;
                 }
             }
-            if(!found)
+            if(!foundInvertedIndex || !foundDocumentDictionary)
                 update =new String[] {"Fail","could not find dictionary"};
         }
         else
@@ -115,6 +128,25 @@ public class Model extends Observable implements IModel {
 
         setChanged();
         notifyObservers(update);
+    }
+
+    public void loadDocumentDictionary(File file) {
+        String line = null;
+        documentDictionary = new HashMap<String, DocDictionaryNode>();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            line = bufferedReader.readLine();
+            while(line != null) {
+                String [] curLine = line.split("\t");
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]));
+                documentDictionary.put(curLine[0],cur);
+                line = bufferedReader.readLine();
+            }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -180,17 +212,37 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(String postingPath, File queries, boolean stem){
+    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
+        ReadFile.initStopWords(stopWordsPath+"\\stop_words.txt");
         Manager m = new Manager();
-        m.calulateQueries(postingPath, queries,stem);
+        m.calulateQueries(postingPath,queries,stem);
     }
 
-    public void getResults(String postingPath, String query ,boolean stem){
-        Manager m = new Manager();
-        m.calulateQuery(postingPath,query,stem);
+    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
+        try {
+            Random r = new Random();
+            int queryNumber = Math.abs(r.nextInt(1000));
+            File f = new File("tempquery.txt");
+            FileWriter fw = new FileWriter(f);
+            String sb = "<top>\n" +
+                    "\n" +
+                    "<num> Number: " + queryNumber + " \n" +
+                    "<title> " + query + "  \n" +
+                    "\n" +
+                    "<desc> Description: \n" +
+                    "\n" +
+                    "\n" +
+                    "<narr> Narrative: \n" +
+                    "\n" +
+                    ".</top>";
+            fw.write(sb);
+            fw.close();
+            getResults(postingPath,stopWordsPath,f,stem);
+            f.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-    public static HashMap<String, CityInfoNode> usedCities;
 
     public void loadCityDictionary(String destination){
         cityDictionary=new HashMap<>();

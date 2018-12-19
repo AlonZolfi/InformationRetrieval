@@ -43,13 +43,13 @@ public class Parse implements Callable<MiniDictionary> {
      * goes over all the terms of label <TEXT>  and parses them according to the rules of the work
      * @return a Mini Dictionary that contains all the data about the terms and the doc
      */
-    private MiniDictionary parse(){
+    public MiniDictionary parse(){
         //split the <Text> label to list of terms
         wordList = stringToList(StringUtils.split(corpus_doc.getDocText(), " |:\"(){}[]\n\r\t"));
         //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
         //the mini dictionary that will be filled according to the terms
-        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getFileName()+"_"+corpus_doc.getDocNum(),corpus_doc.getDocCity());
+        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity());
         //the index of the
         int index = 0;
         while (!wordList.isEmpty()) {

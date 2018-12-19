@@ -1,12 +1,14 @@
 package Queries;
 
+import IO.CorpusDocument;
 import IO.ReadFile;
-import Index.DocDictionaryNode;
 import Model.*;
+import Parse.*;
 
-import javax.jws.WebParam;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class Searcher {
     private String postingPath;
@@ -17,49 +19,66 @@ public class Searcher {
         this.stem = stem;
     }
 
-    public void getQueryResults(Query q){
-        double k = 2, b = 0.75;
-        String query = q.getTitle();
-        HashMap<String, Integer> wordsCount = putWordsInMap(query);
-        HashMap<String, String> wordsPosting = getWordsPosting(query);
+    public void getQueryResults(Query q) {
+        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle(),""),stem);
+        MiniDictionary md = p.parse();
+        Set<String> hs =  md.listOfWords();
+        HashMap<String, Integer> wordsCount = putWordsInMap(hs);
+        CaseInsensitiveMap wordsPosting = getWordsPosting(hs);
         HashSet<String> docCloseList = new HashSet<>();
-        Ranker ranker = new Ranker(wordsCount,wordsPosting);
-        for (String word:wordsCount.keySet()) {
-            String lineNumber = getPostingLineNumber(word);
-            if(!lineNumber.equals("")){
-                String postingLine = ReadFile.readPostingLineAtIndex(postingPath,word.charAt(0),Integer.parseInt(lineNumber),stem);
+        Ranker ranker = new Ranker(wordsCount, wordsPosting);
+        for (String word : wordsCount.keySet()) {
+            if (!wordsPosting.get(word).equals("")) {
+                String postingLine = wordsPosting.get(word);
                 String[] split = postingLine.split("\\|");
-                split[0] = split[0].substring(word.length()+1);
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (!docCloseList.contains(docName))
-                        ranker.BM25(docName, k, b);
+                    if (splitLine.length>1 && !docCloseList.contains(docName)) {
+                        ranker.BM25AndPLN(docName, 2, 0.75);
+                        ranker.tfIdf(docName);
+                    }
                     docCloseList.add(docName);
                 }
             }
         }
     }
 
-    private HashMap<String, String> getWordsPosting(String query) {
-        HashMap<String,String> words = new HashMap<>();
-        String[] splitBySpace = query.split(" ");
-        for (String word: splitBySpace) {
-            String lineNumber = Model.invertedIndex.getPostingLink(word.toLowerCase());
-            if(lineNumber.equals(""))
-                lineNumber = Model.invertedIndex.getPostingLink(word.toUpperCase());
-            if(lineNumber.equals(""))
-                continue;
-            words.put(word,ReadFile.readPostingLineAtIndex(postingPath,word.charAt(0),Integer.parseInt(lineNumber),stem));
+    private CaseInsensitiveMap getWordsPosting(Set<String> query) {
+        CaseInsensitiveMap words = new CaseInsensitiveMap();
+        HashMap<Character, LinkedList<Integer>> allCharactersTogether = new HashMap<>();
+        for (String word: query) {
+            char letter;
+            if(!Character.isLetter(word.charAt(0)))
+                letter = '`';
+            else
+                letter = Character.toLowerCase(word.charAt(0));
+            String lineNumber = getPostingLineNumber(word);
+            if(!lineNumber.equals("")) {
+                if (allCharactersTogether.containsKey(letter))
+                    allCharactersTogether.get(letter).add(Integer.parseInt(lineNumber));
+                else {
+                    LinkedList<Integer> lettersLines = new LinkedList<>();
+                    lettersLines.add(Integer.parseInt(lineNumber));
+                    allCharactersTogether.put(letter,lettersLines);
+                }
+            }
+            else
+                words.put(word,"");
+        }
+        for (Character letter: allCharactersTogether.keySet()) {
+            LinkedList<String> postings= ReadFile.readPostingLineAtIndex(postingPath,Character.toLowerCase(letter),allCharactersTogether.get(letter),stem);
+            for (String posting: postings) {
+                String[] wordAndRestOfPosting = posting.split("~");
+                words.put(wordAndRestOfPosting[0],wordAndRestOfPosting[1]);
+            }
         }
         return words;
     }
 
-
-    private HashMap<String, Integer> putWordsInMap(String query) {
+    private HashMap<String, Integer> putWordsInMap(Set<String> query) {
         HashMap<String,Integer> words = new HashMap<>();
-        String[] splitBySpace = query.split(" ");
-        for (String word: splitBySpace) {
+        for (String word: query) {
             if(!words.containsKey(word))
                 words.put(word,1);
             else

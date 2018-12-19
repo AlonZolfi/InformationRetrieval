@@ -8,7 +8,7 @@ import static java.util.stream.Collectors.toMap;
 
 public class MiniDictionary {
     private String m_name; //name of the doc that past pars
-    private Map<String,LinkedList<Integer>> m_dictionary; //string - the term ; int - TF in the doc
+    private HashMap<String,LinkedList<Integer>> m_dictionary; //string - the term ; int - TF in the doc
     private int m_maxFreq;
     private String m_city;
     private String m_maxFreqWord;
@@ -110,7 +110,7 @@ public class MiniDictionary {
     private String printIndexes(LinkedList<Integer> indexesOfWord) {
         StringBuilder s = new StringBuilder("[");
         for (Integer i: indexesOfWord) {
-            s.append(i).append("-");
+            s.append(i).append("&");
         }
         s.replace(s.length()-1,s.length(),"]");
         return s.toString();

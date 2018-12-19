@@ -14,11 +14,11 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
+<TabPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
       <Tab text="Load Inverted Index">
          <content>
-            <AnchorPane prefHeight="434.0" prefWidth="693.0">
+            <AnchorPane prefHeight="492.0" prefWidth="693.0">
                <children>
                   <TextField fx:id="source" layoutX="23.0" layoutY="51.0" prefHeight="31.0" prefWidth="238.0" promptText="Enter source path or browse" />
                   <TextField fx:id="destination" layoutX="23.0" layoutY="118.0" prefHeight="31.0" prefWidth="238.0" promptText="Enter destination path or browse" />
@@ -40,13 +40,13 @@
                   <Button fx:id="btn_start" layoutX="24.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="31.0" prefWidth="149.0" text="Start Indexing" />
                   <Button fx:id="btn_browse_corpus" layoutX="261.0" layoutY="51.0" mnemonicParsing="false" onAction="#browseSourceClick" text="browse" />
                   <Button fx:id="btn_browse_saveDic" layoutX="261.0" layoutY="118.0" mnemonicParsing="false" onAction="#browseDestClick" text="browse" />
-                  <TableView fx:id="table_showDic" layoutX="7.0" layoutY="256.0" prefHeight="159.0" prefWidth="680.0">
+                  <TableView fx:id="table_showDic" layoutX="6.0" layoutY="256.0" prefHeight="229.0" prefWidth="686.0">
                      <placeholder>
                         <Label text="Press 'Show Dictionary' to see data " />
                      </placeholder>
                     <columns>
                       <TableColumn fx:id="tableCol_term" prefWidth="411.0" text="Term" />
-                      <TableColumn fx:id="tableCol_count" prefWidth="268.0" text="Number of appearances" />
+                      <TableColumn fx:id="tableCol_count" prefWidth="281.0" text="Number of appearances" />
                     </columns>
                   </TableView>
                   <Label fx:id="lbl_resultTitle" layoutX="252.0" layoutY="159.0" text="Results:" underline="true" visible="false" />
@@ -63,25 +63,25 @@
       </Tab>
       <Tab fx:id="tab_search" disable="true" text="Search">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="492.0" prefWidth="699.0">
                <children>
-                  <Button fx:id="btn_search" layoutX="576.0" layoutY="37.0" mnemonicParsing="false" onAction="#onSearchClick" prefHeight="142.0" prefWidth="88.0" text="Search" />
-                  <Label layoutX="24.0" layoutY="40.0" text="Pleasa enter a query" />
-                  <Label layoutX="287.0" layoutY="102.0" text="OR" />
-                  <Label layoutX="24.0" layoutY="114.0" text="Please enter a queries file" />
-                  <TextField fx:id="tb_simpelQuery" layoutX="24.0" layoutY="64.0" prefHeight="25.0" prefWidth="541.0" />
-                  <TextField fx:id="tb_queriesFile" layoutX="24.0" layoutY="145.0" prefHeight="25.0" prefWidth="542.0" />
-                  <Button fx:id="btn_browsQueriesFile" layoutX="166.0" layoutY="110.0" mnemonicParsing="false" text="brows" />
-                  <TableView layoutX="208.0" layoutY="210.0" prefHeight="219.0" prefWidth="353.0">
+                  <Button fx:id="btn_search" layoutX="576.0" layoutY="48.0" mnemonicParsing="false" onAction="#onSearchClick" prefHeight="114.0" prefWidth="109.0" text="Search" underline="true" />
+                  <Label layoutX="24.0" layoutY="27.0" text="Pleasa enter a query" />
+                  <Label layoutX="274.0" layoutY="79.0" text="OR" />
+                  <Label layoutX="25.0" layoutY="98.0" text="Please enter a queries file" />
+                  <TextField fx:id="tf_simpleQuery" layoutX="25.0" layoutY="48.0" prefHeight="25.0" prefWidth="541.0" />
+                  <TextField fx:id="tf_queriesFile" layoutX="24.0" layoutY="131.0" prefHeight="25.0" prefWidth="542.0" />
+                  <Button fx:id="btn_browsQueriesFile" layoutX="202.0" layoutY="93.0" mnemonicParsing="false" onAction="#btn_browseQueries" text="browse" />
+                  <TableView layoutX="206.0" layoutY="206.0" prefHeight="275.0" prefWidth="360.0">
                     <columns>
                       <TableColumn prefWidth="176.0" text="Rank" />
-                      <TableColumn prefWidth="176.0" text="Doc" />
+                      <TableColumn prefWidth="183.0" text="Doc" />
                     </columns>
                   </TableView>
-                  <Label layoutX="208.0" layoutY="185.0" text="Answers" />
-                  <Button layoutX="575.0" layoutY="209.0" mnemonicParsing="false" prefHeight="221.0" prefWidth="91.0" text="Save answers" />
-                  <Label layoutX="24.0" layoutY="185.0" text="Cities" />
-                  <CheckComboBox fx:id="ccb_cities" layoutX="24.0" layoutY="205.0" prefHeight="25.0" prefWidth="170.0" />
+                  <Label layoutX="209.0" layoutY="175.0" text="Answers" />
+                  <Button layoutX="576.0" layoutY="437.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="109.0" text="Save answers" />
+                  <Label layoutX="25.0" layoutY="175.0" text="Cities" />
+                  <CheckComboBox fx:id="ccb_cities" layoutX="25.0" layoutY="206.0" prefHeight="25.0" prefWidth="170.0" />
                </children>
             </AnchorPane>
         </content>

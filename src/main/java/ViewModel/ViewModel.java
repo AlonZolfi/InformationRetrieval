@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextField;
 
+import java.io.File;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -68,5 +69,13 @@ public class ViewModel extends Observable implements Observer {
 
     public void filterCities(List<String> toFilter) {
         model.filterCities(toFilter);
+    }
+
+    public void simpleQuery(String postingPath, String stopWordsPath, String simpleQuery, boolean stem){
+        model.getResults(postingPath,stopWordsPath,simpleQuery,stem);
+    }
+
+    public void fileQuery(String postingPath, String stopWordsPath, File complexQuery, boolean stem){
+        model.getResults(postingPath,stopWordsPath,complexQuery,stem);
     }
 }
