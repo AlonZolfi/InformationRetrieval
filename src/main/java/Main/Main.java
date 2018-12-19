@@ -19,8 +19,6 @@ public class Main extends Application {
         Model model = new Model();
         ViewModel viewModel = new ViewModel(model);
         model.addObserver(viewModel);
-
-        model.loadDictionary("C:\\Users\\alonz\\Desktop\\stam",false);
         //--------------
         primaryStage.setTitle("Information Retrieval Project");
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -32,115 +30,7 @@ public class Main extends Application {
         viewModel.addObserver(view);
         //--------------
         primaryStage.show();
-        model.getResults("C:\\Users\\alonz\\Desktop\\stam",new File("C:\\Users\\alonz\\Desktop\\queries.txt"),false);
 
-        /*String s = "Alon";
-        int i = s.compareToIgnoreCase("ALON");*/
-
-        /*CorpusDocument cd = new CorpusDocument("","","","",
-                "14 " +
-                "May " +
-                "1998 " +
-                "54 " +
-                "20-11 " +
-                "1/5 " +
-                "4/9-11 " +
-                        "1/5 " +
-                        "4/9-8/9 " +
-                        "187 " +
-                "4/9-1/8 " +
-                "999 " +
-                "between " +
-                "18 " +
-                "and " +
-                "24 " +
-                "between " +
-                "3/5 " +
-                "and " +
-                "78/96 " +
-                "between " +
-                "10 " +
-                "3/5 " +
-                "and " +
-                "78/96 " +
-                "between " +
-                "1/8 " +
-                "and " +
-                "3 " +
-                "1/83 " +
-                "between " +
-                "7879 " +
-                "1/8 " +
-                "and " +
-                "3 " +
-                "1/83 " +
-                "24 " +
-                "Value-added " +
-                "step-by-step " +
-                "10-part " +
-                "8798789-848949 " +
-                "-589 " +
-                "1,010,560 " +
-                "10,123 " +
-                "123 " +
-                "Thousand " +
-                "1010.56 " +
-                "10,123,000 " +
-                "55 " +
-                "Million " +
-                "10,123,000,000 " +
-                "55 " +
-                "Billion " +
-                "7 " +
-                "Trillion " +
-                "6% " +
-                "6 "+
-                "percent "+
-                "6000 " +
-                "percentage " +
-                "1102.7320 " +
-                "Dollars " +
-                "$450,000 " +
-                "$450000 " +
-                "1,000,000 " +
-                "Dollars " +
-                "$450,000,000 " +
-                "$100 " +
-                "million " +
-                "20.6m " +
-                "Dollars " +
-                "$100 " +
-                "billion " +
-                "100bn " +
-                "Dollars " +
-                "22 " +
-                "3/7 " +
-                "Dollars " +
-                "654 " +
-                "1451919/116161 " +
-                "100 " +
-                "billion "+
-                "U.S. "+
-                "dollars "+
-                "320.5 " +
-                "million " +
-                "U.S. "+
-                "dollars "+
-                "1.2 "+
-                "trillion "+
-                "U.S. "+
-                "dollars "+
-                "28 "+
-                "DEC "+
-                "23 "+
-                "Feb "+
-                "Nov "+
-                "1994 "+
-                "10-11",
-            "");
-        Parse p = new Parse(cd,false);
-
-        p.call();*/
     }
 
 
