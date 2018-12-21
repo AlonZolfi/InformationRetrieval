@@ -78,4 +78,8 @@ public class ViewModel extends Observable implements Observer {
     public void fileQuery(String postingPath, String stopWordsPath, File complexQuery, boolean stem){
         model.getResults(postingPath,stopWordsPath,complexQuery,stem);
     }
+
+    public String show5words(String docName) {
+        return model.show5words(docName);
+    }
 }

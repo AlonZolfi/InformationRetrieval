@@ -306,4 +306,12 @@ public class Model extends Observable implements IModel {
             }
         }
     }
+
+    @Override
+    public String show5words(String docName) {
+        if (documentDictionary.containsKey(docName)){
+            return documentDictionary.get(docName).get5words();
+        }
+        return "";
+    }
 }

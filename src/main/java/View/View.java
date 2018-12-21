@@ -58,6 +58,7 @@ public class View implements Observer, IView {
     public Label lbl_totalDocsNum;
     public Label lbl_totalTermsNum;
     public Label lbl_totalTimeNum;
+    public Label l_docSpasielWords;
 
     /**
      * constructor of view, connect the view to the viewModel
@@ -120,6 +121,7 @@ public class View implements Observer, IView {
                         btn_showDic.setDisable(false);
                         tab_search.setDisable(false);
                         fillCities();
+                        l_docSpasielWords.setVisible(false);
                     }
                 }
             } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
@@ -133,6 +135,7 @@ public class View implements Observer, IView {
                 btn_showDic.setDisable(false);
                 tab_search.setDisable(false);
                 fillCities();
+                l_docSpasielWords.setVisible(false);
             }
         }
     }
@@ -233,6 +236,7 @@ public class View implements Observer, IView {
         btn_showDic.setDisable(false);
         tab_search.setDisable(false);
         fillCities();
+        l_docSpasielWords.setVisible(false);
     }
 
     public Button btn_browse_saveDic;
@@ -317,6 +321,11 @@ public class View implements Observer, IView {
             tf_queriesFile.setText(chosen.getAbsolutePath());
             queryFile = chosen;
         }
+    }
+
+    private void show5words(String docName){
+        l_docSpasielWords.setText(viewModel.show5words(docName));
+        l_docSpasielWords.setVisible(false);
     }
 
 
