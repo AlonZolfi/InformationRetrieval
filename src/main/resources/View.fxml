@@ -86,7 +86,7 @@
                       <TableColumn fx:id="tableCol_docs" prefWidth="199.0" text="Doc" />
                     </columns>
                   </TableView>
-                  <Label fx:id="l_docSpasielWords" layoutX="96.0" layoutY="279.0" text="Label" />
+                  <Label fx:id="lbl_docSpecialWords" layoutX="96.0" layoutY="279.0" text="Label" />
                   <TextField fx:id="tf_saveResultIn" layoutX="75.0" layoutY="449.0" prefHeight="25.0" prefWidth="461.0" />
                   <Button fx:id="btn_browseSaveAnswers" layoutX="12.0" layoutY="449.0" mnemonicParsing="false" text="browse" />
                   <Label layoutX="14.0" layoutY="426.0" text="Where would you like to save your results?" />
