@@ -289,6 +289,8 @@ public class View implements Observer, IView, Initializable {
             MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify postings path");
         if(tf_queriesFile.getText().equals("") && tf_simpleQuery.getText().equals(""))
             MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify a query!");
+        if(!tf_queriesFile.getText().equals("") && !tf_simpleQuery.getText().equals(""))
+            MyAlert.showAlert(Alert.AlertType.ERROR,"Choose what you want to search");
         boolean found = false;
         List<String> relevantCities = new ArrayList<>();
         ccb_cities.getCheckModel().getCheckedIndices();
@@ -297,12 +299,6 @@ public class View implements Observer, IView, Initializable {
             relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
             found = true;
         }
-        /*for (int i=0;i<ccb_cities.getItems().size();i++){
-            if (ccb_cities.getCheckModel().isChecked(i)) {
-                relevantCities.add(ccb_cities.getCheckModel().getItem(i).toString());
-                found = true;
-            }
-        }*/
         if (found)
             viewModel.filterCities(relevantCities);
         String simpleQuery = tf_simpleQuery.getText();
