@@ -1,5 +1,6 @@
 package View;
 
+import Queries.ShowResultRecord;
 import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
 
@@ -38,6 +39,9 @@ public class View implements Observer, IView {
     public TableColumn<ShowDictionaryRecord,String> tableCol_term;
     public TableColumn<ShowDictionaryRecord,String> tableCol_count;
     public TableView<ShowDictionaryRecord> table_showDic;
+    public TableColumn<ShowResultRecord,String> tableCol_docNames;
+    public TableColumn<ShowResultRecord,String> tableCol_query;
+    public TableView table_showResults;
     public Label lbl_resultTitle;
     public Label lbl_totalDocs;
     public Label lbl_totalTerms;
@@ -110,13 +114,25 @@ public class View implements Observer, IView {
                     }
                 }
             } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
-                showDictionary((ObservableList<ShowDictionaryRecord>)arg);
+                List l = (ObservableList)arg;
+                if(!l.isEmpty()&& l.get(0) instanceof ShowDictionaryRecord)
+                    showDictionary((ObservableList<ShowDictionaryRecord>)arg);
+                else
+                    showQueryResults((ObservableList<ShowResultRecord>)l);
             } else if( arg instanceof double[]){ // show the results of the indexing
                 showIndexResults((double[])arg);
                 btn_showDic.setDisable(false);
                 tab_search.setDisable(false);
                 fillCities();
             }
+        }
+    }
+
+    private void showQueryResults(ObservableList<ShowResultRecord> results) {
+        if(results != null){
+            tableCol_query.setCellValueFactory(cellData -> cellData.getValue().sp_queryIDProperty());
+            tableCol_docNames.setCellValueFactory(cellData -> cellData.getValue().sp_docNamesProperty());
+            table_showResults.setItems(results);
         }
     }
 

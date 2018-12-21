@@ -21,13 +21,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
 
-    void calculateQueries(String postingPath, File queries, boolean stem){
+    HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem){
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
         Searcher searcher = new Searcher(postingPath,stem);
         HashMap<String, LinkedList<String>> queryResults = new HashMap<>();
         for (Query q:queriesList) {
             queryResults.put(q.getNum(),getLimited(searcher.getQueryResults(q)));
         }
+        return queryResults;
+
     }
 
     private LinkedList<String> getLimited(LinkedList<String> queryResults) {
@@ -219,7 +221,7 @@ class Manager {
             }
             cityTry.delete(0, cityTry.length());
             if(cur==null)
-                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength());
+                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
             documentDictionary.put(cur.getDocName(),cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);

@@ -42,8 +42,8 @@ public class Searcher {
                     String docName = splitLine[0];
                     if (splitLine.length>1) {
                         int tf = Integer.parseInt(splitLine[1]);
-                        addToScore(score,docName,ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75));
-                        //double tfidf = ranker.tfIdf(docName);
+                        double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
+                        addToScore(score,docName,BM25);
                     }
                 }
             }
@@ -63,10 +63,12 @@ public class Searcher {
     }
 
     private void addToScore(HashMap<String, Double> score, String docName, double bm25AndPLN) {
-        Double d = score.get(docName);
-        if(d!=null)
-            bm25AndPLN+=d;
-        score.put(docName,bm25AndPLN);
+        if(bm25AndPLN!=0) {
+            Double d = score.get(docName);
+            if (d != null)
+                bm25AndPLN += d;
+            score.put(docName, bm25AndPLN);
+        }
     }
 
     private Double getIDF(int length) {

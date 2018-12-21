@@ -10,6 +10,8 @@ import IO.WriteFile;
 import Index.CityInfoNode;
 import Index.DocDictionaryNode;
 import Index.InvertedIndex;
+import Queries.ShowResultRecord;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.io.FileUtils;
 
@@ -135,7 +137,8 @@ public class Model extends Observable implements IModel {
             line = bufferedReader.readLine();
             while(line != null) {
                 String [] curLine = line.split("\t");
-                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]));
+                //NEED TO SET PRIMARY WORDS FROM FILE TO DOC
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),null);
                 documentDictionary.put(curLine[0],cur);
                 line = bufferedReader.readLine();
             }
@@ -211,7 +214,16 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
         ReadFile.initStopWords(stopWordsPath+"\\stop_words.txt");
         Manager m = new Manager();
-        m.calculateQueries(postingPath,queries,stem);
+        HashMap<String, LinkedList<String>> results = m.calculateQueries(postingPath,queries,stem);
+        resultsToObservableList(results);
+    }
+
+    private void resultsToObservableList(HashMap<String, LinkedList<String>> results) {
+        ObservableList<ShowResultRecord> observableResult = FXCollections.observableArrayList();
+        for (Map.Entry<String,LinkedList<String>> entry: results.entrySet())
+            observableResult.add(new ShowResultRecord(entry.getKey(),entry.getValue()));
+        setChanged();
+        notifyObservers(observableResult);
     }
 
     public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
