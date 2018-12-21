@@ -17,16 +17,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.CheckComboBox;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
 public class View implements Observer, IView, Initializable {
     private ViewModel viewModel;
     private File queryFile;
+
+    public Button btn_browse_saveDic;
 
     public TabPane tabPane_main;
     public TextField tf_queriesFile;
@@ -61,6 +60,10 @@ public class View implements Observer, IView, Initializable {
     public Label lbl_totalTimeNum;
     public Label lbl_docSpecialWords;
 
+    public TextField tf_saveResultIn;
+    public Button btn_browseSaveAnswers;
+    public Button btn_saveAnswers;
+
     /**
      * constructor of view, connect the view to the viewModel
      * @param viewModel the view model of the MVVM
@@ -68,7 +71,6 @@ public class View implements Observer, IView, Initializable {
     public void setViewModel(ViewModel viewModel) {
         this.viewModel = viewModel;
     }
-
     /**
      * This function starts the process of parse and index the dictionary
      */
@@ -78,7 +80,6 @@ public class View implements Observer, IView, Initializable {
         else
             viewModel.onStartClick(source.getText(),destination.getText(), doStemming());//transfer to the view Model
     }
-
     /**
      * This function deletes all the contents of the destination path
      */
@@ -96,7 +97,6 @@ public class View implements Observer, IView, Initializable {
 
 
     }
-
     /**
      * This function determines if we should stem or not
      * @return if we should stem or not
@@ -104,7 +104,6 @@ public class View implements Observer, IView, Initializable {
     private boolean doStemming(){
          return cb_stm.isSelected();
     }
-
     /**
      * a function that gets called when an observer has raised a flag for something that changed
      * @param o - who changed
@@ -123,6 +122,7 @@ public class View implements Observer, IView, Initializable {
                         tab_search.setDisable(false);
                         fillCities();
                         lbl_docSpecialWords.setVisible(false);
+                        btn_saveAnswers.setDisable(true);
                     }
                 }
             } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
@@ -137,11 +137,10 @@ public class View implements Observer, IView, Initializable {
                 tab_search.setDisable(false);
                 fillCities();
                 lbl_docSpecialWords.setVisible(false);
+                btn_saveAnswers.setDisable(true);
             }
         }
     }
-
-
     private void showQueryResults(ObservableList<ShowResultRecord> results) {
         if(results != null){
             tableCol_query.setCellValueFactory(cellData -> cellData.getValue().sp_queryIDProperty());
@@ -155,7 +154,6 @@ public class View implements Observer, IView, Initializable {
             });
         }
     }
-
     private void showQueryResult(ObservableValue<ShowResultRecord> observable) {
         if(observable!=null) {
             ObservableList<ShowQueryResult> observableList = FXCollections.observableList(observable.getValue().getDocNames());
@@ -170,9 +168,7 @@ public class View implements Observer, IView, Initializable {
             });
         }
     }
-
-
-    /***
+    /**
      * This function lets the user select his corpus and stop words path
      */
     public void browseSourceClick(){
@@ -185,7 +181,6 @@ public class View implements Observer, IView, Initializable {
         if (chosen!=null)
             source.setText(chosen.getAbsolutePath());
     }
-
     /***
      * This function lets the user select his  location to save the postings and other data
      */
@@ -199,14 +194,12 @@ public class View implements Observer, IView, Initializable {
         if (chosen!=null)
             destination.setText(chosen.getAbsolutePath());
     }
-
     /**
      * transfers a request to show the dictionary of the current indexing
      */
     public void showDictionaryClick() {
         viewModel.showDictionary();
     }
-
     /**
      * shows the data of the current indexing process such as: Number of docs, Number of terms, Total time to index
      * @param results the results of the current indexing
@@ -224,7 +217,6 @@ public class View implements Observer, IView, Initializable {
         lbl_totalTime.setVisible(true);
         lbl_totalTimeNum.setVisible(true);
     }
-
     /**
      * shows an observable list that contains all the data about the current indexing: Term and TF
      * @param records all the data about the current indexing
@@ -239,10 +231,8 @@ public class View implements Observer, IView, Initializable {
         tab_search.setDisable(false);
         fillCities();
         lbl_docSpecialWords.setVisible(false);
+        btn_saveAnswers.setDisable(true);
     }
-
-    public Button btn_browse_saveDic;
-
     /**
      * transfers to the view model a load dictionary request
      */
@@ -252,7 +242,6 @@ public class View implements Observer, IView, Initializable {
         else
             MyAlert.showAlert(Alert.AlertType.ERROR,"Destination path cannot be empty");
     }
-
     /**
      * fill the cities list with the content of the cityDictionary
      */
@@ -277,13 +266,12 @@ public class View implements Observer, IView, Initializable {
         }
         return null;
     }
-
     private void fillCities(){
         ObservableList cities = FXCollections.observableArrayList(listOfCities());
         ccb_cities.getItems().addAll(cities);
     }
-
     public void onSearchClick() {
+        btn_saveAnswers.setDisable(true);
         clearTables();
         if(destination.getText().equals(""))
             MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify postings path");
@@ -309,12 +297,10 @@ public class View implements Observer, IView, Initializable {
         queryFile = null;
 
     }
-
     private void clearTables() {
         table_showResults.getItems().clear();
         table_showDocs.getItems().clear();
     }
-
     public void btn_browseQueries(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Destination Path");
@@ -326,15 +312,40 @@ public class View implements Observer, IView, Initializable {
             queryFile = chosen;
         }
     }
-
     private void show5words(String docName){
         lbl_docSpecialWords.setText(viewModel.show5words(docName));
         lbl_docSpecialWords.setVisible(true);
     }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         tabPane_main.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
     }
+    public void btn_browsePathForAnswer() {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Load Destination Path");
+        File defaultDirectory = new File("C:");
+        dirChooser.setInitialDirectory(defaultDirectory);
+        File chosen = dirChooser.showDialog(new Stage());
+        if (chosen!=null) {
+            tf_saveResultIn.setText(chosen.getAbsolutePath());
+            btn_saveAnswers.setDisable(false);
+        }
+    }
+
+    public void saveResults(){
+        if(tf_saveResultIn.getText().equals(""))
+            MyAlert.showAlert(Alert.AlertType.ERROR,"Choose where to save the results");
+        FileWriter fileWriter = null;
+        StringBuilder toWrite=new StringBuilder();
+        try {
+            fileWriter = new FileWriter(tf_saveResultIn.getText());
+            fileWriter.write(toWrite.toString());
+            fileWriter.close();
+            toWrite.delete(0,toWrite.length());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

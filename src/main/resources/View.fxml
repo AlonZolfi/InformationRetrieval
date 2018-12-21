@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane fx:id="tabPane_main" prefHeight="566.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
+<TabPane fx:id="tabPane_main" prefHeight="566.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
       <Tab text="Load Inverted Index">
          <content>
@@ -77,18 +77,24 @@
                   <Label layoutX="25.0" layoutY="175.0" text="Fillter by the cities:" />
                   <CheckComboBox fx:id="ccb_cities" layoutX="24.0" layoutY="204.0" prefHeight="25.0" prefWidth="170.0" />
                   <TableView fx:id="table_showResults" layoutX="212.0" layoutY="192.0" prefHeight="248.0" prefWidth="223.0">
+                      <placeholder>
+                          <Label text="Press 'Search' to see data " />
+                      </placeholder>
                     <columns>
                       <TableColumn fx:id="tableCol_query" prefWidth="176.0" text="Query" />
                     </columns>
                   </TableView>
                   <TableView fx:id="table_showDocs" layoutX="448.0" layoutY="195.0" prefHeight="243.0" prefWidth="236.0">
+                      <placeholder>
+                          <Label text="Press 'Search' to see data " />
+                      </placeholder>
                     <columns>
                       <TableColumn fx:id="tableCol_docs" prefWidth="199.0" text="Doc" />
                     </columns>
                   </TableView>
                   <Label fx:id="lbl_docSpecialWords" layoutX="96.0" layoutY="325.0" text="Label" />
                   <TextField fx:id="tf_saveResultIn" layoutX="76.0" layoutY="494.0" prefHeight="25.0" prefWidth="461.0" />
-                  <Button fx:id="btn_browseSaveAnswers" layoutX="13.0" layoutY="494.0" mnemonicParsing="false" text="browse" />
+                  <Button fx:id="btn_browseSaveAnswers" layoutX="13.0" layoutY="494.0" mnemonicParsing="false" onAction="#btn_browsePathForAnswer" text="browse" />
                   <Label layoutX="15.0" layoutY="471.0" text="Where would you like to save your results?" />
                </children>
             </AnchorPane>
