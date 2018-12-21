@@ -26,8 +26,8 @@ public class Searcher {
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
-        CaseInsensitiveMap docsByCitiesFilter = getWordsPosting(Model.usedCities.keySet());
-        CaseInsensitiveMap wordsPosting = getWordsPosting(hs);
+        CaseInsensitiveMap docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities.keySet()));
+        CaseInsensitiveMap wordsPosting = getPosting(hs);
         //objects for the iteration
         Ranker ranker = new Ranker(wordsCountInQuery, wordsPosting);
         HashMap<String, Double> score = new HashMap<>();
@@ -51,6 +51,10 @@ public class Searcher {
             }
         }
         return sortByScore(score);
+    }
+
+    private CaseInsensitiveMap getCitiesDocs(CaseInsensitiveMap posting) {
+        return null;
     }
 
     private boolean isInFilter(String city_name) {
@@ -86,7 +90,7 @@ public class Searcher {
         return Math.log10((docInCorpusCount+1)/length);
     }
 
-    private CaseInsensitiveMap getWordsPosting(Set<String> query) {
+    private CaseInsensitiveMap getPosting(Set<String> query) {
         CaseInsensitiveMap words = new CaseInsensitiveMap();
         HashMap<Character, LinkedList<Integer>> allCharactersTogether = new HashMap<>();
         for (String word: query) {
