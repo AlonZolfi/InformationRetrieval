@@ -13,6 +13,7 @@ public class Searcher {
     private String postingPath;
     private boolean stem;
 
+
     public Searcher(String postingPath, boolean stem) {
         this.postingPath = postingPath;
         this.stem = stem;
@@ -25,6 +26,7 @@ public class Searcher {
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
+        CaseInsensitiveMap docsByCitiesFilter = getWordsPosting(Model.usedCities.keySet());
         CaseInsensitiveMap wordsPosting = getWordsPosting(hs);
         //objects for the iteration
         Ranker ranker = new Ranker(wordsCountInQuery, wordsPosting);
@@ -40,7 +42,7 @@ public class Searcher {
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (splitLine.length>1){// &&(Model.usedCities.size()==0 || isInFilter(Model.usedCities.get(docName).getCity_name()))) {
+                    if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.usedCities.get(docName).getCity_name())) || docsByCitiesFilter.containsKey(docName)) {
                         int tf = Integer.parseInt(splitLine[1]);
                         double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
                         addToScore(score,docName,BM25);

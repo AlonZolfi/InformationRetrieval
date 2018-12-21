@@ -21,6 +21,7 @@ public class Model extends Observable implements IModel {
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
     public static HashMap<String, CityInfoNode> usedCities;
+    public static HashSet<String> docsByCityFilter;
 
     /**
      * starts the index process
@@ -255,13 +256,14 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
+    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, List<String> relevantCities){
+        filterCities(relevantCities);
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m.calculateQueries(postingPath,queries,stem);
         resultsToObservableList(results);
     }
 
-    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
+    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem,List<String> relevantCities){
         try {
             Random r = new Random();
             int queryNumber = Math.abs(r.nextInt(899)+100);
@@ -280,7 +282,7 @@ public class Model extends Observable implements IModel {
                     ".</top>";
             fw.write(sb);
             fw.close();
-            getResults(postingPath,stopWordsPath,f,stem);
+            getResults(postingPath,stopWordsPath,f,stem, relevantCities);
             f.delete();
         } catch (IOException e) {
             e.printStackTrace();

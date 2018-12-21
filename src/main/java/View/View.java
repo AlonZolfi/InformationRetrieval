@@ -285,31 +285,25 @@ public class View implements Observer, IView, Initializable {
 
     public void onSearchClick() {
         clearTables();
-        if(destination.getText().equals(""))
-            MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify postings path");
-        if(tf_queriesFile.getText().equals("") && tf_simpleQuery.getText().equals(""))
-            MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify a query!");
-        boolean found = false;
+        if(destination.getText().equals("")) {
+            MyAlert.showAlert(Alert.AlertType.ERROR, "You must specify postings path");
+            return;
+        }
+        if(tf_queriesFile.getText().equals("") && tf_simpleQuery.getText().equals("")) {
+            MyAlert.showAlert(Alert.AlertType.ERROR, "You must specify a query!");
+            return;
+        }
         List<String> relevantCities = new ArrayList<>();
         ccb_cities.getCheckModel().getCheckedIndices();
         for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
             Integer integer = (Integer)o;
             relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
-            found = true;
         }
-        /*for (int i=0;i<ccb_cities.getItems().size();i++){
-            if (ccb_cities.getCheckModel().isChecked(i)) {
-                relevantCities.add(ccb_cities.getCheckModel().getItem(i).toString());
-                found = true;
-            }
-        }*/
-        if (found)
-            viewModel.filterCities(relevantCities);
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
-            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming());
+            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),relevantCities);
         else
-            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming());
+            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),relevantCities);
         queryFile = null;
 
     }
