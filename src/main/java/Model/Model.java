@@ -137,32 +137,57 @@ public class Model extends Observable implements IModel {
         notifyObservers(update);
     }
 
-    public void loadDocumentDictionary(File file) {
+    private void loadDocumentDictionary(File file) {
         String line = null;
         documentDictionary = new HashMap<String, DocDictionaryNode>();
         try {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             line = bufferedReader.readLine();
+            Pair[] toFill;
             while(line != null) {
                 String [] curLine = line.split("\t");
-                //NEED TO SET PRIMARY WORDS FROM FILE TO DOC
-                Pair<String,Integer> [] toFill = new Pair[5];
-                String [] words = new String[5];
-                String [] numbers = new String[5];
-                String [] data = curLine[6].split(",");
-                for (int i = 0; i <5 ; i++) {
-                    String [] part = data[i].split("~");
-                    words[i]=part[0];
-                    numbers[i]=part[1];
-                    toFill[i]=new Pair<String, Integer>(words[i],Integer.parseInt(numbers[i]));
+                if(curLine.length==7) {
+                    String[] data = curLine[6].split("#");
+                    toFill = new Pair[data.length];
+                    String[] words = new String[data.length];
+                    String[] numbers = new String[data.length];
+                    for (int i = 0; i < data.length; i++) {
+                        String[] part = data[i].split("~");
+                        words[i] = part[0];
+                        numbers[i] = part[1];
+                        toFill[i] = new Pair<String, Integer>(words[i], Integer.parseInt(numbers[i]));
+                    }
                 }
+                else
+                    toFill = new Pair[0];
                 DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),toFill);
                 documentDictionary.put(curLine[0],cur);
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadCityDictionary(String destination){
+        cityDictionary=new HashMap<>();
+        try {
+            FileReader fileReader = new FileReader(destination + "/CityDictionary.txt");
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] words = line.split("\t");
+                if (!words[4].equals("")) {
+                    boolean isCapital = words[5].equals("true");
+                    CityInfoNode i = new CityInfoNode(words[0],words[1],words[2],words[3],isCapital);
+                    i.setPosting(words[4]);
+                    cityDictionary.put(words[0],i);
+                }
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -231,7 +256,6 @@ public class Model extends Observable implements IModel {
     }
 
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem){
-        ReadFile.initStopWords(stopWordsPath+"\\stop_words.txt");
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m.calculateQueries(postingPath,queries,stem);
         resultsToObservableList(results);
@@ -240,7 +264,7 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
         try {
             Random r = new Random();
-            int queryNumber = Math.abs(r.nextInt(1000));
+            int queryNumber = Math.abs(r.nextInt(899)+100);
             File f = new File("tempquery.txt");
             FileWriter fw = new FileWriter(f);
             String sb = "<top>\n" +
@@ -271,30 +295,8 @@ public class Model extends Observable implements IModel {
         notifyObservers(observableResult);
     }
 
-    public void loadCityDictionary(String destination){
-        cityDictionary=new HashMap<>();
-        try {
-            FileReader fileReader = new FileReader(destination + "/CityDictionary.txt");
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                String[] words = line.split("\t");
-                if (!words[4].equals("")) {
-                    boolean isCapital = words[5].equals("true");
-                    CityInfoNode i = new CityInfoNode(words[0],words[1],words[2],words[3],isCapital);
-                    i.setPosting(words[4]);
-                    cityDictionary.put(words[0],i);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     /**
-     * this function filler the resukte by the list of cities marked by the user
+     * this function filler the result by the list of cities marked by the user
      * @param toFilter all the cities that are checked
      */
     public void filterCities(List<String> toFilter) {

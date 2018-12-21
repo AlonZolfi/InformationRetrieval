@@ -56,7 +56,7 @@ class Manager {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
-        int numOfTempPostings = 100;
+        int numOfTempPostings = 900;
         LinkedList<Thread> tmpPostingThread = new LinkedList<>();
 
         for (int i = 0; i < numOfTempPostings; i++) {
@@ -87,7 +87,7 @@ class Manager {
             t1.start();
             tmpPostingThread.add(t1);
 
-            setPraimeryWords(miniDicList);
+            setPrimaryWords(miniDicList);
             //with all the information about the documents, fill the inverted index, doc dictionary and city dictionary
             fillCityData(miniDicList, cityDictionary, cityMemoryDataBaseRESTAPI, invertedIndex, documentDictionary);
             pool.shutdown();
@@ -119,9 +119,9 @@ class Manager {
 
     /**
      * set the 5 most recent words in a doc
-     * @param miniDicList
+     * @param miniDicList miniDictionary list
      */
-    private void setPraimeryWords(ConcurrentLinkedDeque<MiniDictionary> miniDicList) {
+    private void setPrimaryWords(ConcurrentLinkedDeque<MiniDictionary> miniDicList) {
         for (MiniDictionary mini:miniDicList){
             mini.setPrimaryWords();
         }

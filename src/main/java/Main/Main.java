@@ -30,7 +30,6 @@ public class Main extends Application {
         viewModel.addObserver(view);
         //--------------
         primaryStage.show();
-
     }
 
 

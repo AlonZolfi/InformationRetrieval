@@ -114,7 +114,7 @@ public class InvertedIndex {
         ObservableList<ShowDictionaryRecord> showDictionaryRecords = FXCollections.observableArrayList();
         TreeMap<String,InvertedIndexNode> sorted = new TreeMap<String, InvertedIndexNode>(invertedIndexDic);
         for (String s : sorted.keySet())
-            showDictionaryRecords.add(new ShowDictionaryRecord(s,invertedIndexDic.get(s).getNumOfAppearances()+""));
+            showDictionaryRecords.add(new ShowDictionaryRecord(s,invertedIndexDic.get(s).getNumOfAppearances()));
         return showDictionaryRecords;
     }
 

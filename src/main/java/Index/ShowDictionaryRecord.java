@@ -1,26 +1,28 @@
 package Index;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ShowDictionaryRecord {
     private String term;
-    private String count;
+    private int count;
     private StringProperty termProperty;
-    private StringProperty countProperty;
+    private IntegerProperty countProperty;
 
-    ShowDictionaryRecord(String term, String count) {
+    ShowDictionaryRecord(String term, int count) {
         this.term = term;
         this.count = count;
         this.termProperty = new SimpleStringProperty(term);
-        this.countProperty = new SimpleStringProperty(count);
+        this.countProperty = new SimpleIntegerProperty(count);
     }
 
     public StringProperty getTermProperty() {
         return termProperty;
     }
 
-    public StringProperty getCountProperty() {
+    public IntegerProperty getCountProperty() {
         return countProperty;
     }
 }

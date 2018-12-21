@@ -18,7 +18,9 @@ public class Parse implements Callable<MiniDictionary> {
     /**
      * a default constructor
      */
-    public Parse(){}
+    public Parse(){
+
+    }
 
     /**
      * a constructor that receives a document from the corpus and if the terms should be stemmed
@@ -36,14 +38,14 @@ public class Parse implements Callable<MiniDictionary> {
      * @return a Mini dictionary that was retrieved from the parse
      */
     public MiniDictionary call() {
-        return parse();
+        return parse(false);
     }
 
     /**
      * goes over all the terms of label <TEXT>  and parses them according to the rules of the work
      * @return a Mini Dictionary that contains all the data about the terms and the doc
      */
-    public MiniDictionary parse(){
+    public MiniDictionary parse(boolean isQuery){
         //split the <Text> label to list of terms
         wordList = stringToList(StringUtils.split(corpus_doc.getDocText(), " |:\"(){}[]\n\r\t"));
         //list of next words from the current term
@@ -197,7 +199,7 @@ public class Parse implements Callable<MiniDictionary> {
 
             }
 
-            if(!ReadFile.stopWords.contains(term.toLowerCase())) {
+            if(isQuery || !ReadFile.stopWords.contains(term.toLowerCase())) {
                 if(doStemIfTermWasNotManipulated)
                     term = ps.stemTerm(term);
                 miniDic.addWord(term, index);

@@ -5,14 +5,12 @@ import Queries.ShowResultRecord;
 import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -23,12 +21,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
-public class View implements Observer, IView {
+public class View implements Observer, IView, Initializable {
     private ViewModel viewModel;
     private File queryFile;
 
+    public TabPane tabPane_main;
     public TextField tf_queriesFile;
     public TextField tf_simpleQuery;
     public Tab tab_search;
@@ -47,9 +47,9 @@ public class View implements Observer, IView {
 
     public TableView<ShowDictionaryRecord> table_showDic;
     public TableColumn<ShowDictionaryRecord,String> tableCol_term;
-    public TableColumn<ShowDictionaryRecord,String> tableCol_count;
+    public TableColumn<ShowDictionaryRecord,Number> tableCol_count;
 
-    public TableView table_showResults;
+    public TableView<ShowResultRecord> table_showResults;
     public TableColumn<ShowResultRecord,String> tableCol_query;
 
     public Label lbl_resultTitle;
@@ -59,7 +59,7 @@ public class View implements Observer, IView {
     public Label lbl_totalDocsNum;
     public Label lbl_totalTermsNum;
     public Label lbl_totalTimeNum;
-    public Label l_docSpasielWords;
+    public Label lbl_docSpecialWords;
 
     /**
      * constructor of view, connect the view to the viewModel
@@ -122,7 +122,7 @@ public class View implements Observer, IView {
                         btn_showDic.setDisable(false);
                         tab_search.setDisable(false);
                         fillCities();
-                        l_docSpasielWords.setVisible(false);
+                        lbl_docSpecialWords.setVisible(false);
                     }
                 }
             } else if( arg instanceof ObservableList){ // a show dictionary operation was finished and can be shown on display
@@ -136,7 +136,7 @@ public class View implements Observer, IView {
                 btn_showDic.setDisable(false);
                 tab_search.setDisable(false);
                 fillCities();
-                l_docSpasielWords.setVisible(false);
+                lbl_docSpecialWords.setVisible(false);
             }
         }
     }
@@ -146,22 +146,29 @@ public class View implements Observer, IView {
         if(results != null){
             tableCol_query.setCellValueFactory(cellData -> cellData.getValue().sp_queryIDProperty());
             table_showResults.setItems(results);
-            table_showResults.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            table_showResults.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ShowResultRecord>() {
                 @Override
-                public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                    showQueryResult(observable);
+                public void changed(ObservableValue<? extends ShowResultRecord> observable, ShowResultRecord oldValue, ShowResultRecord newValue) {
+                    if (observable!=null && table_showResults.getItems().size()>0)
+                        showQueryResult((ObservableValue<ShowResultRecord>)observable);
                 }
             });
         }
     }
 
     private void showQueryResult(ObservableValue<ShowResultRecord> observable) {
-        //if(results!=null){
-            //ShowResultRecord showResultRecord =(ShowResultRecord) table_showResults.getSelectionModel().getSelectedItem();
-            ObservableList<ShowQueryResult> observableList =FXCollections.observableList(observable.getValue().getDocNames());
+        if(observable!=null) {
+            ObservableList<ShowQueryResult> observableList = FXCollections.observableList(observable.getValue().getDocNames());
             tableCol_docs.setCellValueFactory(cellData -> cellData.getValue().sp_docNameProperty());
             table_showDocs.setItems(observableList);
-        //}
+            table_showDocs.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ShowQueryResult>() {
+                @Override
+                public void changed(ObservableValue<? extends ShowQueryResult> observable, ShowQueryResult oldValue, ShowQueryResult newValue) {
+                    if(observable!=null && newValue!=null)
+                        show5words(observable.getValue().getSp_docName());
+                }
+            });
+        }
     }
 
 
@@ -231,7 +238,7 @@ public class View implements Observer, IView {
         btn_showDic.setDisable(false);
         tab_search.setDisable(false);
         fillCities();
-        l_docSpasielWords.setVisible(false);
+        lbl_docSpecialWords.setVisible(false);
     }
 
     public Button btn_browse_saveDic;
@@ -249,7 +256,7 @@ public class View implements Observer, IView {
     /**
      * fill the cities list with the content of the cityDictionary
      */
-    public ArrayList<String> listOfCities() {
+    private ArrayList<String> listOfCities() {
         ArrayList<String> cities = new ArrayList<>();
         if (!btn_showDic.isDisable()) {
             try {
@@ -270,13 +277,14 @@ public class View implements Observer, IView {
         }
         return null;
     }
-    public ObservableList cities;
-    public void fillCities(){
-        cities = FXCollections.observableArrayList(listOfCities());
+
+    private void fillCities(){
+        ObservableList cities = FXCollections.observableArrayList(listOfCities());
         ccb_cities.getItems().addAll(cities);
     }
 
     public void onSearchClick() {
+        clearTables();
         if(destination.getText().equals(""))
             MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify postings path");
         if(tf_queriesFile.getText().equals("") && tf_simpleQuery.getText().equals(""))
@@ -289,12 +297,12 @@ public class View implements Observer, IView {
             relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
             found = true;
         }
-        for (int i=0;i<ccb_cities.getItems().size();i++){
+        /*for (int i=0;i<ccb_cities.getItems().size();i++){
             if (ccb_cities.getCheckModel().isChecked(i)) {
                 relevantCities.add(ccb_cities.getCheckModel().getItem(i).toString());
                 found = true;
             }
-        }
+        }*/
         if (found)
             viewModel.filterCities(relevantCities);
         String simpleQuery = tf_simpleQuery.getText();
@@ -304,6 +312,11 @@ public class View implements Observer, IView {
             viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming());
         queryFile = null;
 
+    }
+
+    private void clearTables() {
+        table_showResults.getItems().clear();
+        table_showDocs.getItems().clear();
     }
 
     public void btn_browseQueries(ActionEvent actionEvent) {
@@ -319,27 +332,13 @@ public class View implements Observer, IView {
     }
 
     private void show5words(String docName){
-        l_docSpasielWords.setText(viewModel.show5words(docName));
-        l_docSpasielWords.setVisible(false);
+        lbl_docSpecialWords.setText(viewModel.show5words(docName));
+        lbl_docSpecialWords.setVisible(true);
     }
 
-
-    /*
-    if ((Vacation) tableView.getSelectionModel().getSelectedItem()!=null) {
-                Vacation v = (Vacation) tableView.getSelectionModel().getSelectedItem();
-                if(v.getPpublisherUserName().equals(controller.getLoggedUser())){
-                    ErrorBox e = new ErrorBox();
-                    e.showErrorStage("you can't buy your own vacation");
-                    return;
-                }
-                c.setController(this.controller);
-                c.submit(controller.getLoggedUser(),v.getVacationID(),v.getPrice());
-            }
-            else {
-                ErrorBox e = new ErrorBox();
-                e.showErrorStage("you need to choose vacation to submit a request");
-                return;
-            }
-     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        tabPane_main.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+    }
 
 }

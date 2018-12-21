@@ -21,7 +21,7 @@ public class Searcher {
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
         Parse p = new Parse(new CorpusDocument("","","","",q.getTitle(),""),stem);
-        MiniDictionary md = p.parse();
+        MiniDictionary md = p.parse(true);
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
@@ -40,7 +40,7 @@ public class Searcher {
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (splitLine.length>1) {
+                    if (splitLine.length>1){// &&(Model.usedCities.size()==0 || isInFilter(Model.usedCities.get(docName).getCity_name()))) {
                         int tf = Integer.parseInt(splitLine[1]);
                         double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
                         addToScore(score,docName,BM25);
@@ -49,6 +49,14 @@ public class Searcher {
             }
         }
         return sortByScore(score);
+    }
+
+    private boolean isInFilter(String city_name) {
+        for (String city: Model.usedCities.keySet()){
+            if(city.equals(city_name))
+                return true;
+        }
+        return false;
     }
 
     private LinkedList<String> sortByScore(HashMap<String, Double> score) {
