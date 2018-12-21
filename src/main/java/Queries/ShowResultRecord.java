@@ -8,16 +8,24 @@ import java.util.LinkedList;
 public class ShowResultRecord {
 
     private String queryID;
-    private LinkedList<String> docNames;
+    private LinkedList<ShowQueryResult> docNames;
 
     private StringProperty sp_queryID;
     private StringProperty sp_docNames;
 
     public ShowResultRecord(String queryID, LinkedList<String> docNames) {
         this.queryID = queryID;
-        this.docNames = docNames;
+        this.docNames = toQueryResultList(docNames);
         this.sp_queryID = new SimpleStringProperty(queryID);
         this.sp_docNames = new SimpleStringProperty(docNames.toString());
+    }
+
+    private LinkedList<ShowQueryResult> toQueryResultList(LinkedList<String> docNames) {
+        LinkedList<ShowQueryResult> l = new LinkedList<>();
+        for (String s:docNames) {
+            l.add(new ShowQueryResult(s));
+        }
+        return l;
     }
 
     public String getSp_queryID() {
@@ -36,7 +44,7 @@ public class ShowResultRecord {
         return sp_docNames;
     }
 
-    public LinkedList<String> getDocNames() {
+    public LinkedList<ShowQueryResult> getDocNames() {
         return docNames;
     }
 }
