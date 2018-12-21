@@ -4,10 +4,14 @@ import Queries.ShowResultRecord;
 import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -36,12 +40,17 @@ public class View implements Observer, IView {
     public Button btn_loadDic;
     public CheckBox cb_stm;
     public Button btn_browse_corpus;
+
+    public TableView<ShowResultRecord> table_showDocs;
+    public TableColumn<ShowResultRecord, String> tableCol_docs;
+
+    public TableView<ShowDictionaryRecord> table_showDic;
     public TableColumn<ShowDictionaryRecord,String> tableCol_term;
     public TableColumn<ShowDictionaryRecord,String> tableCol_count;
-    public TableView<ShowDictionaryRecord> table_showDic;
-    public TableColumn<ShowResultRecord,String> tableCol_docNames;
-    public TableColumn<ShowResultRecord,String> tableCol_query;
+
     public TableView table_showResults;
+    public TableColumn<ShowResultRecord,String> tableCol_query;
+
     public Label lbl_resultTitle;
     public Label lbl_totalDocs;
     public Label lbl_totalTerms;
@@ -128,12 +137,34 @@ public class View implements Observer, IView {
         }
     }
 
+
     private void showQueryResults(ObservableList<ShowResultRecord> results) {
         if(results != null){
             tableCol_query.setCellValueFactory(cellData -> cellData.getValue().sp_queryIDProperty());
-            tableCol_docNames.setCellValueFactory(cellData -> cellData.getValue().sp_docNamesProperty());
             table_showResults.setItems(results);
+            table_showResults.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+                @Override
+                public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                    showQueryResult(observable);
+                }
+            });
         }
+    }
+
+    private void showQueryResult(ObservableValue<ShowResultRecord> observable) {
+        //if(results!=null){
+            //ShowResultRecord showResultRecord =(ShowResultRecord) table_showResults.getSelectionModel().getSelectedItem();
+            ObservableList<String> observableList = toObsevrable(observable.getValue());
+            //tableCol_docs.set();
+        //}
+    }
+
+    private ObservableList<String> toObsevrable(ShowResultRecord value) {
+        ObservableList<String> observableList = FXCollections.observableArrayList();
+        for (String docName :value.getDocNames()) {
+            observableList.add(docName);
+        }
+        return observableList;
     }
 
     /***
@@ -253,6 +284,12 @@ public class View implements Observer, IView {
             MyAlert.showAlert(Alert.AlertType.ERROR,"You must specify a query!");
         boolean found = false;
         List<String> relevantCities = new ArrayList<>();
+        ccb_cities.getCheckModel().getCheckedIndices();
+        for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
+            Integer integer = (Integer)o;
+            relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
+            found = true;
+        }
         for (int i=0;i<ccb_cities.getItems().size();i++){
             if (ccb_cities.getCheckModel().isChecked(i)) {
                 relevantCities.add(ccb_cities.getCheckModel().getItem(i).toString());
@@ -264,7 +301,8 @@ public class View implements Observer, IView {
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
             viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming());
-        viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming());
+        else
+            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming());
         queryFile = null;
 
     }
