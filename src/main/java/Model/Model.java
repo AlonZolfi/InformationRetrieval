@@ -13,6 +13,7 @@ import Index.InvertedIndex;
 import Queries.ShowResultRecord;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 
 public class Model extends Observable implements IModel {
@@ -146,7 +147,17 @@ public class Model extends Observable implements IModel {
             while(line != null) {
                 String [] curLine = line.split("\t");
                 //NEED TO SET PRIMARY WORDS FROM FILE TO DOC
-                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),null);
+                Pair<String,Integer> [] toFill = new Pair[5];
+                String [] words = new String[5];
+                String [] numbers = new String[5];
+                String [] data = curLine[6].split(",");
+                for (int i = 0; i <5 ; i++) {
+                    String [] part = data[i].split("~");
+                    words[i]=part[0];
+                    numbers[i]=part[1];
+                    toFill[i]=new Pair<String, Integer>(words[i],Integer.parseInt(numbers[i]));
+                }
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),toFill);
                 documentDictionary.put(curLine[0],cur);
                 line = bufferedReader.readLine();
             }
@@ -294,5 +305,13 @@ public class Model extends Observable implements IModel {
                     usedCities.put(nameOfCity,cityDictionary.get(nameOfCity));
             }
         }
+    }
+
+    @Override
+    public String show5words(String docName) {
+        if (documentDictionary.containsKey(docName)){
+            return documentDictionary.get(docName).get5words();
+        }
+        return "";
     }
 }

@@ -55,6 +55,14 @@ public class DocDictionaryNode {
         pw+=m_primaryWords[m_primaryWords.length-1].getKey()+"~"+m_primaryWords[m_primaryWords.length-1].getValue();
         return m_docName+"\t"+m_numOfUniWords+"\t"+m_maxFreq+"\t"+m_maxFreqWord+'\t'+m_city+"\t"+m_docLength+"\t"+pw+"\n";
     }
+
+    public String get5words() {
+        String s ="";
+        for (int i = 0; i <5 ; i++) {
+            s += m_primaryWords[i].getValue()+"\t"+m_primaryWords[i].getKey()+"\n";
+        }
+        return s;
+    }
 }
 
 

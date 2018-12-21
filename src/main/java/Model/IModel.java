@@ -18,4 +18,6 @@ public interface IModel {
     void getResults(String postingPath, String stopWordsPath, String query ,boolean stem);
 
     void filterCities(List<String> toFilter);
+
+    String show5words(String docName);
 }
