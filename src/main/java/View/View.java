@@ -293,6 +293,10 @@ public class View implements Observer, IView, Initializable {
             MyAlert.showAlert(Alert.AlertType.ERROR, "You must specify a query!");
             return;
         }
+        if(!tf_queriesFile.getText().equals("") && !tf_simpleQuery.getText().equals("")) {
+            MyAlert.showAlert(Alert.AlertType.ERROR, "Choose what you want to search and delete the other");
+            return;
+        }
         List<String> relevantCities = new ArrayList<>();
         ccb_cities.getCheckModel().getCheckedIndices();
         for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
