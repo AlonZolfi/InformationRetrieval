@@ -1,5 +1,6 @@
 package View;
 
+import Queries.ShowQueryResult;
 import Queries.ShowResultRecord;
 import ViewModel.ViewModel;
 import Index.ShowDictionaryRecord;
@@ -41,8 +42,8 @@ public class View implements Observer, IView {
     public CheckBox cb_stm;
     public Button btn_browse_corpus;
 
-    public TableView<ShowResultRecord> table_showDocs;
-    public TableColumn<ShowResultRecord, String> tableCol_docs;
+    public TableView<ShowQueryResult> table_showDocs;
+    public TableColumn<ShowQueryResult, String> tableCol_docs;
 
     public TableView<ShowDictionaryRecord> table_showDic;
     public TableColumn<ShowDictionaryRecord,String> tableCol_term;
@@ -157,18 +158,12 @@ public class View implements Observer, IView {
     private void showQueryResult(ObservableValue<ShowResultRecord> observable) {
         //if(results!=null){
             //ShowResultRecord showResultRecord =(ShowResultRecord) table_showResults.getSelectionModel().getSelectedItem();
-            ObservableList<String> observableList = toObsevrable(observable.getValue());
-            //tableCol_docs.set();
+            ObservableList<ShowQueryResult> observableList =FXCollections.observableList(observable.getValue().getDocNames());
+            tableCol_docs.setCellValueFactory(cellData -> cellData.getValue().sp_docNameProperty());
+            table_showDocs.setItems(observableList);
         //}
     }
 
-    private ObservableList<String> toObsevrable(ShowResultRecord value) {
-        ObservableList<String> observableList = FXCollections.observableArrayList();
-        for (String docName :value.getDocNames()) {
-            observableList.add(docName);
-        }
-        return observableList;
-    }
 
     /***
      * This function lets the user select his corpus and stop words path
