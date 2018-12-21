@@ -6,8 +6,10 @@ import javafx.beans.property.StringProperty;
 import java.util.LinkedList;
 
 public class ShowResultRecord {
+
     private String queryID;
     private LinkedList<String> docNames;
+
     private StringProperty sp_queryID;
     private StringProperty sp_docNames;
 
@@ -32,5 +34,9 @@ public class ShowResultRecord {
 
     public StringProperty sp_docNamesProperty() {
         return sp_docNames;
+    }
+
+    public LinkedList<String> getDocNames() {
+        return docNames;
     }
 }
