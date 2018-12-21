@@ -100,12 +100,11 @@ public class Model extends Observable implements IModel {
      */
     @Override
     public void loadDictionary(String path, boolean stem) {
-        boolean foundInvertedIndex = false, foundDocumentDictionary = false;
+        boolean foundInvertedIndex = false, foundDocumentDictionary = false, foundCityDictionary = false;
         File dirSource = new File(path);
         File[] directoryListing = dirSource.listFiles();
         String[] update=new String[0];
         if (directoryListing != null && dirSource.isDirectory()) {
-            loadCityDictionary(path);
             for (File file : directoryListing) { // search for the relevant file
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
                     invertedIndex = new InvertedIndex(file);
@@ -117,9 +116,18 @@ public class Model extends Observable implements IModel {
                     update = new String[]{"Successful","Dictionary was loaded successfully"};
                     foundDocumentDictionary = true;
                 }
+                if ((file.getName().equals("CityDictionary.txt"))) {
+                    loadCityDictionary(path);
+                    update = new String[]{"Successful","Dictionary was loaded successfully"};
+                    foundCityDictionary = true;
+                }
             }
-            if(!foundInvertedIndex || !foundDocumentDictionary)
-                update =new String[] {"Fail","could not find dictionary"};
+            if(!foundInvertedIndex || !foundDocumentDictionary || !foundCityDictionary) {
+                invertedIndex = null;
+                documentDictionary = null;
+                cityDictionary = null;
+                update = new String[]{"Fail", "could not find dictionary"};
+            }
         }
         else
             update =new String[] {"Fail","destination path is illegal or unreachable"};
@@ -218,14 +226,6 @@ public class Model extends Observable implements IModel {
         resultsToObservableList(results);
     }
 
-    private void resultsToObservableList(HashMap<String, LinkedList<String>> results) {
-        ObservableList<ShowResultRecord> observableResult = FXCollections.observableArrayList();
-        for (Map.Entry<String,LinkedList<String>> entry: results.entrySet())
-            observableResult.add(new ShowResultRecord(entry.getKey(),entry.getValue()));
-        setChanged();
-        notifyObservers(observableResult);
-    }
-
     public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem){
         try {
             Random r = new Random();
@@ -250,6 +250,14 @@ public class Model extends Observable implements IModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void resultsToObservableList(HashMap<String, LinkedList<String>> results) {
+        ObservableList<ShowResultRecord> observableResult = FXCollections.observableArrayList();
+        for (Map.Entry<String,LinkedList<String>> entry: results.entrySet())
+            observableResult.add(new ShowResultRecord(entry.getKey(),entry.getValue()));
+        setChanged();
+        notifyObservers(observableResult);
     }
 
     public void loadCityDictionary(String destination){

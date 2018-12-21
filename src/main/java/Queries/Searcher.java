@@ -67,7 +67,7 @@ public class Searcher {
             Double d = score.get(docName);
             if (d != null)
                 bm25AndPLN += d;
-            score.put(docName, bm25AndPLN);
+            score.replace(docName, bm25AndPLN);
         }
     }
 
