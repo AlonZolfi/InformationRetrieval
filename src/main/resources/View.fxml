@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
+<TabPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
       <Tab text="Load Inverted Index">
          <content>
@@ -73,7 +73,7 @@
                   <TextField fx:id="tf_queriesFile" layoutX="24.0" layoutY="131.0" prefHeight="25.0" prefWidth="542.0" />
                   <Button fx:id="btn_browsQueriesFile" layoutX="202.0" layoutY="93.0" mnemonicParsing="false" onAction="#btn_browseQueries" text="browse" />
                   <Label layoutX="257.0" layoutY="165.0" text="Answers" />
-                  <Button layoutX="602.0" layoutY="444.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="83.0" text="Save answers" />
+                  <Button fx:id="btn_saveAnswers" layoutX="546.0" layoutY="444.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="139.0" text="Save answers" />
                   <Label layoutX="25.0" layoutY="175.0" text="Cities" />
                   <CheckComboBox fx:id="ccb_cities" layoutX="25.0" layoutY="206.0" prefHeight="25.0" prefWidth="170.0" />
                   <TableView fx:id="table_showResults" layoutX="260.0" layoutY="186.0" prefHeight="248.0" prefWidth="179.0">
@@ -86,7 +86,10 @@
                       <TableColumn fx:id="tableCol_docs" prefWidth="199.0" text="Doc" />
                     </columns>
                   </TableView>
-                  <Label fx:id="l_docSpasielWords" layoutX="61.0" layoutY="300.0" text="Label" />
+                  <Label fx:id="l_docSpasielWords" layoutX="96.0" layoutY="279.0" text="Label" />
+                  <TextField fx:id="tf_saveResultIn" layoutX="75.0" layoutY="449.0" prefHeight="25.0" prefWidth="461.0" />
+                  <Button fx:id="btn_browseSaveAnswers" layoutX="12.0" layoutY="449.0" mnemonicParsing="false" text="browse" />
+                  <Label layoutX="14.0" layoutY="426.0" text="Where would you like to save your results?" />
                </children>
             </AnchorPane>
         </content>
