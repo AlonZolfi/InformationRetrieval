@@ -19,20 +19,17 @@ public class Ranker {
     double BM25AndPLN(String word, String documentName, int tf, double idf, double k, double b) {
         double rankBM25 = 0;
         double rankPLN = 0;
-        int documentLength = getDocLength(documentName);
+        int documentLength = Model.documentDictionary.get(documentName).getDocLength();
         int wordInQueryCount = m_wordsCount.get(word);
         double numeratorBM25 = wordInQueryCount * (k + 1) * tf * idf;
         double denominatorBM25 = tf + k * (1 - b + (b * (documentLength / m_averageDocumentLength)));
-        double numeratorPLN = wordInQueryCount * Math.log(1 + Math.log(1 + tf)) * idf;
-        double denominatorPLN = 1 - b + (b * (documentLength / m_averageDocumentLength));
+        //double numeratorPLN = wordInQueryCount * Math.log(1 + Math.log(1 + tf)) * idf;
+        //double denominatorPLN = 1 - b + (b * (documentLength / m_averageDocumentLength));
         rankBM25 += numeratorBM25 / denominatorBM25;
-        rankPLN += numeratorPLN / denominatorPLN;
-        return (rankBM25 + rankPLN) / 2;
+        //rankPLN += numeratorPLN / denominatorPLN;
+        return rankBM25; //+ rankPLN) / 2;
     }
 
-    private int getDocLength(String documentName) {
-        return Model.documentDictionary.get(documentName).getDocLength();
-    }
 
     private double getDocumentAverageLength() {
         double sum = 0, count = 0;

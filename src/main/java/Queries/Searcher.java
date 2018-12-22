@@ -21,7 +21,7 @@ public class Searcher {
 
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
-        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle(),""),stem);
+        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle()+" "+q.getDescription(),""),stem);
         MiniDictionary md = p.parse(true);
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
@@ -38,7 +38,7 @@ public class Searcher {
             if (!wordsPosting.get(word).equals("")) {
                 String postingLine = wordsPosting.get(word);
                 String[] split = postingLine.split("\\|");
-                double idf = getIDF(split.length);
+                double idf = getIDF(split.length-1);
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];

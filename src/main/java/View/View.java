@@ -343,7 +343,7 @@ public class View implements Observer, IView, Initializable {
         }
         boolean isWrite = viewModel.writeRes(tf_saveResultIn.getText());
         if (isWrite)
-            MyAlert.showAlert(Alert.AlertType.ERROR, "Your results are saved!");
+            MyAlert.showAlert(Alert.AlertType.INFORMATION, "Your results are saved!");
         else MyAlert.showAlert(Alert.AlertType.ERROR, "Please try again later...");
     }
 

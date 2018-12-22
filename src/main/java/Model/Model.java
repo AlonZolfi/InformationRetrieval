@@ -325,10 +325,12 @@ public class Model extends Observable implements IModel {
 
     public StringBuilder results() {
         StringBuilder res = new StringBuilder();
+        ArrayList<String> queryIDs= new ArrayList<>(m_results.keySet());
+        queryIDs.sort(String.CASE_INSENSITIVE_ORDER);
         if (m_results != null)
-            for (Map.Entry<String, LinkedList<String>> m : m_results.entrySet()) {
-                for (String doc : m.getValue()) {
-                    String line = m.getKey() + " 0 " + doc + " 1 15.38 ah\n";
+            for (String m:queryIDs) {
+                for (String doc : m_results.get(m)) {
+                    String line = m + " 0 " + doc + " 0 0 ah\n";
                     res.append(line);
                 }
             }
@@ -341,13 +343,12 @@ public class Model extends Observable implements IModel {
         StringBuilder toWrite=results();
         try {
             if (m_results.size()>0) {
-                String firtsQ = m_results.toString();
-                fileWriter = new FileWriter(dest + "//resFor" + firtsQ +".txt");
+                fileWriter = new FileWriter(dest + "\\results.txt");
                 fileWriter.write(toWrite.toString());
                 fileWriter.close();
                 toWrite.delete(0, toWrite.length());
             }
-                return true;
+            return true;
         } catch (IOException e) {
             return false;
         }
