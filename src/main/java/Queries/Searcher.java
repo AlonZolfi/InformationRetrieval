@@ -26,7 +26,7 @@ public class Searcher {
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
-        CaseInsensitiveMap docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities.keySet()));
+        HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
         CaseInsensitiveMap wordsPosting = getPosting(hs);
         //objects for the iteration
         Ranker ranker = new Ranker(wordsCountInQuery, wordsPosting);
@@ -42,7 +42,7 @@ public class Searcher {
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
-                    if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.usedCities.get(docName).getCity_name())) || docsByCitiesFilter.containsKey(docName)) {
+                    if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
                         int tf = Integer.parseInt(splitLine[1]);
                         double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
                         addToScore(score,docName,BM25);
@@ -53,12 +53,20 @@ public class Searcher {
         return sortByScore(score);
     }
 
-    private CaseInsensitiveMap getCitiesDocs(CaseInsensitiveMap posting) {
-        return null;
+    private HashSet<String> getCitiesDocs(CaseInsensitiveMap postings) {
+        HashSet<String> citiesDocs = new HashSet<>();
+        for (String postingLine:postings.values()) {
+            String[] split = postingLine.split("\\|");
+            for (String docDetails: split) {
+                String[] splitLine = docDetails.split(",");
+                citiesDocs.add(splitLine[0]);
+            }
+        }
+        return citiesDocs;
     }
 
     private boolean isInFilter(String city_name) {
-        for (String city: Model.usedCities.keySet()){
+        for (String city: Model.usedCities){
             if(city.equals(city_name))
                 return true;
         }

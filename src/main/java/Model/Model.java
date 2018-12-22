@@ -20,7 +20,7 @@ public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
-    public static HashMap<String, CityInfoNode> usedCities;
+    public static HashSet<String> usedCities;
     public HashMap<String,LinkedList<String>> m_results;
 
     /**
@@ -302,11 +302,15 @@ public class Model extends Observable implements IModel {
      * @param toFilter all the cities that are checked
      */
     public void filterCities(List<String> toFilter) {
-        usedCities = new HashMap<>();
+        usedCities = new HashSet<>();
         if (toFilter.size() > 0) {
             for(String nameOfCity:cityDictionary.keySet()) {
-                if(toFilter.contains(nameOfCity))
-                    usedCities.put(nameOfCity,cityDictionary.get(nameOfCity));
+                if(toFilter.contains(nameOfCity)) {
+                    int space = nameOfCity.indexOf(" ");
+                    if (space!=-1)
+                        nameOfCity = nameOfCity.substring(0,space);
+                    usedCities.add(nameOfCity);
+                }
             }
         }
     }

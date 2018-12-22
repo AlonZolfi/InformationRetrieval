@@ -57,7 +57,7 @@ public class DocDictionaryNode {
             if (m_primaryWords[m_primaryWords.length - 1] != null)
                 pw += m_primaryWords[m_primaryWords.length - 1].getKey() + "~" + m_primaryWords[m_primaryWords.length - 1].getValue();
         }
-        return m_docName+"\t"+m_numOfUniWords+"\t"+m_maxFreq+"\t"+m_maxFreqWord+'\t'+m_city+"\t"+m_docLength+"\t"+pw+"\n";
+        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_docLength+"\t"+pw+"\n";
 
     }
 
