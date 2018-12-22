@@ -329,9 +329,28 @@ public class Model extends Observable implements IModel {
         if (m_results != null)
             for (Map.Entry<String, LinkedList<String>> m : m_results.entrySet()) {
                 for (String doc : m.getValue()) {
-                    String line = m.getKey() + " 0 " + doc + " 1 42.38 mt";
+                    String line = m.getKey() + " 0 " + doc + " 1 15.38 ah\n";
+                    res.append(line);
                 }
             }
         return res;
+    }
+
+    @Override
+    public boolean writeRes(String dest) {
+        FileWriter fileWriter = null;
+        StringBuilder toWrite=results();
+        try {
+            if (m_results.size()>0) {
+                String firtsQ = m_results.toString();
+                fileWriter = new FileWriter(dest + "//resFor" + firtsQ);
+                fileWriter.write(toWrite.toString());
+                fileWriter.close();
+                toWrite.delete(0, toWrite.length());
+            }
+                return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

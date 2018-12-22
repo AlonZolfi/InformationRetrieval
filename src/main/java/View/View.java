@@ -338,21 +338,10 @@ public class View implements Observer, IView, Initializable {
             MyAlert.showAlert(Alert.AlertType.ERROR, "Choose where to save the results");
             return;
         }
-        FileWriter fileWriter = null;
-        StringBuilder toWrite=result();
-        try {
-            fileWriter = new FileWriter(tf_saveResultIn.getText());
-            fileWriter.write(toWrite.toString());
-            fileWriter.close();
-            toWrite.delete(0,toWrite.length());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        boolean isWrite = viewModel.writeRes(tf_saveResultIn.getText());
+        if (isWrite)
+            MyAlert.showAlert(Alert.AlertType.ERROR, "Your results are saved!");
+        else MyAlert.showAlert(Alert.AlertType.ERROR, "Please try again later...");
     }
-
-    public StringBuilder result(){
-        return viewModel.results();
-    }
-
 
 }
