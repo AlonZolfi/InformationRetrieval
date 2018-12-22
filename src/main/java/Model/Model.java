@@ -323,7 +323,6 @@ public class Model extends Observable implements IModel {
         return "";
     }
 
-    @Override
     public StringBuilder results() {
         StringBuilder res = new StringBuilder();
         if (m_results != null)
@@ -343,7 +342,7 @@ public class Model extends Observable implements IModel {
         try {
             if (m_results.size()>0) {
                 String firtsQ = m_results.toString();
-                fileWriter = new FileWriter(dest + "//resFor" + firtsQ);
+                fileWriter = new FileWriter(dest + "//resFor" + firtsQ +".txt");
                 fileWriter.write(toWrite.toString());
                 fileWriter.close();
                 toWrite.delete(0, toWrite.length());
