@@ -20,8 +20,8 @@ public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
-    public static HashSet<String> usedCities;
-    public HashMap<String,LinkedList<String>> m_results;
+    public static HashMap<String, CityInfoNode> usedCities;
+    public static HashSet<String> docsByCityFilter;
 
     /**
      * starts the index process
@@ -259,7 +259,7 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, List<String> relevantCities){
         filterCities(relevantCities);
         Manager m = new Manager();
-        HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem);
+        HashMap<String, LinkedList<String>> results = m.calculateQueries(postingPath,queries,stem);
         resultsToObservableList(results);
     }
 
@@ -302,15 +302,11 @@ public class Model extends Observable implements IModel {
      * @param toFilter all the cities that are checked
      */
     public void filterCities(List<String> toFilter) {
-        usedCities = new HashSet<>();
+        usedCities = new HashMap<>();
         if (toFilter.size() > 0) {
             for(String nameOfCity:cityDictionary.keySet()) {
-                if(toFilter.contains(nameOfCity)) {
-                    int space = nameOfCity.indexOf(" ");
-                    if (space!=-1)
-                        nameOfCity = nameOfCity.substring(0,space);
-                    usedCities.add(nameOfCity);
-                }
+                if(toFilter.contains(nameOfCity))
+                    usedCities.put(nameOfCity,cityDictionary.get(nameOfCity));
             }
         }
     }
