@@ -337,24 +337,15 @@ public class View implements Observer, IView, Initializable {
     }
 
     public void saveResults(){
-        if(tf_saveResultIn.getText().equals(""))
-            MyAlert.showAlert(Alert.AlertType.ERROR,"Choose where to save the results");
-        FileWriter fileWriter = null;
-        StringBuilder toWrite=result();
-        try {
-            fileWriter = new FileWriter(tf_saveResultIn.getText());
-            fileWriter.write(toWrite.toString());
-            fileWriter.close();
-            toWrite.delete(0,toWrite.length());
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(tf_saveResultIn.getText().equals("")) {
+            MyAlert.showAlert(Alert.AlertType.ERROR, "Choose where to save the results");
+            return;
         }
+        boolean isWrite = viewModel.writeRes(tf_saveResultIn.getText());
+        if (isWrite)
+            MyAlert.showAlert(Alert.AlertType.ERROR, "Your results are saved!");
+        else MyAlert.showAlert(Alert.AlertType.ERROR, "Please try again later...");
     }
-
-    public StringBuilder result(){
-        return viewModel.results();
-    }
-
 
     public void duplicateStem(ActionEvent actionEvent) {
         if(actionEvent.getSource().equals(cb_stm)) {

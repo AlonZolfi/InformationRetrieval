@@ -83,7 +83,7 @@ public class ViewModel extends Observable implements Observer {
         return model.show5words(docName);
     }
 
-    public StringBuilder results() {
-        return model.results();
+    public boolean writeRes(String dest) {
+        return model.writeRes(dest);
     }
 }

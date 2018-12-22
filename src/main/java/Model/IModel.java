@@ -21,5 +21,5 @@ public interface IModel {
 
     String show5words(String docName);
 
-    StringBuilder results();
+    boolean writeRes(String dest);
 }
