@@ -21,7 +21,7 @@ public class Model extends Observable implements IModel {
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
     public static HashMap<String, CityInfoNode> usedCities;
-    public HashMap<String,LinkedList<String>> m_results;
+    public static HashSet<String> docsByCityFilter;
 
     /**
      * starts the index process
@@ -259,7 +259,7 @@ public class Model extends Observable implements IModel {
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, List<String> relevantCities){
         filterCities(relevantCities);
         Manager m = new Manager();
-        HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem);
+        HashMap<String, LinkedList<String>> results = m.calculateQueries(postingPath,queries,stem);
         resultsToObservableList(results);
     }
 
@@ -317,5 +317,17 @@ public class Model extends Observable implements IModel {
             return documentDictionary.get(docName).get5words();
         }
         return "";
+    }
+
+    @Override
+    public StringBuilder results() {
+        StringBuilder res = new StringBuilder();
+        if (m_results != null)
+            for (Map.Entry<String, LinkedList<String>> m : m_results.entrySet()) {
+                for (String doc : m.getValue()) {
+                    String line = m.getKey() + " 0 " + doc + " 1 42.38 mt";
+                }
+            }
+        return res;
     }
 }
