@@ -82,4 +82,8 @@ public class ViewModel extends Observable implements Observer {
     public String show5words(String docName) {
         return model.show5words(docName);
     }
+
+    public StringBuilder results() {
+        return model.results();
+    }
 }

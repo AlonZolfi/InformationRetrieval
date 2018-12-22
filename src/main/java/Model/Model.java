@@ -322,4 +322,16 @@ public class Model extends Observable implements IModel {
         }
         return "";
     }
+
+    @Override
+    public StringBuilder results() {
+        StringBuilder res = new StringBuilder();
+        if (m_results != null)
+            for (Map.Entry<String, LinkedList<String>> m : m_results.entrySet()) {
+                for (String doc : m.getValue()) {
+                    String line = m.getKey() + " 0 " + doc + " 1 42.38 mt";
+                }
+            }
+        return res;
+    }
 }

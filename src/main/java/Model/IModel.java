@@ -20,4 +20,6 @@ public interface IModel {
     void filterCities(List<String> toFilter);
 
     String show5words(String docName);
+
+    StringBuilder results();
 }

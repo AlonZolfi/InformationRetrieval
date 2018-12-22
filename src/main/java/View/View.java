@@ -271,7 +271,6 @@ public class View implements Observer, IView, Initializable {
         ccb_cities.getItems().addAll(cities);
     }
     public void onSearchClick() {
-        btn_saveAnswers.setDisable(true);
         clearTables();
         if(destination.getText().equals("")) {
             MyAlert.showAlert(Alert.AlertType.ERROR, "You must specify postings path");
@@ -285,6 +284,7 @@ public class View implements Observer, IView, Initializable {
             MyAlert.showAlert(Alert.AlertType.ERROR, "Choose what you want to search and delete the other");
             return;
         }
+        btn_saveAnswers.setDisable(false);
         List<String> relevantCities = new ArrayList<>();
         ccb_cities.getCheckModel().getCheckedIndices();
         for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
@@ -330,7 +330,6 @@ public class View implements Observer, IView, Initializable {
         File chosen = dirChooser.showDialog(new Stage());
         if (chosen!=null) {
             tf_saveResultIn.setText(chosen.getAbsolutePath());
-            btn_saveAnswers.setDisable(false);
         }
     }
 
@@ -338,7 +337,7 @@ public class View implements Observer, IView, Initializable {
         if(tf_saveResultIn.getText().equals(""))
             MyAlert.showAlert(Alert.AlertType.ERROR,"Choose where to save the results");
         FileWriter fileWriter = null;
-        StringBuilder toWrite=new StringBuilder();
+        StringBuilder toWrite=result();
         try {
             fileWriter = new FileWriter(tf_saveResultIn.getText());
             fileWriter.write(toWrite.toString());
@@ -347,6 +346,10 @@ public class View implements Observer, IView, Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public StringBuilder result(){
+        return viewModel.results();
     }
 
 
