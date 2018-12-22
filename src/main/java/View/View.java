@@ -334,8 +334,10 @@ public class View implements Observer, IView, Initializable {
     }
 
     public void saveResults(){
-        if(tf_saveResultIn.getText().equals(""))
-            MyAlert.showAlert(Alert.AlertType.ERROR,"Choose where to save the results");
+        if(tf_saveResultIn.getText().equals("")) {
+            MyAlert.showAlert(Alert.AlertType.ERROR, "Choose where to save the results");
+            return;
+        }
         FileWriter fileWriter = null;
         StringBuilder toWrite=result();
         try {
