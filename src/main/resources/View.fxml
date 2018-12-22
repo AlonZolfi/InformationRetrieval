@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane fx:id="tabPane_main" prefHeight="566.0" prefWidth="699.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="View.View">
+<TabPane fx:id="tabPane_main" prefHeight="575.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
       <Tab text="Load Inverted Index">
          <content>
@@ -24,7 +24,7 @@
                   <TextField fx:id="destination" layoutX="23.0" layoutY="118.0" prefHeight="31.0" prefWidth="238.0" promptText="Enter destination path or browse" />
                   <Label layoutX="24.0" layoutY="24.0" prefHeight="17.0" prefWidth="149.0" text="Source path:" />
                   <Label layoutX="24.0" layoutY="91.0" prefHeight="17.0" prefWidth="149.0" text="Destination path:" />
-                  <CheckBox fx:id="cb_stm" layoutX="24.0" layoutY="170.0" mnemonicParsing="false" text="Stemming" />
+                  <CheckBox fx:id="cb_stm" layoutX="24.0" layoutY="170.0" mnemonicParsing="false" onAction="#duplicateStem" text="Stemming" />
                   <ChoiceBox fx:id="choiceBox_language" layoutX="501.0" layoutY="51.0" prefWidth="165.0" value="English">
                      <items>
                      <FXCollections fx:factory="observableArrayList">
@@ -96,6 +96,7 @@
                   <TextField fx:id="tf_saveResultIn" layoutX="76.0" layoutY="494.0" prefHeight="25.0" prefWidth="461.0" />
                   <Button fx:id="btn_browseSaveAnswers" layoutX="13.0" layoutY="494.0" mnemonicParsing="false" onAction="#btn_browsePathForAnswer" text="browse" />
                   <Label layoutX="15.0" layoutY="471.0" text="Where would you like to save your results?" />
+                  <CheckBox fx:id="cb_searchStem" layoutX="576.0" layoutY="16.0" mnemonicParsing="false" onAction="#duplicateStem" text="Stemming" />
                </children>
             </AnchorPane>
         </content>

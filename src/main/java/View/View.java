@@ -26,7 +26,6 @@ public class View implements Observer, IView, Initializable {
     private File queryFile;
 
     public Button btn_browse_saveDic;
-
     public TabPane tabPane_main;
     public TextField tf_queriesFile;
     public TextField tf_simpleQuery;
@@ -39,6 +38,7 @@ public class View implements Observer, IView, Initializable {
     public Button btn_showDic;
     public Button btn_loadDic;
     public CheckBox cb_stm;
+    public CheckBox cb_searchStem;
     public Button btn_browse_corpus;
 
     public TableView<ShowQueryResult> table_showDocs;
@@ -102,7 +102,7 @@ public class View implements Observer, IView, Initializable {
      * @return if we should stem or not
      */
     private boolean doStemming(){
-         return cb_stm.isSelected();
+         return cb_stm.isSelected() || cb_searchStem.isSelected();
     }
     /**
      * a function that gets called when an observer has raised a flag for something that changed
@@ -148,8 +148,10 @@ public class View implements Observer, IView, Initializable {
             table_showResults.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ShowResultRecord>() {
                 @Override
                 public void changed(ObservableValue<? extends ShowResultRecord> observable, ShowResultRecord oldValue, ShowResultRecord newValue) {
-                    if (observable!=null && table_showResults.getItems().size()>0)
-                        showQueryResult((ObservableValue<ShowResultRecord>)observable);
+                    if (observable!=null && table_showResults.getItems().size()>0) {
+                        showQueryResult((ObservableValue<ShowResultRecord>) observable);
+                        lbl_docSpecialWords.setText("");
+                    }
                 }
             });
         }
@@ -268,6 +270,7 @@ public class View implements Observer, IView, Initializable {
     }
     private void fillCities(){
         ObservableList cities = FXCollections.observableArrayList(listOfCities());
+        cities.sort(String.CASE_INSENSITIVE_ORDER);
         ccb_cities.getItems().addAll(cities);
     }
     public void onSearchClick() {
@@ -353,4 +356,20 @@ public class View implements Observer, IView, Initializable {
     }
 
 
+    public void duplicateStem(ActionEvent actionEvent) {
+        if(actionEvent.getSource().equals(cb_stm)) {
+            if (cb_stm.isSelected())
+                cb_searchStem.setSelected(true);
+            else
+                cb_searchStem.setSelected(false);
+        }
+        else if (actionEvent.getSource().equals(cb_searchStem)){
+            if(cb_searchStem.isSelected())
+                cb_stm.setSelected(true);
+            else
+                cb_stm.setSelected(false);
+        }
+
+
+    }
 }
