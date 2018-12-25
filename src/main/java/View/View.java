@@ -64,6 +64,8 @@ public class View implements Observer, IView, Initializable {
     public Button btn_browseSaveAnswers;
     public Button btn_saveAnswers;
 
+    public CheckBox cb_semantics;
+
     /**
      * constructor of view, connect the view to the viewModel
      * @param viewModel the view model of the MVVM
@@ -363,7 +365,9 @@ public class View implements Observer, IView, Initializable {
             else
                 cb_stm.setSelected(false);
         }
+    }
 
-
+    private boolean useSemantics(){
+        return cb_semantics.isSelected();
     }
 }
