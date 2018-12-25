@@ -39,6 +39,10 @@ public class DocDictionaryNode {
         return m_city;
     }
 
+    public String getTitle() {
+        return m_title;
+    }
+
     public int getDocLength() {
         return m_docLength;
     }
@@ -59,7 +63,7 @@ public class DocDictionaryNode {
             if (m_primaryWords[m_primaryWords.length - 1] != null)
                 pw += m_primaryWords[m_primaryWords.length - 1].getKey() + "~" + m_primaryWords[m_primaryWords.length - 1].getValue();
         }
-        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_docLength+"\t"+m_title+"\t"+pw+"\n";
+        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_title+"\t"+m_docLength+"\t"+pw+"\n";
 
     }
 

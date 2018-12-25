@@ -47,7 +47,7 @@ public class Parse implements Callable<MiniDictionary> {
      */
     public MiniDictionary parse(boolean isQuery){
         //split the <Text> label to list of terms
-        wordList = stringToList(StringUtils.split(corpus_doc.getDocText(), " =#&^*+\\|:\"(){}[]\n\r\t"));
+        wordList = stringToList(StringUtils.split(corpus_doc.getDocText(), " ?=#&^*+\\|:\"(){}[]\n\r\t"));
         //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
         //the mini dictionary that will be filled according to the terms

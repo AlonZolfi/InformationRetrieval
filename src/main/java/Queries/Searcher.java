@@ -22,16 +22,16 @@ public class Searcher {
 
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
-        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle()+ " " + q.getDescription(),""),stem);
+        String s = q.getTitle();//createNewQuery(q);
+        Parse p = new Parse(new CorpusDocument("","","","",s+ " " + q.getDescription(),""),stem);
         MiniDictionary md = p.parse(true);
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
-        putDescInMap(wordsCountInQuery,q.getTitle());
         HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
-        CaseInsensitiveMap wordsPosting = getPosting(hs);
+        CaseInsensitiveMap wordsPosting = getPosting(wordsCountInQuery.keySet());
         //objects for the iteration
-        Ranker ranker = new Ranker(wordsCountInQuery, wordsPosting);
+        Ranker ranker = new Ranker(wordsCountInQuery);
         HashMap<String, Double> score = new HashMap<>();
 
 
@@ -48,12 +48,42 @@ public class Searcher {
                         int tf = Integer.parseInt(splitLine[1]);
                         double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
                         addToScore(score,docName,BM25);
+                        //calculateDocTitle(score,docName,wordsPosting.keySet());
                     }
                 }
             }
         }
         return sortByScore(score);
     }
+
+    private String createNewQuery(Query q) {
+        StringBuilder queryTitle = new StringBuilder(q.getTitle().toLowerCase());
+        String[] split = StringUtils.split(queryTitle.toString()," ?=#&^*+\\|:\"(){}[]\n\r\t");
+        for (int i = 0; i < split.length; i++) {
+            for (int j = 0; j < split.length; j++) {
+                if (!getPostingLineNumber(split[i] + "-" + split[j]).equals("")) {
+                    queryTitle.append(" ").append(split[i]).append("-").append(split[j]);
+                    System.out.println(split[i] + "-" + split[j]);
+                }
+
+            }
+        }
+        return  queryTitle.toString();
+
+    }
+
+    /*private void calculateDocTitle(HashMap<String, Double> score, String docName, Set<String> wordsSet) {
+        String title = Model.documentDictionary.get(docName).getTitle().toLowerCase();
+        if(!title.equals("")){
+            String[] split = StringUtils.split(title," ?=#&^*+\\|:\"(){}[]\n\r\t");
+            for (String wordTitle: split) {
+                if (wordsSet.contains(wordTitle));
+                    addToScore(score,docName,0.25);
+            }
+
+        }
+
+    }*/
 
     private void putDescInMap(HashMap<String, Integer> wordsCountInQuery, String description) {
         String[] split = StringUtils.split(description," ?=#&^*+\\|:\"(){}[]\n\r\t");
@@ -94,12 +124,12 @@ public class Searcher {
         return result;
     }
 
-    private void addToScore(HashMap<String, Double> score, String docName, double bm25AndPLN) {
-        if(bm25AndPLN!=0) {
+    private void addToScore(HashMap<String, Double> score, String docName, double newScore) {
+        if(newScore!=0) {
             Double d = score.get(docName);
             if (d != null)
-                bm25AndPLN += d;
-            score.put(docName, bm25AndPLN);
+                newScore += d;
+            score.put(docName, newScore);
         }
     }
 
@@ -143,10 +173,11 @@ public class Searcher {
     private HashMap<String, Integer> putWordsInMap(Set<String> query) {
         HashMap<String,Integer> words = new HashMap<>();
         for (String word: query) {
-            if(!words.containsKey(word))
-                words.put(word,1);
-            else
-                words.replace(word,words.get(word)+1);
+            if (!words.containsKey(word) && !getPostingLineNumber(word).equals(""))
+                words.put(word, 1);
+            else if(words.containsKey(word))
+                words.replace(word, words.get(word) + 1);
+
         }
         return words;
     }

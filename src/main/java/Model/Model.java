@@ -162,8 +162,12 @@ public class Model extends Observable implements IModel {
                 }
                 else
                     toFill = new Pair[0];
-                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),curLine[6],toFill);
-                documentDictionary.put(curLine[0],cur);
+                try {
+                    DocDictionaryNode cur = new DocDictionaryNode(curLine[0], Integer.parseInt(curLine[1]), Integer.parseInt(curLine[2]), curLine[3], curLine[4], Integer.parseInt(curLine[6]), curLine[5], toFill);
+                    documentDictionary.put(curLine[0],cur);
+                }catch (Exception e){
+                    System.out.println("dsadas");
+                }
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
@@ -260,6 +264,7 @@ public class Model extends Observable implements IModel {
         filterCities(relevantCities);
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem);
+        usedCities = null;
         resultsToObservableList(results);
     }
 

@@ -8,26 +8,20 @@ import java.util.*;
 public class Ranker {
     private double m_averageDocumentLength;
     private HashMap<String, Integer> m_wordsCount;
-    private CaseInsensitiveMap m_wordsPosting;
 
-    Ranker(HashMap<String, Integer> wordsCount, CaseInsensitiveMap wordsPosting){
+    Ranker(HashMap<String, Integer> wordsCount){
         this.m_averageDocumentLength = getDocumentAverageLength();
         this.m_wordsCount = wordsCount;
-        this.m_wordsPosting = wordsPosting;
     }
 
     double BM25AndPLN(String word, String documentName, int tf, double idf, double k, double b) {
         double rankBM25 = 0;
-        double rankPLN = 0;
         int documentLength = Model.documentDictionary.get(documentName).getDocLength();
         int wordInQueryCount = m_wordsCount.get(word);
         double numeratorBM25 = wordInQueryCount * (k + 1) * tf * idf;
         double denominatorBM25 = tf + k * (1 - b + (b * (documentLength / m_averageDocumentLength)));
-        //double numeratorPLN = wordInQueryCount * Math.log(1 + Math.log(1 + tf)) * idf;
-        //double denominatorPLN = 1 - b + (b * (documentLength / m_averageDocumentLength));
         rankBM25 += numeratorBM25 / denominatorBM25;
-        //rankPLN += numeratorPLN / denominatorPLN;
-        return rankBM25; //+ rankPLN) / 2;
+        return rankBM25;
     }
 
 

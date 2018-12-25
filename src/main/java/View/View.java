@@ -303,6 +303,7 @@ public class View implements Observer, IView, Initializable {
 
     }
     private void clearTables() {
+        lbl_docSpecialWords.setText("");
         table_showResults.getItems().clear();
         table_showDocs.getItems().clear();
     }
