@@ -12,6 +12,7 @@ public class MiniDictionary {
     private int m_maxFreq;
     private String m_city;
     private String m_maxFreqWord;
+    private String m_title;
     private Pair<String,Integer>[] places = new Pair[5];
 
     /**
@@ -19,12 +20,13 @@ public class MiniDictionary {
      * @param name name of the file and doc
      * @param city city of the doc
      */
-    MiniDictionary (String name, String city){
+    MiniDictionary (String name, String city, String title){
         m_name=name;
         m_city = city;
         m_dictionary = new HashMap<>();
         m_maxFreq = 0;
         m_maxFreqWord = "";
+        m_title = title;
     }
 
     /**
@@ -215,5 +217,9 @@ public class MiniDictionary {
         });
         sorted.putAll(toSort);
         return sorted;
+    }
+
+    public String getTitle() {
+        return m_title;
     }
 }

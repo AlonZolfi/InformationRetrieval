@@ -148,8 +148,8 @@ public class Model extends Observable implements IModel {
             Pair[] toFill;
             while(line != null) {
                 String [] curLine = line.split("\t");
-                if(curLine.length==7) {
-                    String[] data = curLine[6].split("#");
+                if(curLine.length==8) {
+                    String[] data = curLine[7].split("#");
                     toFill = new Pair[data.length];
                     String[] words = new String[data.length];
                     String[] numbers = new String[data.length];
@@ -162,7 +162,7 @@ public class Model extends Observable implements IModel {
                 }
                 else
                     toFill = new Pair[0];
-                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),toFill);
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0],Integer.parseInt(curLine[1]),Integer.parseInt(curLine[2]),curLine[3],curLine[4],Integer.parseInt(curLine[5]),curLine[6],toFill);
                 documentDictionary.put(curLine[0],cur);
                 line = bufferedReader.readLine();
             }
@@ -318,7 +318,11 @@ public class Model extends Observable implements IModel {
     @Override
     public String show5words(String docName) {
         if (documentDictionary.containsKey(docName)){
-            return documentDictionary.get(docName).get5words();
+            try {
+                return documentDictionary.get(docName).get5words();
+            }catch(Exception e){
+                System.out.println(docName);
+            }
         }
         return "";
     }

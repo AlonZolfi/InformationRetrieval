@@ -4,6 +4,7 @@ import IO.CorpusDocument;
 import IO.ReadFile;
 import Model.*;
 import Parse.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -21,11 +22,12 @@ public class Searcher {
 
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
-        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle()+" "+q.getDescription(),""),stem);
+        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle()+ " " + q.getDescription(),""),stem);
         MiniDictionary md = p.parse(true);
         Set<String> hs =  md.listOfWords();
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
+        putDescInMap(wordsCountInQuery,q.getTitle());
         HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
         CaseInsensitiveMap wordsPosting = getPosting(hs);
         //objects for the iteration
@@ -51,6 +53,14 @@ public class Searcher {
             }
         }
         return sortByScore(score);
+    }
+
+    private void putDescInMap(HashMap<String, Integer> wordsCountInQuery, String description) {
+        String[] split = StringUtils.split(description," ?=#&^*+\\|:\"(){}[]\n\r\t");
+        for (String word: split) {
+            if(wordsCountInQuery.containsKey(word))
+                wordsCountInQuery.replace(word,wordsCountInQuery.get(word)+1);
+        }
     }
 
     private HashSet<String> getCitiesDocs(CaseInsensitiveMap postings) {

@@ -9,15 +9,17 @@ public class DocDictionaryNode {
     private int m_numOfUniWords; //number of unique words in the document
     private String m_city; //city that represents the country the doc came from
     private int m_docLength;//length of the doc in words
+    private String m_title;
     private Pair<String,Integer>[] m_primaryWords;
 
-    public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, String m_city, String maxFreqWord, int docLength, Pair<String,Integer>[] primaryWords) {
+    public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, String m_city, String maxFreqWord, int docLength, String title, Pair<String,Integer>[] primaryWords) {
         this.m_docName = m_docName;
         this.m_maxFreq = m_maxFreq;
         this.m_maxFreqWord = maxFreqWord;
         this.m_numOfUniWords = m_numOfUniWords;
         this.m_city = m_city;
         this.m_docLength = docLength;
+        this.m_title = title;
         this.m_primaryWords = primaryWords;
     }
 
@@ -57,16 +59,18 @@ public class DocDictionaryNode {
             if (m_primaryWords[m_primaryWords.length - 1] != null)
                 pw += m_primaryWords[m_primaryWords.length - 1].getKey() + "~" + m_primaryWords[m_primaryWords.length - 1].getValue();
         }
-        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_docLength+"\t"+pw+"\n";
+        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_docLength+"\t"+m_title+"\t"+pw+"\n";
 
     }
 
     public String get5words() {
-        String s ="";
+        StringBuilder s =new StringBuilder();
         for (int i = 0; i <m_primaryWords.length ; i++) {
-            s += m_primaryWords[i].getValue()+"\t"+m_primaryWords[i].getKey()+"\n";
+            if(m_primaryWords[i]==null)
+                break;
+            s.append(m_primaryWords[i].getValue()).append("\t").append(m_primaryWords[i].getKey()).append("\n");
         }
-        return s;
+        return s.toString();
     }
 }
 

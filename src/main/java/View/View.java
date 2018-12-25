@@ -318,7 +318,10 @@ public class View implements Observer, IView, Initializable {
         }
     }
     private void show5words(String docName){
-        lbl_docSpecialWords.setText(viewModel.show5words(docName));
+        String fiveIdentities = viewModel.show5words(docName);
+        if(fiveIdentities.equals(""))
+            fiveIdentities = "No identities found";
+        lbl_docSpecialWords.setText(fiveIdentities);
         lbl_docSpecialWords.setVisible(true);
     }
     @Override

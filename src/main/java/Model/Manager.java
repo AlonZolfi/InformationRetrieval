@@ -171,7 +171,7 @@ class Manager {
                                 else
                                     cityDictionary.put(cityTry.toString(), toPut);
                                 found = true;
-                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
+                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                             }
                         } else {
                             cityTry.append(" ");
@@ -179,7 +179,7 @@ class Manager {
                         j++;
                     } else {
                         found = true;
-                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
+                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                     }
                 }
                 if (!found) {
@@ -216,12 +216,12 @@ class Manager {
                             oneWordCity=realCity.substring(0,idx);
                         cityDictionary.put(oneWordCity.toUpperCase(), new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy, false));
                     }
-                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
+                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                 }
             }
             cityTry.delete(0, cityTry.length());
             if(cur==null)
-                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength(),mini.getPrimaryWords());
+                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
             documentDictionary.put(cur.getDocName(),cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);
