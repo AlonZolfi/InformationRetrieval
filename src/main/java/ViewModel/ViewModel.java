@@ -71,12 +71,12 @@ public class ViewModel extends Observable implements Observer {
         model.filterCities(toFilter);
     }
 
-    public void simpleQuery(String postingPath, String stopWordsPath, String simpleQuery, boolean stem, List<String> relevantCities){
-        model.getResults(postingPath,stopWordsPath,simpleQuery,stem,relevantCities);
+    public void simpleQuery(String postingPath, String stopWordsPath, String simpleQuery,  boolean stem, boolean semantics, List<String> relevantCities){
+        model.getResults(postingPath,stopWordsPath,simpleQuery,stem,semantics,relevantCities);
     }
 
-    public void fileQuery(String postingPath, String stopWordsPath, File complexQuery, boolean stem, List<String> relevantCities){
-        model.getResults(postingPath,stopWordsPath,complexQuery,stem,relevantCities);
+    public void fileQuery(String postingPath, String stopWordsPath, File complexQuery,  boolean stem, boolean semantics, List<String> relevantCities){
+        model.getResults(postingPath,stopWordsPath,complexQuery,stem,semantics,relevantCities);
     }
 
     public String show5words(String docName) {

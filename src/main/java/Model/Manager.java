@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
 
-    HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem){
+    HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem, boolean semantics){
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
-        Searcher searcher = new Searcher(postingPath,stem);
+        Searcher searcher = new Searcher(postingPath,stem,semantics);
         HashMap<String, LinkedList<String>> queryResults = new HashMap<>();
         for (Query q:queriesList) {
             queryResults.put(q.getNum(),getLimited(searcher.getQueryResults(q)));

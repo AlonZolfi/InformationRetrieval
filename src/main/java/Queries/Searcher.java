@@ -4,8 +4,10 @@ import IO.CorpusDocument;
 import IO.ReadFile;
 import Model.*;
 import Parse.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.*;
 import java.util.*;
 
 import static java.util.Collections.reverseOrder;
@@ -13,19 +15,24 @@ import static java.util.Collections.reverseOrder;
 public class Searcher {
     private String postingPath;
     private boolean stem;
+    private boolean semantics;
 
 
-    public Searcher(String postingPath, boolean stem) {
+    public Searcher(String postingPath, boolean stem, boolean semantics) {
         this.postingPath = postingPath;
         this.stem = stem;
+        this.semantics = semantics;
     }
 
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
+
         String s = q.getTitle();//createNewQuery(q);
         Parse p = new Parse(new CorpusDocument("","","","",s+ " " + q.getDescription(),""),stem);
         MiniDictionary md = p.parse(true);
-        Set<String> hs =  md.listOfWords();
+        Set<String> hs =  new HashSet<>(md.listOfWords());
+        if(semantics)
+            improveWithSemantics(hs,q.getTitle());
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
         HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
@@ -46,7 +53,7 @@ public class Searcher {
                     String docName = splitLine[0];
                     if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
                         int tf = Integer.parseInt(splitLine[1]);
-                        double BM25 = ranker.BM25AndPLN(word,docName,tf,idf, 1.2, 0.75);
+                        double BM25 = ranker.BM25(word,docName,tf,idf, 1.2, 0.75);
                         addToScore(score,docName,BM25);
                         //calculateDocTitle(score,docName,wordsPosting.keySet());
                     }
@@ -56,6 +63,52 @@ public class Searcher {
         return sortByScore(score);
     }
 
+    private void improveWithSemantics(Set<String> wordsSet, String hs) {
+        String[] split = StringUtils.split(hs," ?=#&^*+\\|:\"(){}[]\n\r\t");
+        HashMap<String,double[]> vectors = getVectorString();
+        for (String word:split) {
+            if (vectors!=null && vectors.containsKey(word)) {
+                double[] wordVector = vectors.get(word);
+                for (Map.Entry<String,double[]> vec:vectors.entrySet()) {
+                    double mone = 0;
+                    double mecaneword = 0;
+                    double mecaneVec = 0;
+                    if (vec.getValue().length!=wordVector.length) {
+                        System.out.println("lll");
+                        continue;
+                    }
+                    int end = Math.min(vec.getValue().length-1,wordVector.length);
+                    for (int i = 0; i < end-1; i++) {
+                        mone += wordVector[i] * vec.getValue()[i];
+                        mecaneword += Math.pow(wordVector[i], 2);
+                        mecaneVec += Math.pow(vec.getValue()[i], 2);
+                    }
+                    double res = mone / (Math.sqrt(mecaneVec) * Math.sqrt(mecaneword));
+                    if (res >= 0.89)
+                        wordsSet.add(vec.getKey());
+                }
+            }
+        }
+    }
+
+    private HashMap<String, double[]> getVectorString() {
+        HashMap<String, double[]> result = new HashMap<>();
+        try {
+            List<String> vectors = FileUtils.readLines(new File("src/glove.txt"));
+            for (String line:vectors) {
+                String[] split = line.split(" ");
+                double[] values = new double[split.length-1];
+                for (int i = 1; i < split.length; i++) {
+                    values[i-1] = Double.parseDouble(split[i]);
+                }
+                result.put(split[0],values);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     private String createNewQuery(Query q) {
         StringBuilder queryTitle = new StringBuilder(q.getTitle().toLowerCase());
         String[] split = StringUtils.split(queryTitle.toString()," ?=#&^*+\\|:\"(){}[]\n\r\t");
@@ -63,9 +116,7 @@ public class Searcher {
             for (int j = 0; j < split.length; j++) {
                 if (!getPostingLineNumber(split[i] + "-" + split[j]).equals("")) {
                     queryTitle.append(" ").append(split[i]).append("-").append(split[j]);
-                    System.out.println(split[i] + "-" + split[j]);
                 }
-
             }
         }
         return  queryTitle.toString();

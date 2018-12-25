@@ -147,8 +147,8 @@ public class Model extends Observable implements IModel {
             line = bufferedReader.readLine();
             Pair[] toFill;
             while(line != null) {
-                String [] curLine = line.split("\t");
-                if(curLine.length==8) {
+                String[] curLine = line.split("\t");
+                if (curLine.length == 8) {
                     String[] data = curLine[7].split("#");
                     toFill = new Pair[data.length];
                     String[] words = new String[data.length];
@@ -159,15 +159,11 @@ public class Model extends Observable implements IModel {
                         numbers[i] = part[1];
                         toFill[i] = new Pair<String, Integer>(words[i], Integer.parseInt(numbers[i]));
                     }
-                }
-                else
+                } else
                     toFill = new Pair[0];
-                try {
-                    DocDictionaryNode cur = new DocDictionaryNode(curLine[0], Integer.parseInt(curLine[1]), Integer.parseInt(curLine[2]), curLine[3], curLine[4], Integer.parseInt(curLine[6]), curLine[5], toFill);
-                    documentDictionary.put(curLine[0],cur);
-                }catch (Exception e){
-                    System.out.println("dsadas");
-                }
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0], Integer.parseInt(curLine[1]), Integer.parseInt(curLine[2]), curLine[3], curLine[4], Integer.parseInt(curLine[6]), curLine[5], toFill);
+                documentDictionary.put(curLine[0], cur);
+
                 line = bufferedReader.readLine();
             }
             bufferedReader.close();
@@ -260,15 +256,15 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, List<String> relevantCities){
+    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities){
         filterCities(relevantCities);
         Manager m = new Manager();
-        HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem);
+        HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem,semantics);
         usedCities = null;
         resultsToObservableList(results);
     }
 
-    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem,List<String> relevantCities){
+    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem, boolean semantics, List<String> relevantCities){
         try {
             Random r = new Random();
             int queryNumber = Math.abs(r.nextInt(899)+100);
@@ -287,7 +283,7 @@ public class Model extends Observable implements IModel {
                     ".</top>";
             fw.write(sb);
             fw.close();
-            getResults(postingPath,stopWordsPath,f,stem, relevantCities);
+            getResults(postingPath,stopWordsPath,f,stem, semantics,relevantCities);
             f.delete();
         } catch (IOException e) {
             e.printStackTrace();

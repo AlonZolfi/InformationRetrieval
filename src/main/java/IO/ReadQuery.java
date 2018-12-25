@@ -18,6 +18,8 @@ public class ReadQuery {
         FileInputStream fis = null;
         LinkedList<Query> queryList=null;
         try {
+            if(queries==null)
+                System.out.println("wtf");
             fis = new FileInputStream(queries);
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("top");
@@ -43,6 +45,7 @@ public class ReadQuery {
                 String narrative ="Narrative: \n";
                 String narr = narrWithOtherData.substring(narrWithOtherData.indexOf(narrative)+narrative.length());
                 queryList.add(new Query(queryNum,title,desc,narr));
+                fis.close();
             }
         } catch (IOException e) {
             e.printStackTrace();

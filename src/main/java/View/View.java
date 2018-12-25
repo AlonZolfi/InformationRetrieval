@@ -298,11 +298,9 @@ public class View implements Observer, IView, Initializable {
         }
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
-            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),relevantCities);
+            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities);
         else
-            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),relevantCities);
-        queryFile = null;
-
+            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),useSemantics(),relevantCities);
     }
     private void clearTables() {
         lbl_docSpecialWords.setText("");

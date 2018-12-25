@@ -14,7 +14,7 @@ public class Ranker {
         this.m_wordsCount = wordsCount;
     }
 
-    double BM25AndPLN(String word, String documentName, int tf, double idf, double k, double b) {
+    double BM25(String word, String documentName, int tf, double idf, double k, double b) {
         double rankBM25 = 0;
         int documentLength = Model.documentDictionary.get(documentName).getDocLength();
         int wordInQueryCount = m_wordsCount.get(word);
