@@ -16,23 +16,28 @@ public class Searcher {
     private String postingPath;
     private boolean stem;
     private boolean semantics;
+    private HashMap<String,double[]> vectors;
 
 
     public Searcher(String postingPath, boolean stem, boolean semantics) {
         this.postingPath = postingPath;
         this.stem = stem;
         this.semantics = semantics;
+        this.vectors = null;
     }
 
     public LinkedList<String> getQueryResults(Query q) {
         //parse query
-
-        String s = q.getTitle();//createNewQuery(q);
-        Parse p = new Parse(new CorpusDocument("","","","",s+ " " + q.getDescription(),""),stem);
+        String s = q.getTitle();
+        Parse p = new Parse(new CorpusDocument("","","","",s +" " + q.getDescription(),""),stem);
         MiniDictionary md = p.parse(true);
         Set<String> hs =  new HashSet<>(md.listOfWords());
+        Set<String> semanticWords = new HashSet<>();
         if(semantics)
-            improveWithSemantics(hs,q.getTitle());
+            semanticWords = improveWithSemantics(hs, q.getTitle());
+        if(semanticWords.size()>0)
+            System.out.println(semanticWords.size());
+
         //prepare for calculation
         HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
         HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
@@ -53,9 +58,14 @@ public class Searcher {
                     String docName = splitLine[0];
                     if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
                         int tf = Integer.parseInt(splitLine[1]);
-                        double BM25 = ranker.BM25(word,docName,tf,idf, 1.2, 0.75);
+                        double weight = 1;
+                        if(semanticWords.contains(word))
+                            weight = 0.4;
+                        else if (word.contains("-"))
+                            weight = 5;
+                        double BM25 = ranker.BM25(word,docName,tf,idf, weight);
                         addToScore(score,docName,BM25);
-                        //calculateDocTitle(score,docName,wordsPosting.keySet());
+                        calculateDocTitle(score,docName,wordsPosting.keySet());
                     }
                 }
             }
@@ -63,9 +73,11 @@ public class Searcher {
         return sortByScore(score);
     }
 
-    private void improveWithSemantics(Set<String> wordsSet, String hs) {
-        String[] split = StringUtils.split(hs," ?=#&^*+\\|:\"(){}[]\n\r\t");
-        HashMap<String,double[]> vectors = getVectorString();
+    private HashSet<String> improveWithSemantics(Set<String> wordsSet, String hs) {
+        HashSet<String> result = new HashSet<>();
+        String[] split = StringUtils.split(hs," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
+        if(vectors==null)
+            vectors = getVectorString();
         for (String word:split) {
             if (vectors!=null && vectors.containsKey(word)) {
                 double[] wordVector = vectors.get(word);
@@ -73,10 +85,8 @@ public class Searcher {
                     double mone = 0;
                     double mecaneword = 0;
                     double mecaneVec = 0;
-                    if (vec.getValue().length!=wordVector.length) {
-                        System.out.println("lll");
+                    if (vec.getKey().equals(word) || vec.getValue().length!=wordVector.length)
                         continue;
-                    }
                     int end = Math.min(vec.getValue().length-1,wordVector.length);
                     for (int i = 0; i < end-1; i++) {
                         mone += wordVector[i] * vec.getValue()[i];
@@ -84,11 +94,14 @@ public class Searcher {
                         mecaneVec += Math.pow(vec.getValue()[i], 2);
                     }
                     double res = mone / (Math.sqrt(mecaneVec) * Math.sqrt(mecaneword));
-                    if (res >= 0.89)
+                    if (res >= 0.85) {
                         wordsSet.add(vec.getKey());
+                        result.add(vec.getKey());
+                    }
                 }
             }
         }
+        return result;
     }
 
     private HashMap<String, double[]> getVectorString() {
@@ -111,11 +124,11 @@ public class Searcher {
 
     private String createNewQuery(Query q) {
         StringBuilder queryTitle = new StringBuilder(q.getTitle().toLowerCase());
-        String[] split = StringUtils.split(queryTitle.toString()," ?=#&^*+\\|:\"(){}[]\n\r\t");
-        for (int i = 0; i < split.length; i++) {
-            for (int j = 0; j < split.length; j++) {
-                if (!getPostingLineNumber(split[i] + "-" + split[j]).equals("")) {
-                    queryTitle.append(" ").append(split[i]).append("-").append(split[j]);
+        String[] split = StringUtils.split(queryTitle.toString()," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
+        for (String aSplit : split) {
+            for (String aSplit1 : split) {
+                if (!getPostingLineNumber(aSplit + "-" + aSplit1).equals("")) {
+                    queryTitle.append(" ").append(aSplit).append("-").append(aSplit1);
                 }
             }
         }
@@ -123,21 +136,19 @@ public class Searcher {
 
     }
 
-    /*private void calculateDocTitle(HashMap<String, Double> score, String docName, Set<String> wordsSet) {
+    private void calculateDocTitle(HashMap<String, Double> score, String docName, Set<String> wordsSet) {
         String title = Model.documentDictionary.get(docName).getTitle().toLowerCase();
         if(!title.equals("")){
-            String[] split = StringUtils.split(title," ?=#&^*+\\|:\"(){}[]\n\r\t");
+            String[] split = StringUtils.split(title," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
             for (String wordTitle: split) {
-                if (wordsSet.contains(wordTitle));
-                    addToScore(score,docName,0.25);
+                if (wordsSet.contains(wordTitle))
+                    addToScore(score,docName,0.1);
             }
-
         }
-
-    }*/
+    }
 
     private void putDescInMap(HashMap<String, Integer> wordsCountInQuery, String description) {
-        String[] split = StringUtils.split(description," ?=#&^*+\\|:\"(){}[]\n\r\t");
+        String[] split = StringUtils.split(description," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
         for (String word: split) {
             if(wordsCountInQuery.containsKey(word))
                 wordsCountInQuery.replace(word,wordsCountInQuery.get(word)+1);

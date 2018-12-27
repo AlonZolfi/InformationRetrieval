@@ -22,6 +22,7 @@ public class Model extends Observable implements IModel {
     public static HashMap<String, CityInfoNode> cityDictionary;
     public static HashSet<String> usedCities;
     public HashMap<String,LinkedList<String>> m_results;
+    private boolean dictionaryisStemmed = false;
 
     /**
      * starts the index process
@@ -109,18 +110,17 @@ public class Model extends Observable implements IModel {
         if (directoryListing != null && dirSource.isDirectory()) {
             for (File file : directoryListing) { // search for the relevant file
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
+                    if(stem)
+                        dictionaryisStemmed =true;
                     invertedIndex = new InvertedIndex(file);
-                    update = new String[]{"Successful","Dictionary was loaded successfully"};
                     foundInvertedIndex = true;
                 }
                 if ((file.getName().equals("StemDocumentDictionary.txt") && stem)||(file.getName().equals("DocumentDictionary.txt"))&&!stem) {
                     loadDocumentDictionary(file);
-                    update = new String[]{"Successful","Dictionary was loaded successfully"};
                     foundDocumentDictionary = true;
                 }
                 if ((file.getName().equals("CityDictionary.txt"))) {
                     loadCityDictionary(path);
-                    update = new String[]{"Successful","Dictionary was loaded successfully"};
                     foundCityDictionary = true;
                 }
             }
@@ -128,8 +128,10 @@ public class Model extends Observable implements IModel {
                 invertedIndex = null;
                 documentDictionary = null;
                 cityDictionary = null;
-                update = new String[]{"Fail", "could not find dictionary"};
+                update = new String[]{"Fail", "could not find one or more dictionaries"};
             }
+            else
+                update = new String[]{"Successful","Dictionary was loaded successfully"};
         }
         else
             update =new String[] {"Fail","destination path is illegal or unreachable"};
@@ -257,6 +259,12 @@ public class Model extends Observable implements IModel {
     }
 
     public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities){
+        if((stem && !dictionaryisStemmed) || (!stem && dictionaryisStemmed)){
+            String[] update = {"Fail","could not search because of ambiguous stemming prefrences"};
+            setChanged();
+            notifyObservers(update);
+            return;
+        }
         filterCities(relevantCities);
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem,semantics);

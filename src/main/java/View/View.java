@@ -115,8 +115,11 @@ public class View implements Observer, IView, Initializable {
         if(o==viewModel){
             if(arg instanceof String[]){
                 String[] toUpdate = (String[])arg;
-                if(toUpdate[0].equals("Fail")) // if we received a fail message from the model
-                    MyAlert.showAlert(Alert.AlertType.ERROR,toUpdate[1]);
+                if(toUpdate[0].equals("Fail")) { // if we received a fail message from the model
+                    if(toUpdate[1].equals("could not find one or more dictionaries"))
+                        tab_search.setDisable(true);
+                    MyAlert.showAlert(Alert.AlertType.ERROR, toUpdate[1]);
+                }
                 else if(toUpdate[0].equals("Successful")) {// if we received a successful message from the model
                     MyAlert.showAlert(Alert.AlertType.INFORMATION, toUpdate[1]);
                     if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary")) {
@@ -272,8 +275,21 @@ public class View implements Observer, IView, Initializable {
     }
     private void fillCities(){
         ObservableList cities = FXCollections.observableArrayList(listOfCities());
+        ArrayList<String> all = new ArrayList<>();
+        all.add("All");
+        ObservableList allos = FXCollections.observableArrayList(all);
         cities.sort(String.CASE_INSENSITIVE_ORDER);
+        ccb_cities.getItems().addAll(allos);
         ccb_cities.getItems().addAll(cities);
+        ccb_cities.getItemBooleanProperty(0).addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (oldValue)
+                    ccb_cities.getCheckModel().clearChecks();
+                else
+                    ccb_cities.getCheckModel().checkAll();
+            }
+        });
     }
     public void onSearchClick() {
         clearTables();
@@ -364,6 +380,10 @@ public class View implements Observer, IView, Initializable {
             else
                 cb_stm.setSelected(false);
         }
+    }
+
+    public void clearCitySelection(){
+
     }
 
     private boolean useSemantics(){

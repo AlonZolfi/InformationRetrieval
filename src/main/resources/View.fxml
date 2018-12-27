@@ -14,9 +14,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<TabPane fx:id="tabPane_main" prefHeight="575.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
+<TabPane fx:id="tabPane_main" prefHeight="575.0" prefWidth="699.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.View">
    <tabs>
-      <Tab text="Load Inverted Index">
+      <Tab closable="false" text="Load Inverted Index">
          <content>
             <AnchorPane prefHeight="492.0" prefWidth="693.0">
                <children>
@@ -40,7 +40,7 @@
                   <Button fx:id="btn_start" layoutX="24.0" layoutY="208.0" mnemonicParsing="false" onAction="#onStartClick" prefHeight="31.0" prefWidth="149.0" text="Start Indexing" />
                   <Button fx:id="btn_browse_corpus" layoutX="261.0" layoutY="51.0" mnemonicParsing="false" onAction="#browseSourceClick" text="browse" />
                   <Button fx:id="btn_browse_saveDic" layoutX="261.0" layoutY="118.0" mnemonicParsing="false" onAction="#browseDestClick" text="browse" />
-                  <TableView fx:id="table_showDic" layoutX="6.0" layoutY="256.0" prefHeight="279.0" prefWidth="686.0">
+                  <TableView fx:id="table_showDic" layoutX="6.0" layoutY="257.0" prefHeight="274.0" prefWidth="686.0">
                      <placeholder>
                         <Label text="Press 'Show Dictionary' to see data " />
                      </placeholder>
@@ -49,55 +49,55 @@
                       <TableColumn fx:id="tableCol_count" prefWidth="281.0" text="Number of appearances" />
                     </columns>
                   </TableView>
-                  <Label fx:id="lbl_resultTitle" layoutX="252.0" layoutY="159.0" text="Results:" underline="true" visible="false" />
-                  <Label fx:id="lbl_totalDocs" layoutX="252.0" layoutY="185.0" text="Total Docs:" visible="false" />
-                  <Label fx:id="lbl_totalTerms" layoutX="252.0" layoutY="212.0" text="Total Unique Terms:" visible="false" />
-                  <Label fx:id="lbl_totalTime" layoutX="252.0" layoutY="239.0" text="Total Time:" visible="false" />
-                  <Label fx:id="lbl_totalDocsNum" layoutX="329.0" layoutY="186.0" visible="false" />
-                  <Label fx:id="lbl_totalTermsNum" layoutX="388.0" layoutY="213.0" visible="false" />
-                  <Label fx:id="lbl_totalTimeNum" layoutX="327.0" layoutY="239.0" visible="false" />
+                  <Label fx:id="lbl_resultTitle" layoutX="262.0" layoutY="152.0" text="Results:" underline="true" visible="false" />
+                  <Label fx:id="lbl_totalDocs" layoutX="262.0" layoutY="178.0" text="Total Docs:" visible="false" />
+                  <Label fx:id="lbl_totalTerms" layoutX="262.0" layoutY="205.0" text="Total Unique Terms:" visible="false" />
+                  <Label fx:id="lbl_totalTime" layoutX="262.0" layoutY="232.0" text="Total Time:" visible="false" />
+                  <Label fx:id="lbl_totalDocsNum" layoutX="339.0" layoutY="179.0" visible="false" />
+                  <Label fx:id="lbl_totalTermsNum" layoutX="398.0" layoutY="206.0" visible="false" />
+                  <Label fx:id="lbl_totalTimeNum" layoutX="337.0" layoutY="232.0" visible="false" />
                   <Label layoutX="501.0" layoutY="24.0" text="Language:" />
                </children>
             </AnchorPane>
          </content>
       </Tab>
-      <Tab fx:id="tab_search" disable="true" text="Search">
+      <Tab fx:id="tab_search" closable="false" disable="true" text="Search">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="492.0" prefWidth="699.0">
                <children>
-                  <Button fx:id="btn_search" layoutX="576.0" layoutY="48.0" mnemonicParsing="false" onAction="#onSearchClick" prefHeight="114.0" prefWidth="109.0" text="Search" underline="true" />
-                  <Label layoutX="24.0" layoutY="27.0" text="Pleasa enter a query" />
-                  <Label layoutX="274.0" layoutY="79.0" text="OR" />
-                  <Label layoutX="25.0" layoutY="98.0" text="Please enter a queries file" />
-                  <TextField fx:id="tf_simpleQuery" layoutX="25.0" layoutY="48.0" prefHeight="25.0" prefWidth="541.0" />
-                  <TextField fx:id="tf_queriesFile" layoutX="24.0" layoutY="131.0" prefHeight="25.0" prefWidth="542.0" />
-                  <Button fx:id="btn_browsQueriesFile" layoutX="202.0" layoutY="93.0" mnemonicParsing="false" onAction="#btn_browseQueries" text="browse" />
-                  <Label layoutX="219.0" layoutY="167.0" text="Answers" />
-                  <Button fx:id="btn_saveAnswers" layoutX="547.0" layoutY="489.0" mnemonicParsing="false" onAction="#saveResults" prefHeight="34.0" prefWidth="139.0" text="Save answers" />
-                  <Label layoutX="25.0" layoutY="175.0" text="Fillter by the cities:" />
-                  <CheckComboBox fx:id="ccb_cities" layoutX="24.0" layoutY="204.0" prefHeight="25.0" prefWidth="170.0" />
-                  <TableView fx:id="table_showResults" layoutX="212.0" layoutY="192.0" prefHeight="248.0" prefWidth="223.0">
+                  <Button fx:id="btn_search" layoutX="576.0" layoutY="35.0" mnemonicParsing="false" onAction="#onSearchClick" prefHeight="103.0" prefWidth="109.0" text="Search" underline="true" />
+                  <Label layoutX="24.0" layoutY="14.0" text="Pleasa enter a query:" />
+                  <Label layoutX="543.0" layoutY="82.0" text="OR" />
+                  <Label layoutX="25.0" layoutY="75.0" text="Please enter a queries file:" />
+                  <TextField fx:id="tf_simpleQuery" layoutX="25.0" layoutY="35.0" prefHeight="25.0" prefWidth="541.0" />
+                  <TextField fx:id="tf_queriesFile" layoutX="24.0" layoutY="107.0" prefHeight="25.0" prefWidth="542.0" />
+                  <Button fx:id="btn_browsQueriesFile" layoutX="202.0" layoutY="70.0" mnemonicParsing="false" onAction="#btn_browseQueries" text="browse" />
+                  <Label layoutX="26.0" layoutY="185.0" text="Answers:" />
+                  <Button fx:id="btn_saveAnswers" layoutX="547.0" layoutY="494.0" mnemonicParsing="false" onAction="#saveResults" prefHeight="30.0" prefWidth="139.0" text="Save answers" />
+                  <Label layoutX="26.0" layoutY="149.0" text="Fillter by cities:" />
+                  <CheckComboBox fx:id="ccb_cities" layoutX="128.0" layoutY="144.0" prefHeight="25.0" prefWidth="170.0" />
+                  <TableView fx:id="table_showResults" layoutX="67.0" layoutY="217.0" prefHeight="248.0" prefWidth="212.0">
                       <placeholder>
                           <Label text="Press 'Search' to see data " />
                       </placeholder>
                     <columns>
-                      <TableColumn fx:id="tableCol_query" prefWidth="176.0" text="Query" />
+                      <TableColumn fx:id="tableCol_query" prefWidth="211.0" text="Query" />
                     </columns>
                   </TableView>
-                  <TableView fx:id="table_showDocs" layoutX="448.0" layoutY="195.0" prefHeight="243.0" prefWidth="236.0">
+                  <TableView fx:id="table_showDocs" layoutX="298.0" layoutY="219.0" prefHeight="243.0" prefWidth="208.0">
                       <placeholder>
-                          <Label text="Press 'Search' to see data " />
+                          <Label prefHeight="64.0" prefWidth="206.0" text="Press on a query number to see relevant documents " textAlignment="CENTER" wrapText="true" />
                       </placeholder>
                     <columns>
-                      <TableColumn fx:id="tableCol_docs" prefWidth="199.0" text="Doc" />
+                      <TableColumn fx:id="tableCol_docs" prefWidth="206.0" text="Document" />
                     </columns>
                   </TableView>
-                  <Label fx:id="lbl_docSpecialWords" layoutX="27.0" layoutY="252.0" text="Label" />
-                  <TextField fx:id="tf_saveResultIn" layoutX="76.0" layoutY="494.0" prefHeight="25.0" prefWidth="461.0" />
+                  <Label fx:id="lbl_docSpecialWords" layoutX="549.0" layoutY="247.0" text="Label" />
+                  <TextField fx:id="tf_saveResultIn" layoutX="81.0" layoutY="494.0" prefHeight="25.0" prefWidth="461.0" />
                   <Button fx:id="btn_browseSaveAnswers" layoutX="13.0" layoutY="494.0" mnemonicParsing="false" onAction="#btn_browsePathForAnswer" text="browse" />
                   <Label layoutX="15.0" layoutY="471.0" text="Where would you like to save your results?" />
-                  <CheckBox fx:id="cb_searchStem" layoutX="576.0" layoutY="16.0" mnemonicParsing="false" onAction="#duplicateStem" text="Stemming" />
-                  <CheckBox fx:id="cb_semantics" layoutX="448.0" layoutY="19.0" mnemonicParsing="false" text="use semantics" />
+                  <CheckBox fx:id="cb_searchStem" layoutX="471.0" layoutY="149.0" mnemonicParsing="false" onAction="#duplicateStem" text="Stemming" />
+                  <CheckBox fx:id="cb_semantics" layoutX="337.0" layoutY="149.0" mnemonicParsing="false" text="Use Semantics" />
                </children>
             </AnchorPane>
         </content>
