@@ -10,6 +10,7 @@ import Queries.Query;
 import Queries.Searcher;
 import Web.APIRequest;
 import Web.CitysMemoryDataBase;
+import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import javafx.util.Pair;
 import org.json.JSONObject;
 
@@ -18,15 +19,26 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class Manager {
+public class Manager {
     private AtomicInteger numOfPostings = new AtomicInteger(0);
+    public static HashMap<String,double[]> vectors;
+    public static Mutex m = new Mutex();
 
     HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem, boolean semantics){
+        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
-        Searcher searcher = new Searcher(postingPath,stem,semantics);
         HashMap<String, LinkedList<String>> queryResults = new HashMap<>();
+        LinkedList<Pair<String,Future<LinkedList<String>>>> queryFuture = new LinkedList<>();
         for (Query q:queriesList) {
-            queryResults.put(q.getNum(),getLimited(searcher.getQueryResults(q)));
+            Searcher searcher = new Searcher(postingPath,stem,semantics,q);
+            queryFuture.add(new Pair<>(q.getNum(),pool.submit(searcher)));
+        }
+        for (Pair<String,Future<LinkedList<String>>> f: queryFuture) {
+            try {
+                queryResults.put(f.getKey(),getLimited(f.getValue().get()));
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
         return queryResults;
 

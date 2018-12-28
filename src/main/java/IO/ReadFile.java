@@ -1,5 +1,6 @@
 package IO;
 
+import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -9,6 +10,7 @@ import java.util.concurrent.*;
 public class ReadFile {
 
     public static Set<String> stopWords;
+    public static Mutex m = new Mutex();
 
     /**
      * initiate the stop words set containing all the stop words
@@ -66,6 +68,11 @@ public class ReadFile {
     }
 
     public static LinkedList<String> readPostingLineAtIndex(String path, char c, LinkedList<Integer> indices, boolean stem){
+        try {
+            m.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String fileName = path+"\\finalPosting";
         if(stem)
             fileName += "Stem";
@@ -79,6 +86,17 @@ public class ReadFile {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        m.release();
         return postings;
+    }
+
+    public static List<String> fileToList(String path){
+        List<String> l = null;
+        try {
+            l = FileUtils.readLines(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return l;
     }
 }

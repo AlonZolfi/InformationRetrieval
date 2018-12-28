@@ -4,29 +4,29 @@ import IO.CorpusDocument;
 import IO.ReadFile;
 import Model.*;
 import Parse.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.*;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static java.util.Collections.reverseOrder;
 
-public class Searcher {
+
+public class Searcher implements Callable<LinkedList<String>> {
     private String postingPath;
     private boolean stem;
     private boolean semantics;
-    private HashMap<String,double[]> vectors;
+    private Query q;
 
 
-    public Searcher(String postingPath, boolean stem, boolean semantics) {
+    public Searcher(String postingPath, boolean stem, boolean semantics, Query q) {
         this.postingPath = postingPath;
         this.stem = stem;
         this.semantics = semantics;
-        this.vectors = null;
+        this.q =q;
     }
 
-    public LinkedList<String> getQueryResults(Query q) {
+    public LinkedList<String> getQueryResults() {
         //parse query
         String s = q.getTitle();
         Parse p = new Parse(new CorpusDocument("","","","",s +" " + q.getDescription(),""),stem);
@@ -53,16 +53,16 @@ public class Searcher {
                 String postingLine = wordsPosting.get(word);
                 String[] split = postingLine.split("\\|");
                 double idf = getIDF(split.length-1);
+                double weight = 1;
+                if(semanticWords.contains(word))
+                    weight = 0.5;
+                else if (word.contains("-"))
+                    weight = 5;
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
                     if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
                         int tf = Integer.parseInt(splitLine[1]);
-                        double weight = 1;
-                        if(semanticWords.contains(word))
-                            weight = 0.4;
-                        else if (word.contains("-"))
-                            weight = 5;
                         double BM25 = ranker.BM25(word,docName,tf,idf, weight);
                         addToScore(score,docName,BM25);
                         calculateDocTitle(score,docName,wordsPosting.keySet());
@@ -73,15 +73,26 @@ public class Searcher {
         return sortByScore(score);
     }
 
+    @Override
+    public LinkedList<String> call() throws Exception {
+        return getQueryResults();
+    }
+
     private HashSet<String> improveWithSemantics(Set<String> wordsSet, String hs) {
         HashSet<String> result = new HashSet<>();
         String[] split = StringUtils.split(hs," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
-        if(vectors==null)
-            vectors = getVectorString();
+        try {
+            Manager.m.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if(Manager.vectors==null)
+            Manager.vectors = getVectorString();
+        Manager.m.release();
         for (String word:split) {
-            if (vectors!=null && vectors.containsKey(word)) {
-                double[] wordVector = vectors.get(word);
-                for (Map.Entry<String,double[]> vec:vectors.entrySet()) {
+            if (Manager.vectors!=null && Manager.vectors.containsKey(word)) {
+                double[] wordVector = Manager.vectors.get(word);
+                for (Map.Entry<String,double[]> vec:Manager.vectors.entrySet()) {
                     double mone = 0;
                     double mecaneword = 0;
                     double mecaneVec = 0;
@@ -106,18 +117,14 @@ public class Searcher {
 
     private HashMap<String, double[]> getVectorString() {
         HashMap<String, double[]> result = new HashMap<>();
-        try {
-            List<String> vectors = FileUtils.readLines(new File("src/glove.txt"));
-            for (String line:vectors) {
-                String[] split = line.split(" ");
-                double[] values = new double[split.length-1];
-                for (int i = 1; i < split.length; i++) {
-                    values[i-1] = Double.parseDouble(split[i]);
-                }
-                result.put(split[0],values);
+        List<String> vectors = ReadFile.fileToList("src/glove.txt");
+        for (String line : vectors) {
+            String[] split = line.split(" ");
+            double[] values = new double[split.length - 1];
+            for (int i = 1; i < split.length; i++) {
+                values[i - 1] = Double.parseDouble(split[i]);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            result.put(split[0], values);
         }
         return result;
     }

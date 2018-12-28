@@ -18,8 +18,6 @@ public class ReadQuery {
         FileInputStream fis = null;
         LinkedList<Query> queryList=null;
         try {
-            if(queries==null)
-                System.out.println("wtf");
             fis = new FileInputStream(queries);
             Document doc = Jsoup.parse(fis, null, "", Parser.xmlParser());
             Elements elements = doc.select("top");
@@ -51,15 +49,5 @@ public class ReadQuery {
             e.printStackTrace();
         }
         return queryList;
-    }
-
-    private static String getNumberOfQuery(String numberWithOtherData) {
-        StringBuilder number = new StringBuilder("");
-        for (int i = 0; i < numberWithOtherData.length(); i++) {
-            char letter = numberWithOtherData.charAt(i);
-            if(Character.isDigit(letter))
-                number.append(letter);
-        }
-        return number.toString();
     }
 }
