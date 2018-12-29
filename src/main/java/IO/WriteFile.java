@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WriteFile {
     /**
@@ -127,4 +128,13 @@ public class WriteFile {
 
     }
 
+    public static void writeLanguages(String destinationPath, HashSet<String> languages) {
+        StringBuilder toWrite = new StringBuilder();
+        for (String cur :languages)
+            toWrite.append(cur).append("\n");
+        File dir = new File(destinationPath);
+        String fileName = "Languages.txt";
+        File actualFile = new File(dir,fileName);
+        write(actualFile,toWrite);
+    }
 }

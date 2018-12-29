@@ -1,6 +1,5 @@
 package Model;
 
-import IO.CorpusDocument;
 import IO.ReadFile;
 import IO.ReadQuery;
 import IO.WriteFile;
@@ -58,13 +57,14 @@ public class Manager {
      * @param cityDictionary - the city dictionary
      * @param documentDictionary - the document dictionary
      * @param invertedIndex - the inverted index
+     * @param languages
      * @param corpusPath - the path of the corpus
      * @param destinationPath - the path where the postings will be written
      * @param stem - if stemming should be done
      * @return returns data about the current run [num of documents, number of unique terms]
      * @throws Exception .
      */
-    double[] manage(HashMap<String, CityInfoNode> cityDictionary, HashMap<String, DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, String corpusPath, String destinationPath, boolean stem) throws Exception {
+    double[] manage(HashMap<String, CityInfoNode> cityDictionary, HashMap<String, DocDictionaryNode> documentDictionary, InvertedIndex invertedIndex, HashSet<String> languages, String corpusPath, String destinationPath, boolean stem) throws Exception {
 
         CitysMemoryDataBase cityMemoryDataBaseRESTAPI = fillCityDataBase();
         int numOfDocs = 0;
@@ -101,7 +101,7 @@ public class Manager {
 
             setPrimaryWords(miniDicList);
             //with all the information about the documents, fill the inverted index, doc dictionary and city dictionary
-            fillCityData(miniDicList, cityDictionary, cityMemoryDataBaseRESTAPI, invertedIndex, documentDictionary);
+            fillCityData(miniDicList, cityDictionary, cityMemoryDataBaseRESTAPI, invertedIndex, documentDictionary,languages);
             pool.shutdown();
         }
 
@@ -161,8 +161,9 @@ public class Manager {
      * @param citysMemoryDataBaseRESTAPI - the city database
      * @param invertedIndex - the inverted index
      * @param documentDictionary - the document dictionary
+     * @param languages
      */
-    private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary) {
+    private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary, HashSet<String> languages) {
         for (MiniDictionary mini : miniDicList) {
             String curCity = mini.getCity();
             StringBuilder cityTry = new StringBuilder();
@@ -183,7 +184,7 @@ public class Manager {
                                 else
                                     cityDictionary.put(cityTry.toString(), toPut);
                                 found = true;
-                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
+                                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(),mini.getDocLang(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                             }
                         } else {
                             cityTry.append(" ");
@@ -191,7 +192,7 @@ public class Manager {
                         j++;
                     } else {
                         found = true;
-                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
+                        cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(),mini.getDocLang(), mini.size(), cityTry.toString(), mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                     }
                 }
                 if (!found) {
@@ -228,16 +229,18 @@ public class Manager {
                             oneWordCity=realCity.substring(0,idx);
                         cityDictionary.put(oneWordCity.toUpperCase(), new CityInfoNode(realCity.toUpperCase(), realCuntry, realPopulation, realCurancy, false));
                     }
-                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
+                    cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(),mini.getDocLang(), mini.size(), curCity, mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
                 }
             }
             cityTry.delete(0, cityTry.length());
             if(cur==null)
-                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
+                cur = new DocDictionaryNode(mini.getName(), mini.getMaxFrequency(),mini.getDocLang(), mini.size(), "", mini.getMaxFreqWord(),mini.getDocLength(),mini.getTitle(),mini.getPrimaryWords());
             documentDictionary.put(cur.getDocName(),cur);
             for (String word : mini.listOfWords()) {
                 invertedIndex.addTerm(word);
             }
+            if(!mini.getDocLang().equals(""))
+                languages.add(mini.getDocLang());
         }
     }
 

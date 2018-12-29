@@ -1,11 +1,10 @@
 package Parse;
 
-import IO.ReadFile;
-import IO.CorpusDocument;
 import org.apache.commons.lang3.StringUtils;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import Model.*;
 
 public class Parse implements Callable<MiniDictionary> {
     private LinkedList<String> wordList;
@@ -51,7 +50,7 @@ public class Parse implements Callable<MiniDictionary> {
         //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
         //the mini dictionary that will be filled according to the terms
-        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity(),corpus_doc.getDocTitle());
+        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity(),corpus_doc.getDocTitle(),corpus_doc.getDocLang());
         //the index of the
         int index = 0;
         while (!wordList.isEmpty()) {
@@ -199,7 +198,7 @@ public class Parse implements Callable<MiniDictionary> {
 
             }
 
-            if(isQuery || !ReadFile.stopWords.contains(term.toLowerCase())) {
+            if(isQuery || !Model.stopWords.contains(term.toLowerCase())) {
                 if(doStemIfTermWasNotManipulated)
                     term = ps.stemTerm(term);
                 miniDic.addWord(term, index);

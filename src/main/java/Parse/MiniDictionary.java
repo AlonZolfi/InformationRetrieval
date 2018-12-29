@@ -10,6 +10,7 @@ public class MiniDictionary {
     private String m_name; //name of the doc that past pars
     private HashMap<String,LinkedList<Integer>> m_dictionary; //string - the term ; int - TF in the doc
     private int m_maxFreq;
+    private String m_lang;
     private String m_city;
     private String m_maxFreqWord;
     private String m_title;
@@ -19,12 +20,14 @@ public class MiniDictionary {
      * create new MiniDictionary
      * @param name name of the file and doc
      * @param city city of the doc
+     * @param docLang
      */
-    MiniDictionary (String name, String city, String title){
+    MiniDictionary(String name, String city, String title, String docLang){
         m_name=name;
         m_city = city;
         m_dictionary = new HashMap<>();
         m_maxFreq = 0;
+        m_lang = docLang;
         m_maxFreqWord = "";
         m_title = title;
     }
@@ -222,4 +225,6 @@ public class MiniDictionary {
     public String getTitle() {
         return m_title;
     }
+
+    public String getDocLang(){return m_lang;}
 }

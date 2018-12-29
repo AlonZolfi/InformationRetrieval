@@ -1,6 +1,5 @@
 package Queries;
 
-import IO.CorpusDocument;
 import IO.ReadFile;
 import Model.*;
 import Parse.*;
@@ -29,7 +28,7 @@ public class Searcher implements Callable<LinkedList<String>> {
     public LinkedList<String> getQueryResults() {
         //parse query
         String s = q.getTitle();
-        Parse p = new Parse(new CorpusDocument("","","","",s +" " + q.getDescription(),""),stem);
+        Parse p = new Parse(new CorpusDocument("","","","",s +" " + q.getDescription(),"",""),stem);
         MiniDictionary md = p.parse(true);
         Set<String> hs =  new HashSet<>(md.listOfWords());
         Set<String> semanticWords = new HashSet<>();
@@ -62,10 +61,12 @@ public class Searcher implements Callable<LinkedList<String>> {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
                     if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
-                        int tf = Integer.parseInt(splitLine[1]);
-                        double BM25 = ranker.BM25(word,docName,tf,idf, weight);
-                        addToScore(score,docName,BM25);
-                        calculateDocTitle(score,docName,wordsPosting.keySet());
+                        if (Model.usedLanguages.size() == 0 || Model.usedLanguages.contains(Model.documentDictionary.get(docName).getDocLang())) {
+                            int tf = Integer.parseInt(splitLine[1]);
+                            double BM25 = ranker.BM25(word, docName, tf, idf, weight);
+                            addToScore(score, docName, BM25);
+                            calculateDocTitle(score, docName, wordsPosting.keySet());
+                        }
                     }
                 }
             }

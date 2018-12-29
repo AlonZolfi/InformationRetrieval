@@ -1,4 +1,4 @@
-package IO;
+package Parse;
 /*
 this class represents a single document in the corpus containing all the data about the document
  */
@@ -10,14 +10,16 @@ public class CorpusDocument {
     private String m_docTitle;
     private String m_docText;
     private String m_docCity;
+    private String m_docLang;
 
-    public CorpusDocument(String m_fileName, String m_docNum, String m_docDate, String m_docTitle, String m_docText, String m_docCity) {
-        this.m_fileName = m_fileName;
-        this.m_docNum = m_docNum;
-        this.m_docDate = m_docDate;
-        this.m_docTitle = m_docTitle;
-        this.m_docText = m_docText;
-        this.m_docCity = m_docCity;
+    public CorpusDocument(String fileName, String docNum, String docDate, String docTitle, String docText, String docCity, String docLang) {
+        this.m_fileName = fileName;
+        this.m_docNum = docNum;
+        this.m_docDate = docDate;
+        this.m_docTitle = docTitle;
+        this.m_docText = docText;
+        this.m_docCity = docCity;
+        this.m_docLang = docLang;
     }
 
     public String getFileName() {
@@ -42,5 +44,9 @@ public class CorpusDocument {
 
     public String getDocCity() {
         return m_docCity;
+    }
+
+    public String getDocLang(){
+        return m_docLang;
     }
 }

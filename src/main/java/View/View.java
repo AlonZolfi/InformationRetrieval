@@ -1,5 +1,6 @@
 package View;
 
+import IO.ReadFile;
 import Queries.ShowQueryResult;
 import Queries.ShowResultRecord;
 import ViewModel.ViewModel;
@@ -30,6 +31,7 @@ public class View implements Observer, IView, Initializable {
     public TextField tf_queriesFile;
     public TextField tf_simpleQuery;
     public Tab tab_search;
+    public CheckComboBox ccb_languages;
     public CheckComboBox ccb_cities;
     public TextField source;
     public TextField destination;
@@ -125,7 +127,8 @@ public class View implements Observer, IView, Initializable {
                     if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary")) {
                         btn_showDic.setDisable(false);
                         tab_search.setDisable(false);
-                        fillCities();
+                        fillCities(ccb_cities,FXCollections.observableArrayList(listOfCities()));
+                        fillCities(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
                         lbl_docSpecialWords.setVisible(false);
                         btn_saveAnswers.setDisable(true);
                     }
@@ -140,7 +143,8 @@ public class View implements Observer, IView, Initializable {
                 showIndexResults((double[])arg);
                 btn_showDic.setDisable(false);
                 tab_search.setDisable(false);
-                fillCities();
+                fillCities(ccb_cities,FXCollections.observableArrayList(listOfCities()));
+                fillCities(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
                 lbl_docSpecialWords.setVisible(false);
                 btn_saveAnswers.setDisable(true);
             }
@@ -235,10 +239,9 @@ public class View implements Observer, IView, Initializable {
             table_showDic.setItems(records);
         }
         btn_showDic.setDisable(false);
-        tab_search.setDisable(false);
-        fillCities();
+        /*tab_search.setDisable(false);
         lbl_docSpecialWords.setVisible(false);
-        btn_saveAnswers.setDisable(true);
+        btn_saveAnswers.setDisable(true);*/
     }
     /**
      * transfers to the view model a load dictionary request
@@ -268,29 +271,40 @@ public class View implements Observer, IView, Initializable {
                 bufferedReader.close();
                 return cities;
             } catch (IOException e) {
-                e.printStackTrace();
+                MyAlert.showAlert(Alert.AlertType.ERROR, "Could not load cities");
             }
         }
         return null;
     }
-    private void fillCities(){
-        ObservableList cities = FXCollections.observableArrayList(listOfCities());
+
+    private ArrayList<String> listOfLanguages() {
+        ArrayList<String> langs = new ArrayList<>();
+        if (!btn_showDic.isDisable()) {
+            langs.addAll(ReadFile.initSet(destination.getText() + "/Languages.txt"));
+        }
+        return langs;
+    }
+
+
+    private void fillCities(CheckComboBox toFill, ObservableList list){
         ArrayList<String> all = new ArrayList<>();
         all.add("All");
         ObservableList allos = FXCollections.observableArrayList(all);
-        cities.sort(String.CASE_INSENSITIVE_ORDER);
-        ccb_cities.getItems().addAll(allos);
-        ccb_cities.getItems().addAll(cities);
-        ccb_cities.getItemBooleanProperty(0).addListener(new ChangeListener<Boolean>() {
+        list.sort(String.CASE_INSENSITIVE_ORDER);
+        toFill.getItems().addAll(allos);
+        toFill.getItems().addAll(list);
+        toFill.getItemBooleanProperty(0).addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (oldValue)
-                    ccb_cities.getCheckModel().clearChecks();
+                    toFill.getCheckModel().clearChecks();
                 else
-                    ccb_cities.getCheckModel().checkAll();
+                    toFill.getCheckModel().checkAll();
             }
         });
     }
+
+
     public void onSearchClick() {
         clearTables();
         if(destination.getText().equals("")) {
@@ -312,11 +326,17 @@ public class View implements Observer, IView, Initializable {
             Integer integer = (Integer)o;
             relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
         }
+        List<String> relevantLanguages = new ArrayList<>();
+        ccb_languages.getCheckModel().getCheckedIndices();
+        for (Object o: ccb_languages.getCheckModel().getCheckedIndices()){
+            Integer integer = (Integer)o;
+            relevantLanguages.add(ccb_languages.getCheckModel().getItem(integer).toString());
+        }
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
-            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities);
+            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities,relevantLanguages);
         else
-            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),useSemantics(),relevantCities);
+            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),useSemantics(),relevantCities,relevantLanguages);
     }
     private void clearTables() {
         lbl_docSpecialWords.setText("");

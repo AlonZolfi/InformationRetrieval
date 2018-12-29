@@ -20,7 +20,10 @@ public class Model extends Observable implements IModel {
     public static InvertedIndex invertedIndex;
     public static HashMap<String, DocDictionaryNode> documentDictionary;
     public static HashMap<String, CityInfoNode> cityDictionary;
+    public static HashSet<String> languages;
+    public static HashSet<String> stopWords;
     public static HashSet<String> usedCities;
+    public static HashSet<String> usedLanguages;
     public HashMap<String,LinkedList<String>> m_results;
     private boolean dictionaryisStemmed = false;
 
@@ -36,13 +39,14 @@ public class Model extends Observable implements IModel {
         if(paths!=null) {
             double start = System.currentTimeMillis();
             Manager man = new Manager();
-            ReadFile.initStopWords(paths[2]);
+            stopWords = ReadFile.initSet(paths[2]);
             invertedIndex = new InvertedIndex();
             documentDictionary = new HashMap<>();
             cityDictionary = new HashMap<>();
+            languages = new HashSet<>();
             double[] results = new double[0];
             try {
-                results = man.manage(cityDictionary,documentDictionary, invertedIndex, paths[0], paths[1], stm);
+                results = man.manage(cityDictionary,documentDictionary, invertedIndex,languages, paths[0], paths[1], stm);
                 writeDictionariesToDisk(destinationPath,stm);
             } catch (Exception e) {
                 String[] update = {"Fail","Indexing failed"};
@@ -103,7 +107,7 @@ public class Model extends Observable implements IModel {
      */
     @Override
     public void loadDictionary(String path, boolean stem) {
-        boolean foundInvertedIndex = false, foundDocumentDictionary = false, foundCityDictionary = false;
+        boolean foundInvertedIndex = false, foundDocumentDictionary = false, foundCityDictionary = false, foundLanguages = false;
         File dirSource = new File(path);
         File[] directoryListing = dirSource.listFiles();
         String[] update=new String[0];
@@ -123,8 +127,12 @@ public class Model extends Observable implements IModel {
                     loadCityDictionary(path);
                     foundCityDictionary = true;
                 }
+                if ((file.getName().equals("Languages.txt"))) {
+                    languages = ReadFile.initSet(path+"/Languages.txt");
+                    foundLanguages = true;
+                }
             }
-            if(!foundInvertedIndex || !foundDocumentDictionary || !foundCityDictionary) {
+            if(!foundInvertedIndex || !foundDocumentDictionary || !foundCityDictionary ||!foundLanguages) {
                 invertedIndex = null;
                 documentDictionary = null;
                 cityDictionary = null;
@@ -163,7 +171,7 @@ public class Model extends Observable implements IModel {
                     }
                 } else
                     toFill = new Pair[0];
-                DocDictionaryNode cur = new DocDictionaryNode(curLine[0], Integer.parseInt(curLine[1]), Integer.parseInt(curLine[2]), curLine[3], curLine[4], Integer.parseInt(curLine[6]), curLine[5], toFill);
+                DocDictionaryNode cur = new DocDictionaryNode(curLine[0], Integer.parseInt(curLine[1]),curLine[2], Integer.parseInt(curLine[3]), curLine[4], curLine[5], Integer.parseInt(curLine[7]), curLine[6], toFill);
                 documentDictionary.put(curLine[0], cur);
 
                 line = bufferedReader.readLine();
@@ -248,17 +256,21 @@ public class Model extends Observable implements IModel {
         //write the city dictionary to the disk
         Thread tDocs = new Thread(() -> WriteFile.writeCityDictionary(destinationPath, cityDictionary));
         tDocs.start();
+        //write the languages to the disk
+        Thread tLang = new Thread(() -> WriteFile.writeLanguages(destinationPath, languages));
+        tLang.start();
         //wait for them to end
         try {
             tInvertedFile.join();
             tCity.join();
             tDocs.join();
+            tLang.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities){
+    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
         if((stem && !dictionaryisStemmed) || (!stem && dictionaryisStemmed)){
             String[] update = {"Fail","could not search because of ambiguous stemming prefrences"};
             setChanged();
@@ -266,13 +278,14 @@ public class Model extends Observable implements IModel {
             return;
         }
         filterCities(relevantCities);
+        usedLanguages = new HashSet<>(relevantCities);
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem,semantics);
         usedCities = null;
         resultsToObservableList(results);
     }
 
-    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem, boolean semantics, List<String> relevantCities){
+    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
         try {
             Random r = new Random();
             int queryNumber = Math.abs(r.nextInt(899)+100);
@@ -291,7 +304,7 @@ public class Model extends Observable implements IModel {
                     ".</top>";
             fw.write(sb);
             fw.close();
-            getResults(postingPath,stopWordsPath,f,stem, semantics,relevantCities);
+            getResults(postingPath,stopWordsPath,f,stem, semantics,relevantCities,relevantLanguages);
             f.delete();
         } catch (IOException e) {
             e.printStackTrace();

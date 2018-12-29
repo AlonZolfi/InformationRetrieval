@@ -1,5 +1,6 @@
 package IO;
 
+import Parse.CorpusDocument;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -53,9 +54,11 @@ public class ReadDocuments implements Callable<LinkedList<CorpusDocument>> {
                 String docText = element.getElementsByTag("TEXT").text();
                 String docTitle = element.getElementsByTag("TI").text();
                 String docCity= element.getElementsByTag("F").select("F[P=104]").text().toUpperCase();
-                CorpusDocument document = new CorpusDocument(fileToSeparate.getName(), docNum, docDate, docTitle, docText, docCity);
+                String docLang= element.getElementsByTag("F").select("F[P=105]").text().toUpperCase();
+                CorpusDocument document = new CorpusDocument(fileToSeparate.getName(), docNum, docDate, docTitle, docText, docCity, docLang);
                 docList.add(document);
             }
+
             return docList;
         } catch (IOException e) {
             e.printStackTrace();

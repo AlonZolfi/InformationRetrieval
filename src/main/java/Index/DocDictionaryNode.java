@@ -5,6 +5,7 @@ import javafx.util.Pair;
 public class DocDictionaryNode {
     private String m_docName; //doc name
     private int m_maxFreq; //the max freqenecy of a word existing in the doc
+    private String m_docLang;
     private String m_maxFreqWord; // the word that exists most of the times
     private int m_numOfUniWords; //number of unique words in the document
     private String m_city; //city that represents the country the doc came from
@@ -12,15 +13,17 @@ public class DocDictionaryNode {
     private String m_title;
     private Pair<String,Integer>[] m_primaryWords;
 
-    public DocDictionaryNode(String m_docName, int m_maxFreq, int m_numOfUniWords, String m_city, String maxFreqWord, int docLength, String title, Pair<String,Integer>[] primaryWords) {
-        this.m_docName = m_docName;
-        this.m_maxFreq = m_maxFreq;
+    public DocDictionaryNode(String docName, int maxFreq, String docLang, int numOfUniWords, String city, String maxFreqWord, int docLength, String title, Pair<String,Integer>[] primaryWords) {
+        this.m_docName = docName;
+        this.m_maxFreq = maxFreq;
+        this.m_docLang = docLang;
+        this.m_numOfUniWords = numOfUniWords;
+        this.m_city = city;
         this.m_maxFreqWord = maxFreqWord;
-        this.m_numOfUniWords = m_numOfUniWords;
-        this.m_city = m_city;
         this.m_docLength = docLength;
         this.m_title = title;
         this.m_primaryWords = primaryWords;
+
     }
 
     public String getDocName() {
@@ -47,6 +50,8 @@ public class DocDictionaryNode {
         return m_docLength;
     }
 
+    public String getDocLang(){return m_docLang;}
+
     @Override
     public int hashCode() {
         return m_docName.hashCode();
@@ -63,7 +68,7 @@ public class DocDictionaryNode {
             if (m_primaryWords[m_primaryWords.length - 1] != null)
                 pw += m_primaryWords[m_primaryWords.length - 1].getKey() + "~" + m_primaryWords[m_primaryWords.length - 1].getValue();
         }
-        return m_docName+"\t"+m_maxFreq+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_title+"\t"+m_docLength+"\t"+pw+"\n";
+        return m_docName+"\t"+m_maxFreq+"\t"+m_docLang+"\t"+m_numOfUniWords+'\t'+m_city+"\t"+m_maxFreqWord+"\t"+m_title+"\t"+m_docLength+"\t"+pw+"\n";
 
     }
 

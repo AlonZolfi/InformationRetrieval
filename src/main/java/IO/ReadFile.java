@@ -1,5 +1,6 @@
 package IO;
 
+import Parse.CorpusDocument;
 import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 import org.apache.commons.io.FileUtils;
 
@@ -9,28 +10,27 @@ import java.util.concurrent.*;
 
 public class ReadFile {
 
-    public static Set<String> stopWords;
     public static Mutex m = new Mutex();
 
     /**
      * initiate the stop words set containing all the stop words
      * @param fileName the path of the file
      */
-    public static void initStopWords(String fileName) {
-        stopWords = new HashSet<>();
+    public static HashSet<String> initSet(String fileName) {
+        HashSet<String> set = new HashSet<>();
         String line = null;
 
         try {
             FileReader fileReader = new FileReader(fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while ((line = bufferedReader.readLine()) != null) {
-                stopWords.add(line);
+                set.add(line);
             }
             bufferedReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        return set;
     }
 
     /**
