@@ -48,4 +48,24 @@ public interface IView extends Observer{
      * transfers to the view model a load dictionary request
      */
     void loadDictionary();
+
+    /**
+     * responds to click on search
+     */
+    void onSearchClick();
+
+    /**
+     * responds to browse query click
+     */
+    void btn_browseQueries();
+
+    /**
+     * responds for browse answer click
+     */
+    void btn_browsePathForAnswer();
+
+    /**
+     * save results click handle
+     */
+    void saveResults();
 }

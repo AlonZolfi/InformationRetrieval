@@ -25,7 +25,7 @@ public class Model extends Observable implements IModel {
     public static HashSet<String> usedCities;
     public static HashSet<String> usedLanguages;
     public HashMap<String,LinkedList<String>> m_results;
-    private boolean dictionaryisStemmed = false;
+    private boolean dictionaryIsStemmed = false;
 
     /**
      * starts the index process
@@ -39,6 +39,8 @@ public class Model extends Observable implements IModel {
         if(paths!=null) {
             double start = System.currentTimeMillis();
             Manager man = new Manager();
+            if(stm)
+                dictionaryIsStemmed =true;
             stopWords = ReadFile.initSet(paths[2]);
             invertedIndex = new InvertedIndex();
             documentDictionary = new HashMap<>();
@@ -115,7 +117,7 @@ public class Model extends Observable implements IModel {
             for (File file : directoryListing) { // search for the relevant file
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
                     if(stem)
-                        dictionaryisStemmed =true;
+                        dictionaryIsStemmed =true;
                     invertedIndex = new InvertedIndex(file);
                     foundInvertedIndex = true;
                 }
@@ -148,6 +150,10 @@ public class Model extends Observable implements IModel {
         notifyObservers(update);
     }
 
+    /**
+     * loads the document dictionary
+     * @param file the file of the doc dic
+     */
     private void loadDocumentDictionary(File file) {
         String line = null;
         documentDictionary = new HashMap<String, DocDictionaryNode>();
@@ -158,8 +164,8 @@ public class Model extends Observable implements IModel {
             Pair[] toFill;
             while(line != null) {
                 String[] curLine = line.split("\t");
-                if (curLine.length == 8) {
-                    String[] data = curLine[7].split("#");
+                if (curLine.length == 9) {
+                    String[] data = curLine[8].split("#");
                     toFill = new Pair[data.length];
                     String[] words = new String[data.length];
                     String[] numbers = new String[data.length];
@@ -182,6 +188,10 @@ public class Model extends Observable implements IModel {
         }
     }
 
+    /**
+     * loads the city dictionary
+     * @param destination the file of city dic
+     */
     private void loadCityDictionary(String destination){
         cityDictionary=new HashMap<>();
         try {
@@ -270,8 +280,17 @@ public class Model extends Observable implements IModel {
         }
     }
 
-    public void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
-        if((stem && !dictionaryisStemmed) || (!stem && dictionaryisStemmed)){
+    /**
+     * returns the result for a query file
+     * @param postingPath postings path
+     * @param queries queries file
+     * @param stem should stem or not
+     * @param semantics should improve with semantic or not
+     * @param relevantCities list of cities
+     * @param relevantLanguages list of languages
+     */
+    public void getResults(String postingPath, File queries, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
+        if((stem && !dictionaryIsStemmed) || (!stem && dictionaryIsStemmed)){
             String[] update = {"Fail","could not search because of ambiguous stemming prefrences"};
             setChanged();
             notifyObservers(update);
@@ -282,10 +301,20 @@ public class Model extends Observable implements IModel {
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem,semantics);
         usedCities = null;
+        usedLanguages = null;
         resultsToObservableList(results);
     }
 
-    public void getResults(String postingPath, String stopWordsPath, String query ,boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
+    /**
+     * returns the result for a query file
+     * @param postingPath postings path
+     * @param query the query
+     * @param stem should stem or not
+     * @param semantics should improve with semantic or not
+     * @param relevantCities list of cities
+     * @param relevantLanguages list of languages
+     */
+    public void getResults(String postingPath, String query ,boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages){
         try {
             Random r = new Random();
             int queryNumber = Math.abs(r.nextInt(899)+100);
@@ -304,13 +333,17 @@ public class Model extends Observable implements IModel {
                     ".</top>";
             fw.write(sb);
             fw.close();
-            getResults(postingPath,stopWordsPath,f,stem, semantics,relevantCities,relevantLanguages);
+            getResults(postingPath,f,stem, semantics,relevantCities,relevantLanguages);
             f.delete();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * change results to observable list
+     * @param results the result
+     */
     private void resultsToObservableList(HashMap<String, LinkedList<String>> results) {
         ObservableList<ShowResultRecord> observableResult = FXCollections.observableArrayList();
         for (Map.Entry<String,LinkedList<String>> entry: results.entrySet())
@@ -337,6 +370,11 @@ public class Model extends Observable implements IModel {
         }
     }
 
+    /**
+     * get the 5 important entities
+     * @param docName document name
+     * @return 5 entities
+     */
     @Override
     public String show5words(String docName) {
         if (documentDictionary.containsKey(docName)){
@@ -349,7 +387,11 @@ public class Model extends Observable implements IModel {
         return "";
     }
 
-    public StringBuilder results() {
+    /**
+     * returns a string builder with the results ready to be written to the disk
+     * @return a string builder ready to be written
+     */
+    private StringBuilder results() {
         StringBuilder res = new StringBuilder();
         ArrayList<String> queryIDs= new ArrayList<>(m_results.keySet());
         queryIDs.sort(String.CASE_INSENSITIVE_ORDER);
@@ -363,6 +405,11 @@ public class Model extends Observable implements IModel {
         return res;
     }
 
+    /**
+     * writes the results to the disk
+     * @param dest destionatio of the write
+     * @return true if worked
+     */
     @Override
     public boolean writeRes(String dest) {
         FileWriter fileWriter = null;

@@ -20,7 +20,7 @@ public class MiniDictionary {
      * create new MiniDictionary
      * @param name name of the file and doc
      * @param city city of the doc
-     * @param docLang
+     * @param docLang document language
      */
     MiniDictionary(String name, String city, String title, String docLang){
         m_name=name;
@@ -183,6 +183,10 @@ public class MiniDictionary {
         return m_city;
     }
 
+    /**
+     * returns the document length
+     * @return document length
+     */
     public int getDocLength(){
         int count = 0;
         for (LinkedList l: m_dictionary.values()) {
@@ -191,6 +195,9 @@ public class MiniDictionary {
         return count;
     }
 
+    /**
+     * sets the 5 primary words
+     */
     public void setPrimaryWords() {
         Map<String,LinkedList<Integer>> inPlace = sorted(m_dictionary);
         int i =0;
@@ -207,10 +214,19 @@ public class MiniDictionary {
         }
     }
 
+    /**
+     * returns the primary words
+     * @return the primary words
+     */
     public Pair<String,Integer>[] getPrimaryWords(){
-            return places;
+        return places;
     }
 
+    /**
+     * sorts a map
+     * @param toSort which map should be sorted
+     * @return a sorted map
+     */
     private Map<String,LinkedList<Integer>> sorted(Map<String,LinkedList<Integer>> toSort){
         TreeMap<String,LinkedList<Integer>> sorted = new TreeMap<>((o1, o2) -> {
             if (o1.equals(o2))return 0;
@@ -222,9 +238,29 @@ public class MiniDictionary {
         return sorted;
     }
 
+    /**
+     * returns doc title
+     * @return doc title
+     */
     public String getTitle() {
         return m_title;
     }
 
+    /**
+     * returns document language
+     * @return document language
+     */
     public String getDocLang(){return m_lang;}
+
+    /**
+     * returns number of appearnces of words
+     * @return number of appearnces of words
+     */
+    public HashMap<String,Integer> countAppearances(){
+        HashMap<String,Integer> result = new HashMap<>();
+        for (Map.Entry<String,LinkedList<Integer>> entry: m_dictionary.entrySet()) {
+            result.put(entry.getKey(),entry.getValue().size());
+        }
+        return result;
+    }
 }

@@ -23,6 +23,14 @@ public class Manager {
     public static HashMap<String,double[]> vectors;
     public static Mutex m = new Mutex();
 
+    /**
+     * returns
+     * @param postingPath
+     * @param queries
+     * @param stem
+     * @param semantics
+     * @return
+     */
     HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem, boolean semantics){
         ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
         LinkedList<Query> queriesList = ReadQuery.readQueries(queries);
@@ -43,6 +51,11 @@ public class Manager {
 
     }
 
+    /**
+     * returns 50 or less results for a query
+     * @param queryResults the full results
+     * @return 50 relevant queries
+     */
     private LinkedList<String> getLimited(LinkedList<String> queryResults) {
         LinkedList<String> limited = new LinkedList<>();
         for (int i = 0; i < 50 && !queryResults.isEmpty(); i++) {
@@ -51,13 +64,12 @@ public class Manager {
         return limited;
     }
 
-
     /**
      * This function manages the index process by separating it to a few bunches
      * @param cityDictionary - the city dictionary
      * @param documentDictionary - the document dictionary
      * @param invertedIndex - the inverted index
-     * @param languages
+     * @param languages - the languages
      * @param corpusPath - the path of the corpus
      * @param destinationPath - the path where the postings will be written
      * @param stem - if stemming should be done
@@ -161,7 +173,7 @@ public class Manager {
      * @param citysMemoryDataBaseRESTAPI - the city database
      * @param invertedIndex - the inverted index
      * @param documentDictionary - the document dictionary
-     * @param languages
+     * @param languages - the languages
      */
     private void fillCityData(ConcurrentLinkedDeque<MiniDictionary> miniDicList, HashMap<String, CityInfoNode> cityDictionary, CitysMemoryDataBase citysMemoryDataBaseRESTAPI, InvertedIndex invertedIndex, HashMap<String, DocDictionaryNode> documentDictionary, HashSet<String> languages) {
         for (MiniDictionary mini : miniDicList) {

@@ -2,6 +2,9 @@ package Index;
 
 import javafx.util.Pair;
 
+/**
+ * represents a document
+ */
 public class DocDictionaryNode {
     private String m_docName; //doc name
     private int m_maxFreq; //the max freqenecy of a word existing in the doc
@@ -28,14 +31,6 @@ public class DocDictionaryNode {
 
     public String getDocName() {
         return m_docName;
-    }
-
-    public int getMaxFreq() {
-        return m_maxFreq;
-    }
-
-    public int getNumOfUniWords() {
-        return m_numOfUniWords;
     }
 
     public String getCity() {
@@ -80,6 +75,18 @@ public class DocDictionaryNode {
             s.append(m_primaryWords[i].getValue()).append("\t").append(m_primaryWords[i].getKey()).append("\n");
         }
         return s.toString();
+    }
+
+    public Pair<String, Integer>[] getPrimaryWords() {
+        return m_primaryWords;
+    }
+
+    public int getMaxFreq() {
+        return m_maxFreq;
+    }
+
+    public int getNumOfUniWords() {
+        return m_numOfUniWords;
     }
 }
 

@@ -1,10 +1,10 @@
 package Queries;
 
 public class Query {
-    private String m_num;
-    private String m_title;
-    private String m_description;
-    private String m_narrative;
+    private String m_num;//query num
+    private String m_title; //actual query
+    private String m_description;//description of query
+    private String m_narrative;//narrative of the query
 
     public Query(String num, String title, String description, String narrative) {
         this.m_num = num;
@@ -17,11 +17,11 @@ public class Query {
         return m_num;
     }
 
-    public String getTitle() {
+    String getTitle() {
         return m_title;
     }
 
-    public String getDescription() {
+    String getDescription() {
         return m_description;
     }
 

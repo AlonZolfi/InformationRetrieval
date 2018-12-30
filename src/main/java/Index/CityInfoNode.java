@@ -18,8 +18,19 @@ public class CityInfoNode {
         this.isCapital = is_Capital;
     }
 
+    /**
+     * the posting line in the inverted index
+     * @param posting posting line
+     */
+    public void setPosting(String posting){m_posting=posting;}
+
     public String getCity_name() {
         return city_name;
+    }
+
+    @Override
+    public String toString() {
+        return city_name+"\t"+country_name+"\t"+population_amount+"\t"+currency_sign+"\t"+m_posting+"\t"+isCapital+"\n";
     }
 
     public String getCountryName() {
@@ -32,12 +43,5 @@ public class CityInfoNode {
 
     public String getCurrencySign() {
         return  currency_sign;
-    }
-
-    public void setPosting(String posting){m_posting=posting;}
-
-    @Override
-    public String toString() {
-        return city_name+"\t"+country_name+"\t"+population_amount+"\t"+currency_sign+"\t"+m_posting+"\t"+isCapital+"\n";
     }
 }

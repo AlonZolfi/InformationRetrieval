@@ -13,9 +13,9 @@ public interface IModel {
 
     void loadDictionary(String path, boolean stem);
 
-    void getResults(String postingPath, String stopWordsPath, File queries, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages);
+    void getResults(String postingPath, File queries, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages);
 
-    void getResults(String postingPath, String stopWordsPath, String query, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages);
+    void getResults(String postingPath, String query, boolean stem, boolean semantics, List<String> relevantCities, List<String> relevantLanguages);
 
     void filterCities(List<String> toFilter);
 

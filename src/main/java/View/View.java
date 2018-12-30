@@ -68,6 +68,12 @@ public class View implements Observer, IView, Initializable {
 
     public CheckBox cb_semantics;
 
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        tabPane_main.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+    }
+
     /**
      * constructor of view, connect the view to the viewModel
      * @param viewModel the view model of the MVVM
@@ -75,6 +81,7 @@ public class View implements Observer, IView, Initializable {
     public void setViewModel(ViewModel viewModel) {
         this.viewModel = viewModel;
     }
+
     /**
      * This function starts the process of parse and index the dictionary
      */
@@ -84,6 +91,7 @@ public class View implements Observer, IView, Initializable {
         else
             viewModel.onStartClick(source.getText(),destination.getText(), doStemming());//transfer to the view Model
     }
+
     /**
      * This function deletes all the contents of the destination path
      */
@@ -101,6 +109,7 @@ public class View implements Observer, IView, Initializable {
 
 
     }
+
     /**
      * This function determines if we should stem or not
      * @return if we should stem or not
@@ -108,6 +117,7 @@ public class View implements Observer, IView, Initializable {
     private boolean doStemming(){
          return cb_stm.isSelected() || cb_searchStem.isSelected();
     }
+
     /**
      * a function that gets called when an observer has raised a flag for something that changed
      * @param o - who changed
@@ -127,8 +137,8 @@ public class View implements Observer, IView, Initializable {
                     if(toUpdate[1].substring(0,toUpdate[1].indexOf(" ")).equals("Dictionary")) {
                         btn_showDic.setDisable(false);
                         tab_search.setDisable(false);
-                        fillCities(ccb_cities,FXCollections.observableArrayList(listOfCities()));
-                        fillCities(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
+                        fillCheckComboBox(ccb_cities,FXCollections.observableArrayList(listOfCities()));
+                        fillCheckComboBox(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
                         lbl_docSpecialWords.setVisible(false);
                         btn_saveAnswers.setDisable(true);
                     }
@@ -143,13 +153,18 @@ public class View implements Observer, IView, Initializable {
                 showIndexResults((double[])arg);
                 btn_showDic.setDisable(false);
                 tab_search.setDisable(false);
-                fillCities(ccb_cities,FXCollections.observableArrayList(listOfCities()));
-                fillCities(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
+                fillCheckComboBox(ccb_cities,FXCollections.observableArrayList(listOfCities()));
+                fillCheckComboBox(ccb_languages,FXCollections.observableArrayList(listOfLanguages()));
                 lbl_docSpecialWords.setVisible(false);
                 btn_saveAnswers.setDisable(true);
             }
         }
     }
+
+    /**
+     * show the query number that were searched
+     * @param results query numbers
+     */
     private void showQueryResults(ObservableList<ShowResultRecord> results) {
         if(results != null){
             tableCol_query.setCellValueFactory(cellData -> cellData.getValue().sp_queryIDProperty());
@@ -165,6 +180,11 @@ public class View implements Observer, IView, Initializable {
             });
         }
     }
+
+    /**
+     * show the docs relevant for each query
+     * @param observable the
+     */
     private void showQueryResult(ObservableValue<ShowResultRecord> observable) {
         if(observable!=null) {
             ObservableList<ShowQueryResult> observableList = FXCollections.observableList(observable.getValue().getDocNames());
@@ -179,6 +199,7 @@ public class View implements Observer, IView, Initializable {
             });
         }
     }
+
     /**
      * This function lets the user select his corpus and stop words path
      */
@@ -192,6 +213,7 @@ public class View implements Observer, IView, Initializable {
         if (chosen!=null)
             source.setText(chosen.getAbsolutePath());
     }
+
     /***
      * This function lets the user select his  location to save the postings and other data
      */
@@ -205,12 +227,14 @@ public class View implements Observer, IView, Initializable {
         if (chosen!=null)
             destination.setText(chosen.getAbsolutePath());
     }
+
     /**
      * transfers a request to show the dictionary of the current indexing
      */
     public void showDictionaryClick() {
         viewModel.showDictionary();
     }
+
     /**
      * shows the data of the current indexing process such as: Number of docs, Number of terms, Total time to index
      * @param results the results of the current indexing
@@ -228,6 +252,7 @@ public class View implements Observer, IView, Initializable {
         lbl_totalTime.setVisible(true);
         lbl_totalTimeNum.setVisible(true);
     }
+
     /**
      * shows an observable list that contains all the data about the current indexing: Term and TF
      * @param records all the data about the current indexing
@@ -243,6 +268,7 @@ public class View implements Observer, IView, Initializable {
         lbl_docSpecialWords.setVisible(false);
         btn_saveAnswers.setDisable(true);*/
     }
+
     /**
      * transfers to the view model a load dictionary request
      */
@@ -252,6 +278,7 @@ public class View implements Observer, IView, Initializable {
         else
             MyAlert.showAlert(Alert.AlertType.ERROR,"Destination path cannot be empty");
     }
+
     /**
      * fill the cities list with the content of the cityDictionary
      */
@@ -277,6 +304,10 @@ public class View implements Observer, IView, Initializable {
         return null;
     }
 
+    /**
+     * initiates the languages in the CheckComboBox
+     * @return returns array list of languages
+     */
     private ArrayList<String> listOfLanguages() {
         ArrayList<String> langs = new ArrayList<>();
         if (!btn_showDic.isDisable()) {
@@ -285,8 +316,12 @@ public class View implements Observer, IView, Initializable {
         return langs;
     }
 
-
-    private void fillCities(CheckComboBox toFill, ObservableList list){
+    /**
+     * fills CheckComboBox ToFill with the list
+     * @param toFill combobox the fill
+     * @param list the list to fill the cb with
+     */
+    private void fillCheckComboBox(CheckComboBox toFill, ObservableList list){
         ArrayList<String> all = new ArrayList<>();
         all.add("All");
         ObservableList allos = FXCollections.observableArrayList(all);
@@ -304,7 +339,9 @@ public class View implements Observer, IView, Initializable {
         });
     }
 
-
+    /**
+     * when search query is clicked
+     */
     public void onSearchClick() {
         clearTables();
         if(destination.getText().equals("")) {
@@ -320,30 +357,41 @@ public class View implements Observer, IView, Initializable {
             return;
         }
         btn_saveAnswers.setDisable(false);
+        //get the cities that were flitered
         List<String> relevantCities = new ArrayList<>();
         ccb_cities.getCheckModel().getCheckedIndices();
         for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
             Integer integer = (Integer)o;
             relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
         }
+        //get the languages that were filtered
         List<String> relevantLanguages = new ArrayList<>();
         ccb_languages.getCheckModel().getCheckedIndices();
         for (Object o: ccb_languages.getCheckModel().getCheckedIndices()){
             Integer integer = (Integer)o;
             relevantLanguages.add(ccb_languages.getCheckModel().getItem(integer).toString());
         }
+
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
             viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities,relevantLanguages);
         else
             viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),useSemantics(),relevantCities,relevantLanguages);
     }
+
+    /**
+     * clears table when a new query is entered
+     */
     private void clearTables() {
         lbl_docSpecialWords.setText("");
         table_showResults.getItems().clear();
         table_showDocs.getItems().clear();
     }
-    public void btn_browseQueries(ActionEvent actionEvent) {
+
+    /**
+     * browse a location of the queries
+     */
+    public void btn_browseQueries() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Destination Path");
         File defaultDirectory = new File("C:");
@@ -354,6 +402,11 @@ public class View implements Observer, IView, Initializable {
             queryFile = chosen;
         }
     }
+
+    /**
+     * returns the 5 Entities of a document
+     * @param docName document name
+     */
     private void show5words(String docName){
         String fiveIdentities = viewModel.show5words(docName);
         if(fiveIdentities.equals(""))
@@ -361,10 +414,10 @@ public class View implements Observer, IView, Initializable {
         lbl_docSpecialWords.setText(fiveIdentities);
         lbl_docSpecialWords.setVisible(true);
     }
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        tabPane_main.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-    }
+
+    /**
+     * browse a location to save the results
+     */
     public void btn_browsePathForAnswer() {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle("Load Destination Path");
@@ -376,6 +429,9 @@ public class View implements Observer, IView, Initializable {
         }
     }
 
+    /**
+     * save the result to a file
+     */
     public void saveResults(){
         if(tf_saveResultIn.getText().equals("")) {
             MyAlert.showAlert(Alert.AlertType.ERROR, "Choose where to save the results");
@@ -387,6 +443,10 @@ public class View implements Observer, IView, Initializable {
         else MyAlert.showAlert(Alert.AlertType.ERROR, "Please try again later...");
     }
 
+    /**
+     * manage duplicate stem checkbox
+     * @param actionEvent a
+     */
     public void duplicateStem(ActionEvent actionEvent) {
         if(actionEvent.getSource().equals(cb_stm)) {
             if (cb_stm.isSelected())
@@ -402,10 +462,10 @@ public class View implements Observer, IView, Initializable {
         }
     }
 
-    public void clearCitySelection(){
-
-    }
-
+    /**
+     * whether semantics should be used
+      * @return true for semantics, false otherwise
+     */
     private boolean useSemantics(){
         return cb_semantics.isSelected();
     }

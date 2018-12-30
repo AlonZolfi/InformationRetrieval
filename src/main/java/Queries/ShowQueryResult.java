@@ -4,12 +4,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class ShowQueryResult {
-
-    private String docName;
     private StringProperty sp_docName;
 
-    public ShowQueryResult(String docName) {
-        this.docName = docName;
+    ShowQueryResult(String docName) {
         sp_docName = new SimpleStringProperty(docName);
     }
 

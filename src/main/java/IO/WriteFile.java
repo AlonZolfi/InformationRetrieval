@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WriteFile {
+
     /**
      * writes a tmp posting to the disk
      * @param path the path where it should be written
@@ -111,6 +112,21 @@ public class WriteFile {
     }
 
     /**
+     * writes the languages to the disk
+     * @param destinationPath the path where it should be written
+     * @param languages the languages
+     */
+    public static void writeLanguages(String destinationPath, HashSet<String> languages) {
+        StringBuilder toWrite = new StringBuilder();
+        for (String cur :languages)
+            toWrite.append(cur).append("\n");
+        File dir = new File(destinationPath);
+        String fileName = "Languages.txt";
+        File actualFile = new File(dir,fileName);
+        write(actualFile,toWrite);
+    }
+
+    /**
      * write a certain string to the file
      * @param actualFile the file to be written to
      * @param toWrite what should be written
@@ -126,15 +142,5 @@ public class WriteFile {
             e.printStackTrace();
         }
 
-    }
-
-    public static void writeLanguages(String destinationPath, HashSet<String> languages) {
-        StringBuilder toWrite = new StringBuilder();
-        for (String cur :languages)
-            toWrite.append(cur).append("\n");
-        File dir = new File(destinationPath);
-        String fileName = "Languages.txt";
-        File actualFile = new File(dir,fileName);
-        write(actualFile,toWrite);
     }
 }

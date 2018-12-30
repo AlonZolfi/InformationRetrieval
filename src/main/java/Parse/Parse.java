@@ -50,7 +50,10 @@ public class Parse implements Callable<MiniDictionary> {
         //list of next words from the current term
         LinkedList<String> nextWord = new LinkedList<>();
         //the mini dictionary that will be filled according to the terms
-        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity(),corpus_doc.getDocTitle(),corpus_doc.getDocLang());
+        String lang = corpus_doc.getDocLang();
+        if(!corpus_doc.getDocLang().equals(""))
+            lang = cleanLanguage(lang);
+        MiniDictionary miniDic = new MiniDictionary(corpus_doc.getDocNum(),corpus_doc.getDocCity(),corpus_doc.getDocTitle(),lang);
         //the index of the
         int index = 0;
         while (!wordList.isEmpty()) {
@@ -206,6 +209,27 @@ public class Parse implements Callable<MiniDictionary> {
             }
         }
         return miniDic;
+    }
+
+    /**
+     * removes unwanted letters from language
+     * @param lang the language
+     * @return clean word
+     */
+    private String cleanLanguage(String lang) {
+        String language = lang;
+        int idx = lang.indexOf(" ");
+        if(idx!=-1)
+            language = language.substring(0,idx);
+        int i = language.length() - 1;
+        while (i >= 0 && !Character.isLetter(language.charAt(i))) {
+            language = language.substring(0, i);
+            i--;
+        }
+        while (language.length()>0 && !Character.isLetter(language.charAt(0))) {
+            language = language.substring(1);
+        }
+        return language;
     }
 
     /**

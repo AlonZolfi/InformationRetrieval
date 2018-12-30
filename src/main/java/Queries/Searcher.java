@@ -3,6 +3,7 @@ package Queries;
 import IO.ReadFile;
 import Model.*;
 import Parse.*;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -10,13 +11,11 @@ import java.util.concurrent.Callable;
 
 import static java.util.Collections.reverseOrder;
 
-
 public class Searcher implements Callable<LinkedList<String>> {
-    private String postingPath;
-    private boolean stem;
-    private boolean semantics;
-    private Query q;
-
+    private String postingPath;//path of the postings
+    private boolean stem;//whether words should be stemmed
+    private boolean semantics;//if we should improve results with semantics
+    private Query q;//the query
 
     public Searcher(String postingPath, boolean stem, boolean semantics, Query q) {
         this.postingPath = postingPath;
@@ -25,27 +24,38 @@ public class Searcher implements Callable<LinkedList<String>> {
         this.q =q;
     }
 
-    public LinkedList<String> getQueryResults() {
+    @Override
+    public LinkedList<String> call() throws Exception {
+        return getQueryResults();
+    }
+
+    /**
+     * Search for relevant documents for the given query
+     * @return relevant documents
+     */
+    private LinkedList<String> getQueryResults() {
         //parse query
-        String s = q.getTitle();
-        Parse p = new Parse(new CorpusDocument("","","","",s +" " + q.getDescription(),"",""),stem);
+        Parse p = new Parse(new CorpusDocument("","","","",q.getTitle() +" " + q.getDescription(),"",""),stem);
         MiniDictionary md = p.parse(true);
-        Set<String> hs =  new HashSet<>(md.listOfWords());
+        //Set<String> hs =  new HashSet<>(md.listOfWords());
+        HashMap<String, Integer> wordsCountInQuery = md.countAppearances(); //count word in the query
+
+        //search for semantic words if asked for
         Set<String> semanticWords = new HashSet<>();
         if(semantics)
-            semanticWords = improveWithSemantics(hs, q.getTitle());
-        if(semanticWords.size()>0)
-            System.out.println(semanticWords.size());
+            semanticWords = improveWithSemantics(wordsCountInQuery, q.getTitle().toLowerCase());
 
         //prepare for calculation
-        HashMap<String, Integer> wordsCountInQuery = putWordsInMap(hs);
-        HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
         CaseInsensitiveMap wordsPosting = getPosting(wordsCountInQuery.keySet());
+
+        //get all doc occurences of the cities
+        HashSet<String> docsByCitiesFilter = getCitiesDocs(getPosting(Model.usedCities));
+
         //objects for the iteration
         Ranker ranker = new Ranker(wordsCountInQuery);
         HashMap<String, Double> score = new HashMap<>();
 
-
+        //for each word go throw its posting with relevant documents
         for (String word : wordsCountInQuery.keySet())
         {
             if (!wordsPosting.get(word).equals("")) {
@@ -71,25 +81,48 @@ public class Searcher implements Callable<LinkedList<String>> {
                 }
             }
         }
+        calculate5Entities(score,wordsCountInQuery.keySet(),semanticWords);
         return sortByScore(score);
     }
 
-    @Override
-    public LinkedList<String> call() throws Exception {
-        return getQueryResults();
+    /**
+     * adds to the score the 5 entities algorithm
+     * @param score score map
+     * @param wordsInQuery words of query
+     * @param semanticWords words of semnatic
+     */
+    private void calculate5Entities(HashMap<String, Double> score, Set<String> wordsInQuery, Set<String> semanticWords) {
+        for (String docName: score.keySet()){
+            Pair<String,Integer>[] five = Model.documentDictionary.get(docName).getPrimaryWords();
+            if(five!=null){
+                for (Pair<String, Integer> aFive : five) {
+                    if (aFive != null && wordsInQuery.contains(aFive.getKey()) && !semanticWords.contains(aFive.getKey())) {
+                        addToScore(score, docName, 1.5);
+                    }
+                }
+            }
+        }
     }
 
-    private HashSet<String> improveWithSemantics(Set<String> wordsSet, String hs) {
+    /**
+     * calculates cosine simularity of vectors to get semantic words
+     * @param wordsMap words to get semantic words for
+     * @param query actual query
+     * @return the semantic words
+     */
+    private HashSet<String> improveWithSemantics(HashMap<String,Integer> wordsMap, String query) {
         HashSet<String> result = new HashSet<>();
-        String[] split = StringUtils.split(hs," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
+        //get the hash map of the GLOVE file
         try {
             Manager.m.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         if(Manager.vectors==null)
-            Manager.vectors = getVectorString();
+            Manager.vectors = buildSemanticMap();
         Manager.m.release();
+        //go throw each word and search for semantic words
+        String[] split = StringUtils.split(query," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
         for (String word:split) {
             if (Manager.vectors!=null && Manager.vectors.containsKey(word)) {
                 double[] wordVector = Manager.vectors.get(word);
@@ -97,9 +130,10 @@ public class Searcher implements Callable<LinkedList<String>> {
                     double mone = 0;
                     double mecaneword = 0;
                     double mecaneVec = 0;
-                    if (vec.getKey().equals(word) || vec.getValue().length!=wordVector.length)
+                    if (wordsMap.containsKey(vec.getKey()) || vec.getValue().length!=wordVector.length)
                         continue;
                     int end = Math.min(vec.getValue().length-1,wordVector.length);
+                    //calculate similarity
                     for (int i = 0; i < end-1; i++) {
                         mone += wordVector[i] * vec.getValue()[i];
                         mecaneword += Math.pow(wordVector[i], 2);
@@ -107,7 +141,7 @@ public class Searcher implements Callable<LinkedList<String>> {
                     }
                     double res = mone / (Math.sqrt(mecaneVec) * Math.sqrt(mecaneword));
                     if (res >= 0.85) {
-                        wordsSet.add(vec.getKey());
+                        wordsMap.put(vec.getKey(),1);
                         result.add(vec.getKey());
                     }
                 }
@@ -116,7 +150,11 @@ public class Searcher implements Callable<LinkedList<String>> {
         return result;
     }
 
-    private HashMap<String, double[]> getVectorString() {
+    /**
+     * builds the semantic map according to the file
+     * @return map - words as keys and vectors as values
+     */
+    private HashMap<String, double[]> buildSemanticMap() {
         HashMap<String, double[]> result = new HashMap<>();
         List<String> vectors = ReadFile.fileToList("src/glove.txt");
         for (String line : vectors) {
@@ -130,21 +168,14 @@ public class Searcher implements Callable<LinkedList<String>> {
         return result;
     }
 
-    private String createNewQuery(Query q) {
-        StringBuilder queryTitle = new StringBuilder(q.getTitle().toLowerCase());
-        String[] split = StringUtils.split(queryTitle.toString()," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
-        for (String aSplit : split) {
-            for (String aSplit1 : split) {
-                if (!getPostingLineNumber(aSplit + "-" + aSplit1).equals("")) {
-                    queryTitle.append(" ").append(aSplit).append("-").append(aSplit1);
-                }
-            }
-        }
-        return  queryTitle.toString();
-
-    }
-
+    /**
+     * calculates the doc title with the query
+     * @param score map of scores
+     * @param docName document name
+     * @param wordsSet words of query
+     */
     private void calculateDocTitle(HashMap<String, Double> score, String docName, Set<String> wordsSet) {
+        //go throw all words of title and check if words appear in the query
         String title = Model.documentDictionary.get(docName).getTitle().toLowerCase();
         if(!title.equals("")){
             String[] split = StringUtils.split(title," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
@@ -155,14 +186,11 @@ public class Searcher implements Callable<LinkedList<String>> {
         }
     }
 
-    private void putDescInMap(HashMap<String, Integer> wordsCountInQuery, String description) {
-        String[] split = StringUtils.split(description," ~;!?=#&^*+\\|:\"(){}[]<>\n\r\t");
-        for (String word: split) {
-            if(wordsCountInQuery.containsKey(word))
-                wordsCountInQuery.replace(word,wordsCountInQuery.get(word)+1);
-        }
-    }
-
+    /**
+     * returns the docs that are relevant for the filtered cities (where the city appears in the text)
+     * @param postings posting lines for the cities
+     * @return relevant docs
+     */
     private HashSet<String> getCitiesDocs(CaseInsensitiveMap postings) {
         HashSet<String> citiesDocs = new HashSet<>();
         for (String postingLine:postings.values()) {
@@ -175,6 +203,11 @@ public class Searcher implements Callable<LinkedList<String>> {
         return citiesDocs;
     }
 
+    /**
+     * checks if documents city is in the city filter
+     * @param city_name name of the city
+     * @return true if is in filter, false otherwise
+     */
     private boolean isInFilter(String city_name) {
         for (String city: Model.usedCities){
             if(city.equals(city_name))
@@ -183,6 +216,11 @@ public class Searcher implements Callable<LinkedList<String>> {
         return false;
     }
 
+    /**
+     * sort the scores of documents from higher to lower
+     * @param score scores to sort
+     * @return sorted list
+     */
     private LinkedList<String> sortByScore(HashMap<String, Double> score) {
         List<Map.Entry<String,Double>> list = new ArrayList<>(score.entrySet());
         list.sort(reverseOrder(Map.Entry.comparingByValue()));
@@ -194,6 +232,12 @@ public class Searcher implements Callable<LinkedList<String>> {
         return result;
     }
 
+    /**
+     * adds the new score to the score of the document
+     * @param score scores of documents
+     * @param docName document name
+     * @param newScore new score be added
+     */
     private void addToScore(HashMap<String, Double> score, String docName, double newScore) {
         if(newScore!=0) {
             Double d = score.get(docName);
@@ -203,11 +247,21 @@ public class Searcher implements Callable<LinkedList<String>> {
         }
     }
 
+    /**
+     * returns the IDF of a word in the corpus
+     * @param length number of docs the word appears in
+     * @return calculated IDF
+     */
     private Double getIDF(int length) {
         double docInCorpusCount = Model.documentDictionary.keySet().size();
         return Math.log10((docInCorpusCount+1)/length);
     }
 
+    /**
+     * gets the posting of all query words
+     * @param query query words
+     * @return the postings of the words
+     */
     private CaseInsensitiveMap getPosting(Set<String> query) {
         CaseInsensitiveMap words = new CaseInsensitiveMap();
         HashMap<Character, LinkedList<Integer>> allCharactersTogether = new HashMap<>();
@@ -240,18 +294,11 @@ public class Searcher implements Callable<LinkedList<String>> {
         return words;
     }
 
-    private HashMap<String, Integer> putWordsInMap(Set<String> query) {
-        HashMap<String,Integer> words = new HashMap<>();
-        for (String word: query) {
-            if (!words.containsKey(word) && !getPostingLineNumber(word).equals(""))
-                words.put(word, 1);
-            else if(words.containsKey(word))
-                words.replace(word, words.get(word) + 1);
-
-        }
-        return words;
-    }
-
+    /**
+     * returns the posting line number in the file
+     * @param word the word
+     * @return line number
+     */
     private String getPostingLineNumber(String word){
         String lineNumber = Model.invertedIndex.getPostingLink(word.toLowerCase());
         if(lineNumber.equals(""))
