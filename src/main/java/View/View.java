@@ -264,9 +264,6 @@ public class View implements Observer, IView, Initializable {
             table_showDic.setItems(records);
         }
         btn_showDic.setDisable(false);
-        /*tab_search.setDisable(false);
-        lbl_docSpecialWords.setVisible(false);
-        btn_saveAnswers.setDisable(true);*/
     }
 
     /**
@@ -374,9 +371,9 @@ public class View implements Observer, IView, Initializable {
 
         String simpleQuery = tf_simpleQuery.getText();
         if (!simpleQuery.equals(""))
-            viewModel.simpleQuery(destination.getText(),source.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities,relevantLanguages);
+            viewModel.simpleQuery(destination.getText(),simpleQuery,doStemming(),useSemantics(),relevantCities,relevantLanguages);
         else
-            viewModel.fileQuery(destination.getText(),source.getText(),queryFile,doStemming(),useSemantics(),relevantCities,relevantLanguages);
+            viewModel.fileQuery(destination.getText(),queryFile,doStemming(),useSemantics(),relevantCities,relevantLanguages);
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 public class ReadFile {
 
-    public static Mutex m = new Mutex();
+    private static Mutex m = new Mutex();
 
     /**
      * initiate the stop words set containing all the stop words
@@ -67,6 +67,14 @@ public class ReadFile {
         return allDocsInCorpus;
     }
 
+    /**
+     * returns the lines in the file with the given indices
+     * @param path posting path
+     * @param c char posting
+     * @param indices indices to be brought
+     * @param stem if posting is stemmed
+     * @return posting lines
+     */
     public static LinkedList<String> readPostingLineAtIndex(String path, char c, LinkedList<Integer> indices, boolean stem){
         try {
             m.acquire();
@@ -90,6 +98,11 @@ public class ReadFile {
         return postings;
     }
 
+    /**
+     * file lines to linked list
+     * @param path of file
+     * @return linked list with all lines of file
+     */
     public static List<String> fileToList(String path){
         List<String> l = null;
         try {

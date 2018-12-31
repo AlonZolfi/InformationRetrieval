@@ -24,12 +24,12 @@ public class Manager {
     public static Mutex m = new Mutex();
 
     /**
-     * returns
-     * @param postingPath
-     * @param queries
-     * @param stem
-     * @param semantics
-     * @return
+     * returns the query results for each query
+     * @param postingPath path of posting
+     * @param queries the queries to search
+     * @param stem if we should stem
+     * @param semantics if we should improve semantics
+     * @return the results for all queries
      */
     HashMap<String, LinkedList<String>> calculateQueries(String postingPath, File queries, boolean stem, boolean semantics){
         ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);

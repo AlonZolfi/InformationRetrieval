@@ -20,15 +20,14 @@ class Ranker {
      * @param documentName document name
      * @param tf number of appearnces of the word in the document
      * @param idf idf of the word
-     * @param weight what weight should be in the word
      * @return the value of part of BM25 (word with doc)
      */
-    double BM25(String word, String documentName, int tf, double idf, double weight) {
+    double BM25(String word, String documentName, int tf, double idf) {
         double k = 1.2, b= 0.75;
         int documentLength = Model.documentDictionary.get(documentName).getDocLength();
         int wordInQueryCount = m_wordsCount.get(word);
-        double numeratorBM25 = wordInQueryCount * (k + 1) * weight*tf * idf;
-        double denominatorBM25 = weight*tf + k * (1 - b + (b * (documentLength / m_averageDocumentLength)));
+        double numeratorBM25 = wordInQueryCount * (k + 1) * tf * idf;
+        double denominatorBM25 = tf + k * (1 - b + (b * (documentLength / m_averageDocumentLength)));
         return numeratorBM25 / denominatorBM25;
     }
 

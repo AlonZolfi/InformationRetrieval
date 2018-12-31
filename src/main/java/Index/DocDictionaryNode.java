@@ -8,12 +8,12 @@ import javafx.util.Pair;
 public class DocDictionaryNode {
     private String m_docName; //doc name
     private int m_maxFreq; //the max freqenecy of a word existing in the doc
-    private String m_docLang;
+    private String m_docLang;//the language of the document
     private String m_maxFreqWord; // the word that exists most of the times
     private int m_numOfUniWords; //number of unique words in the document
     private String m_city; //city that represents the country the doc came from
     private int m_docLength;//length of the doc in words
-    private String m_title;
+    private String m_title;//the title of the document
     private Pair<String,Integer>[] m_primaryWords;
 
     public DocDictionaryNode(String docName, int maxFreq, String docLang, int numOfUniWords, String city, String maxFreqWord, int docLength, String title, Pair<String,Integer>[] primaryWords) {

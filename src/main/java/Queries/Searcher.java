@@ -37,7 +37,6 @@ public class Searcher implements Callable<LinkedList<String>> {
         //parse query
         Parse p = new Parse(new CorpusDocument("","","","",q.getTitle() +" " + q.getDescription(),"",""),stem);
         MiniDictionary md = p.parse(true);
-        //Set<String> hs =  new HashSet<>(md.listOfWords());
         HashMap<String, Integer> wordsCountInQuery = md.countAppearances(); //count word in the query
 
         //search for semantic words if asked for
@@ -56,24 +55,23 @@ public class Searcher implements Callable<LinkedList<String>> {
         HashMap<String, Double> score = new HashMap<>();
 
         //for each word go throw its posting with relevant documents
-        for (String word : wordsCountInQuery.keySet())
-        {
+        for (String word : wordsCountInQuery.keySet()) {
             if (!wordsPosting.get(word).equals("")) {
                 String postingLine = wordsPosting.get(word);
                 String[] split = postingLine.split("\\|");
                 double idf = getIDF(split.length-1);
                 double weight = 1;
                 if(semanticWords.contains(word))
-                    weight = 0.5;
+                    weight = 0.35;
                 else if (word.contains("-"))
-                    weight = 5;
+                    weight = 1.15;
                 for (String aSplit : split) {
                     String[] splitLine = aSplit.split(",");
                     String docName = splitLine[0];
                     if (splitLine.length>1 &&(Model.usedCities.size()==0 || isInFilter(Model.documentDictionary.get(docName).getCity())) || docsByCitiesFilter.contains(docName)) {
                         if (Model.usedLanguages.size() == 0 || Model.usedLanguages.contains(Model.documentDictionary.get(docName).getDocLang())) {
                             int tf = Integer.parseInt(splitLine[1]);
-                            double BM25 = ranker.BM25(word, docName, tf, idf, weight);
+                            double BM25 = weight * ranker.BM25(word, docName, tf, idf);
                             addToScore(score, docName, BM25);
                             calculateDocTitle(score, docName, wordsPosting.keySet());
                         }
@@ -97,7 +95,7 @@ public class Searcher implements Callable<LinkedList<String>> {
             if(five!=null){
                 for (Pair<String, Integer> aFive : five) {
                     if (aFive != null && wordsInQuery.contains(aFive.getKey()) && !semanticWords.contains(aFive.getKey())) {
-                        addToScore(score, docName, 1.5);
+                        addToScore(score, docName, 0.1);
                     }
                 }
             }
@@ -130,7 +128,7 @@ public class Searcher implements Callable<LinkedList<String>> {
                     double mone = 0;
                     double mecaneword = 0;
                     double mecaneVec = 0;
-                    if (wordsMap.containsKey(vec.getKey()) || vec.getValue().length!=wordVector.length)
+                    if (wordExistsInQuery(split, vec.getKey()) || vec.getValue().length != wordVector.length)
                         continue;
                     int end = Math.min(vec.getValue().length-1,wordVector.length);
                     //calculate similarity
@@ -140,14 +138,33 @@ public class Searcher implements Callable<LinkedList<String>> {
                         mecaneVec += Math.pow(vec.getValue()[i], 2);
                     }
                     double res = mone / (Math.sqrt(mecaneVec) * Math.sqrt(mecaneword));
-                    if (res >= 0.85) {
-                        wordsMap.put(vec.getKey(),1);
-                        result.add(vec.getKey());
+                    if (res >= 0.83 && !Model.invertedIndex.getPostingLink(vec.getKey()).equals("")) {
+                        String newSemWord = vec.getKey();
+                        if(stem){
+                            Parse p = new Parse(new CorpusDocument("","","","",vec.getKey(),"",""),stem);
+                            MiniDictionary md = p.parse(true);
+                            newSemWord = md.getMaxFreqWord();
+                        }
+                        if(!wordExistsInMap(wordsMap,newSemWord)) {
+                            wordsMap.put(newSemWord, 1);
+                            result.add(newSemWord);
+                        }
                     }
                 }
             }
         }
         return result;
+    }
+
+    private boolean wordExistsInQuery(String[] split, String key) {
+        for (String word:split)
+            if (word.equals(key))
+                return true;
+        return false;
+    }
+
+    private boolean wordExistsInMap(HashMap<String, Integer> wordsMap, String newSemWord){
+        return wordsMap.containsKey(newSemWord.toLowerCase()) || wordsMap.containsKey(newSemWord.toUpperCase());
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ReadQuery {
+
     public static LinkedList<Query> readQueries(File queries){
         FileInputStream fis = null;
         LinkedList<Query> queryList=null;
