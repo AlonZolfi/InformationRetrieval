@@ -24,6 +24,7 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader();
         Parent root = fxmlLoader.load(getClass().getClassLoader().getResource("View.fxml").openStream());
         primaryStage.setScene(new Scene(root));
+        primaryStage.setResizable(false);
         //--------------
         View view = fxmlLoader.getController();
         view.setViewModel(viewModel);

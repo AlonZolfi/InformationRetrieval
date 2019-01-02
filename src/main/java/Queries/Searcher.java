@@ -156,6 +156,12 @@ public class Searcher implements Callable<LinkedList<String>> {
         return result;
     }
 
+    /**
+     * checks if the word exists in the query
+     * @param split words in the query
+     * @param key the word
+     * @return true if exists false otherwise
+     */
     private boolean wordExistsInQuery(String[] split, String key) {
         for (String word:split)
             if (word.equals(key))
@@ -163,6 +169,12 @@ public class Searcher implements Callable<LinkedList<String>> {
         return false;
     }
 
+    /**
+     * checks if a word exists in a map
+     * @param wordsMap map of words
+     * @param newSemWord the word
+     * @return true if exists, false otherwise
+     */
     private boolean wordExistsInMap(HashMap<String, Integer> wordsMap, String newSemWord){
         return wordsMap.containsKey(newSemWord.toLowerCase()) || wordsMap.containsKey(newSemWord.toUpperCase());
     }

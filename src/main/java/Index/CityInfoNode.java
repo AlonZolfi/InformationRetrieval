@@ -1,5 +1,8 @@
 package Index;
 
+/**
+ * represents a city in the corpus
+ */
 public class CityInfoNode {
 
     private String city_name;

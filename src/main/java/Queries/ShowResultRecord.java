@@ -20,6 +20,11 @@ public class ShowResultRecord {
         this.sp_docNames = new SimpleStringProperty(docNames.toString());
     }
 
+    /**
+     * returns list of QueryResult object
+     * @param docNames document names
+     * @return list of query result object
+     */
     private LinkedList<ShowQueryResult> toQueryResultList(LinkedList<String> docNames) {
         LinkedList<ShowQueryResult> l = new LinkedList<>();
         for (String s:docNames) {

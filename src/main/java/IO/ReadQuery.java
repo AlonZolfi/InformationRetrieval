@@ -15,6 +15,11 @@ import java.util.List;
 
 public class ReadQuery {
 
+    /**
+     * reads queries from a file
+     * @param queries queries file
+     * @return list of Query object
+     */
     public static LinkedList<Query> readQueries(File queries){
         FileInputStream fis = null;
         LinkedList<Query> queryList=null;

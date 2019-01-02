@@ -1,5 +1,8 @@
 package Queries;
 
+/**
+ * represents a query
+ */
 public class Query {
     private String m_num;//query num
     private String m_title; //actual query

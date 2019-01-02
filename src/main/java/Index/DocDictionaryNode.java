@@ -67,6 +67,10 @@ public class DocDictionaryNode {
 
     }
 
+    /**
+     * returnd 5 strongest entities  in the document
+     * @return string of 5 entities
+     */
     public String get5words() {
         StringBuilder s =new StringBuilder();
         for (int i = 0; i <m_primaryWords.length ; i++) {
