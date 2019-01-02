@@ -6,6 +6,7 @@ import Parse.*;
 import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 
@@ -185,7 +186,8 @@ public class Searcher implements Callable<LinkedList<String>> {
      */
     private HashMap<String, double[]> buildSemanticMap() {
         HashMap<String, double[]> result = new HashMap<>();
-        List<String> vectors = ReadFile.fileToList("src/glove.txt");
+        File file = new File("./");
+        List<String> vectors = ReadFile.fileToList(file.getAbsolutePath()+"\\src\\main\\resources\\glove.txt");//getClass().getResource("/glove.txt").getPath()/*);
         for (String line : vectors) {
             String[] split = line.split(" ");
             double[] values = new double[split.length - 1];
