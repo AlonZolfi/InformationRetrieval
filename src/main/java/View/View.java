@@ -359,14 +359,16 @@ public class View implements Observer, IView, Initializable {
         ccb_cities.getCheckModel().getCheckedIndices();
         for (Object o: ccb_cities.getCheckModel().getCheckedIndices()){
             Integer integer = (Integer)o;
-            relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
+            if(integer!=0)
+                relevantCities.add(ccb_cities.getCheckModel().getItem(integer).toString());
         }
         //get the languages that were filtered
         List<String> relevantLanguages = new ArrayList<>();
         ccb_languages.getCheckModel().getCheckedIndices();
         for (Object o: ccb_languages.getCheckModel().getCheckedIndices()){
             Integer integer = (Integer)o;
-            relevantLanguages.add(ccb_languages.getCheckModel().getItem(integer).toString());
+            if(integer!=0)
+                relevantLanguages.add(ccb_languages.getCheckModel().getItem(integer).toString());
         }
 
         String simpleQuery = tf_simpleQuery.getText();

@@ -41,6 +41,8 @@ public class Model extends Observable implements IModel {
             Manager man = new Manager();
             if(stm)
                 dictionaryIsStemmed =true;
+            else
+                dictionaryIsStemmed=false;
             stopWords = ReadFile.initSet(paths[2]);
             invertedIndex = new InvertedIndex();
             documentDictionary = new HashMap<>();
@@ -118,6 +120,8 @@ public class Model extends Observable implements IModel {
                 if ((file.getName().equals("StemInvertedFile.txt") && stem)||(file.getName().equals("InvertedFile.txt"))&&!stem) {
                     if(stem)
                         dictionaryIsStemmed =true;
+                    else
+                        dictionaryIsStemmed=false;
                     invertedIndex = new InvertedIndex(file);
                     foundInvertedIndex = true;
                 }
@@ -297,7 +301,7 @@ public class Model extends Observable implements IModel {
             return;
         }
         filterCities(relevantCities);
-        usedLanguages = new HashSet<>(relevantCities);
+        usedLanguages = new HashSet<>(relevantLanguages);
         Manager m = new Manager();
         HashMap<String, LinkedList<String>> results = m_results = m.calculateQueries(postingPath,queries,stem,semantics);
         usedCities = null;
